@@ -1,15 +1,10 @@
-import ReactDOM from 'react-dom/client';
 
-function App() {
-  return (
-    <div>
-      <h1>Hello from React Webview!</h1>
-    </div>
-  );
-}
+import ReactDOM from 'react-dom/client';
+import PupilEditor from './PupilEditor.js';
 
 const container = document.getElementById('root');
+
 if (container) {
   const root = ReactDOM.createRoot(container);
-  root.render(<App />);
+  root.render(<PupilEditor />);
 }
