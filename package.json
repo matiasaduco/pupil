@@ -30,7 +30,6 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-
     "dev": "vite dev --config vite.config.ts",
     "build": "vite build --config vite.config.ts"
   },
@@ -40,6 +39,8 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@types/vscode": "^1.103.0",
+    "@types/webgl2": "^0.0.11",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^5.0.0",
@@ -50,9 +51,11 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "express": "^5.1.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
-  }
-  ,
-    "type": "module"
-  }
+    "react-dom": "^19.1.1",
+    "webgazer": "^3.4.0",
+    "ws": "^8.18.3"
+  },
+  "type": "module"
+}
