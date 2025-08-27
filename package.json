@@ -12,14 +12,28 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
+    "customEditors": [
       {
-        "command": "pupil.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "pupil.openWebview",
-        "title": "Abrir Webview React"
+        "viewType": "pupil.editor",
+        "displayName": "Pupil Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.js"
+          },
+          {
+            "filenamePattern": "*.ts"
+          },
+          {
+            "filenamePattern": "*.html"
+          },
+          {
+            "filenamePattern": "*.css"
+          },
+          {
+            "filenamePattern": "*.json"
+          }
+        ],
+        "priority": "default"
       }
     ]
   },
@@ -30,14 +44,13 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-
     "dev": "vite dev --config vite.config.ts",
     "build": "vite build --config vite.config.ts"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/react": "^19.1.10",
+    "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "@types/vscode": "^1.103.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
@@ -50,9 +63,10 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-editor": "^0.52.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
-  }
-  ,
-    "type": "module"
-  }
+  },
+  "type": "module"
+}
