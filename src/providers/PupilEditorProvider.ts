@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getWebviewContent } from '../utils/getWebviewContent.js';
+import { getEditorContent } from '../utils/getEditorContent.js';
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	constructor(private readonly context: vscode.ExtensionContext) {}
@@ -31,7 +31,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			]
 		};
 
-		webviewPanel.webview.html = getWebviewContent(this.context, webviewPanel.webview);
+		webviewPanel.webview.html = getEditorContent(this.context, webviewPanel.webview);
 
 		const eventsListener = vscode.window.onDidChangeActiveColorTheme(() => {
 			this.updateTheme(webviewPanel);

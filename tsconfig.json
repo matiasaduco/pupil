@@ -13,6 +13,7 @@
 		"jsx": "react-jsx",
 		"esModuleInterop": true,
 		"allowJs": true,
+		"typeRoots": ["./node_modules/@types"],
 		"resolveJsonModule": true,
 		"skipLibCheck": true
 		/* Additional Checks */
@@ -21,5 +22,5 @@
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
 	"include": ["src", "src/global.d.ts"],
-	"exclude": ["node_modules", "dist", "**/*.mjs", "vite.config.ts"]
+	"exclude": ["node_modules", "dist", "**/*.mjs", "vite.config.ts", "node_modules/@types/webgl2"]
 }

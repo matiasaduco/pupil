@@ -12,6 +12,12 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "pupil.openWebview",
+        "title": "Start Pupil"
+      }
+    ],
     "customEditors": [
       {
         "viewType": "pupil.editor",
@@ -53,6 +59,8 @@
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "@types/vscode": "^1.103.0",
+    "@types/webgl2": "^0.0.11",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^5.0.0",
@@ -64,10 +72,13 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
+    "express": "^5.1.0",
     "monaco-editor": "^0.52.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-simple-keyboard": "^3.8.116"
+    "react-simple-keyboard": "^3.8.116",
+    "webgazer": "^3.4.0",
+    "ws": "^8.18.3"
   },
   "type": "module"
 }
