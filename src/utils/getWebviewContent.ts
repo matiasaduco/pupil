@@ -15,7 +15,7 @@ export function getWebviewContent(): string {
                 </style>
             </head>
             <body>
-                <h2>GazeCloud Eye Tracking</h2>
+                <h2> Eye Tracking</h2>
                 <div id="gaze-dot"></div>
 
                 <script>

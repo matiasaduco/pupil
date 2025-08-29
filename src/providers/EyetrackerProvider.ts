@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
 import { getWebviewContent } from '../utils/getWebviewContent.js';
 
@@ -23,6 +26,15 @@ export class EyetrackerProvider {
                     this.panel.webview.postMessage({ type: 'gaze', data: gazeData });
                 }
             });
+        });
+        const app = express();
+        const PORT = 3000;
+
+        const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        app.use(express.static(path.join(__dirname, '../../src/webview')));
+
+        app.listen(PORT, () => {
+            console.log(`Eye Tracker server running at http://localhost:${PORT}/eye-tracker.html`);
         });
     }
 
