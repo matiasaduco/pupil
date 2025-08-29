@@ -13,13 +13,14 @@
 		"jsx": "react-jsx",
 		"esModuleInterop": true,
 		"allowJs": true,
+		"typeRoots": ["./node_modules/@types"],
 		"resolveJsonModule": true,
-		"typeRoots": ["./node_modules/@types"]
+		"skipLibCheck": true
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
-	"include": ["src"],
+	"include": ["src", "src/global.d.ts"],
 	"exclude": ["node_modules", "dist", "**/*.mjs", "vite.config.ts", "node_modules/@types/webgl2"]
 }

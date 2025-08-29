@@ -1,53 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Pupil Webview</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    #status {
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-  <h1>WebGazer Test</h1>
-  <div id="status">Initializing...</div>
-
-  <script>
-    (function() {
-      const statusEl = document.getElementById('status');
-
-      // Load WebGazer.js from CDN
-      const script = document.createElement('script');
-      script.src = 'https://webgazer.cs.brown.edu/webgazer.js';
-      script.onload = () => {
-        statusEl.textContent = 'WebGazer loaded!';
-
-        // Configure WebGazer
-        webgazer.setRegression('ridge');
-        webgazer.setGazeListener((data) => {
-          if(data) {
-            console.log('Gaze coordinates:', data.x, data.y);
-          }
-        });
-        webgazer.begin();
-
-        // Show video, face overlay, prediction points if available
-        if (webgazer.showVideo) webgazer.showVideo(true);
-        if (webgazer.showFaceOverlay) webgazer.showFaceOverlay(true);
-        if (webgazer.showPredictionPoints) webgazer.showPredictionPoints(true);
-
-        statusEl.textContent = 'WebGazer running!';
-      };
-      script.onerror = () => {
-        statusEl.textContent = 'Failed to load WebGazer.js';
-      };
-      document.head.appendChild(script);
-    })();
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pupil Editor</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
 </html>

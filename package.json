@@ -14,12 +14,32 @@
   "contributes": {
     "commands": [
       {
-        "command": "pupil.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "pupil.openWebview",
-        "title": "Abrir Webview React"
+        "title": "Start Pupil"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "pupil.editor",
+        "displayName": "Pupil Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.js"
+          },
+          {
+            "filenamePattern": "*.ts"
+          },
+          {
+            "filenamePattern": "*.html"
+          },
+          {
+            "filenamePattern": "*.css"
+          },
+          {
+            "filenamePattern": "*.json"
+          }
+        ],
+        "priority": "default"
       }
     ]
   },
@@ -36,7 +56,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/react": "^19.1.10",
+    "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "@types/vscode": "^1.103.0",
     "@types/webgl2": "^0.0.11",
@@ -51,9 +71,12 @@
     "vite": "^7.1.2"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "express": "^5.1.0",
+    "monaco-editor": "^0.52.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-simple-keyboard": "^3.8.116",
     "webgazer": "^3.4.0",
     "ws": "^8.18.3"
   },
