@@ -27,13 +27,25 @@ export function getWebviewContent(): string {
                             const webviewWidth = window.innerWidth;
                             const webviewHeight = window.innerHeight;
 
-                            const x = Math.min(Math.max(data.data.x, 0), webviewWidth - 10); // Subtract dot size
-                            const y = Math.min(Math.max(data.data.y, 0), webviewHeight - 10); // Subtract dot size
+                            const x = Math.min(Math.max(data.data.x * webviewWidth, 0), webviewWidth - 10);
+                            const y = Math.min(Math.max(data.data.y * webviewHeight, 0), webviewHeight - 10);
 
                             dot.style.left = x + 'px';
                             dot.style.top = y + 'px';
                         }
                     });
+                    let lastBlinkTime = 0;
+
+                    webgazer.setGazeListener((data, elapsedTime) => {
+                        if (!data) {
+                            const now = Date.now();
+                            if (now - lastBlinkTime > 200) { // at least 200ms between blinks
+                                console.log("Blink detected!");
+                                lastBlinkTime = now;
+                            }
+                        }
+                    });
+
                 </script>
             </body>
             </html>

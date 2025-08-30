@@ -2,74 +2,156 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Eye Tracker</title>
+  <title>WebGazer Eye Tracker</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      margin-top: 2rem;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
     }
     #status {
-      margin-top: 1rem;
+      margin: 10px;
       font-weight: bold;
+    }
+    #calibration-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      pointer-events: none;
+    }
+    .calib-point {
+      width: 20px;
+      height: 20px;
+      background: red;
+      border-radius: 50%;
+      position: absolute;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    #gaze-dot {
+      width: 10px;
+      height: 10px;
+      background: blue;
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #start-calib-btn {
+      margin: 10px;
+      padding: 10px 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Eye Tracking Active</h1>
-  <p>Make sure to allow camera access in your browser</p>
-  <p id="status">Waiting for connection...</p>
+  <h1>WebGazer Eye Tracker</h1>
+  <div id="status">Initializing...</div>
+  <button id="start-calib-btn">Start Calibration</button>
+  <div id="calibration-overlay"></div>
+  <div id="gaze-dot"></div>
 
-  
-  <script src="https://api.gazerecorder.com/GazeCloudAPI.js"></script>
-
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
   <script>
-    
     const ws = new WebSocket('ws://localhost:8765');
-
-    ws.onopen = () => {
-      document.getElementById('status').textContent = "Connected to VS Code extension ✅";
-      console.log('Connected to VS Code extension');
-    };
-
-    ws.onclose = () => {
-      document.getElementById('status').textContent = "Disconnected ❌";
-      console.log('Disconnected from VS Code extension');
-    };
-
-    ws.onerror = (err) => {
-      console.error('WebSocket error:', err);
-      document.getElementById('status').textContent = "Error ⚠️";
-    };
+    const overlay = document.getElementById('calibration-overlay');
+    const gazeDot = document.getElementById('gaze-dot');
+    let calibrationPoints = [];
 
     
-    GazeCloudAPI.StartEyeTracking();
+    let smoothBuffer = [];
+    const SMOOTH_COUNT = 20;
 
     
-    GazeCloudAPI.OnResult = function(GazeData) {
-      console.log('Gaze Data:', GazeData); // Debug log
+    const savedCalib = localStorage.getItem('webgazer_calibration_points');
+    if(savedCalib) {
+      calibrationPoints = JSON.parse(savedCalib);
+      document.getElementById('status').textContent = "Loaded saved calibration ✅";
+    }
 
-      if (GazeData.state === 0 && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-          x: GazeData.docX,
-          y: GazeData.docY,
-          time: GazeData.time
-        }));
+    ws.onopen = () => { document.getElementById('status').textContent = "Connected ✅"; };
+    ws.onclose = () => { document.getElementById('status').textContent = "Disconnected ❌"; };
+    ws.onerror = (err) => { console.error(err); document.getElementById('status').textContent = "Error ⚠️"; };
+
+    function startWebGazer() {
+ /*      let lastBlinkTime = 0;
+      const BLINK_INTERVAL = 300; // ms minimum between blinks
+      const BLINK_CONFIDENCE_THRESHOLD = 0.25; */
+
+    webgazer.setRegression('ridge')
+      .setGazeListener((data, elapsedTime) => {
+        if(!data) return;
+
+          // Blink
+          /*
+          if(data.confidence !== undefined && data.confidence < BLINK_CONFIDENCE_THRESHOLD) {
+            if(elapsedTime - lastBlinkTime > BLINK_INTERVAL) {
+              console.log('Blink detected at', elapsedTime, 'ms');
+              lastBlinkTime = elapsedTime;
+            }
+          }
+          */
+        // Smooth 
+        smoothBuffer.push({x: data.x, y: data.y});
+        if(smoothBuffer.length > SMOOTH_COUNT) smoothBuffer.shift();
+        const avgX = smoothBuffer.reduce((sum,p)=>sum+p.x,0)/smoothBuffer.length;
+        const avgY = smoothBuffer.reduce((sum,p)=>sum+p.y,0)/smoothBuffer.length;
+
+        // Movimiento punto local
+        gazeDot.style.left = Math.min(Math.max(avgX,0), window.innerWidth-10) + 'px';
+        gazeDot.style.top = Math.min(Math.max(avgY,0), window.innerHeight-10) + 'px';
+
+        // Coordinadas normalizadas y envío
+        if(ws.readyState === WebSocket.OPEN) {
+          const normX = avgX / window.innerWidth;
+          const normY = avgY / window.innerHeight;
+          ws.send(JSON.stringify({x: normX, y: normY, time: elapsedTime}));
+        }
+      })
+      .begin()
+      .then(() => {
+        webgazer.showVideo(false);
+        webgazer.showFaceOverlay(false);
+        webgazer.showPredictionPoints(false);
+      });
+}
+
+    function showCalibrationGrid() {
+      const cols = 3, rows = 3;
+      overlay.innerHTML = '';
+      overlay.style.display = 'block';
+      overlay.style.pointerEvents = 'auto';
+
+      for(let r=0; r<rows; r++){
+        for(let c=0; c<cols; c++){
+          const dot = document.createElement('div');
+          dot.className = 'calib-point';
+          dot.style.left = (c+1)*window.innerWidth/(cols+1)-10 + 'px';
+          dot.style.top = (r+1)*window.innerHeight/(rows+1)-10 + 'px';
+          dot.addEventListener('click', () => {
+            calibrationPoints.push({
+              x: parseFloat(dot.style.left)+10,
+              y: parseFloat(dot.style.top)+10
+            });
+            dot.style.background = 'green';
+            if(calibrationPoints.length === cols*rows){
+              localStorage.setItem('webgazer_calibration_points', JSON.stringify(calibrationPoints));
+              overlay.style.display = 'none';
+              overlay.style.pointerEvents = 'none';
+              document.getElementById('status').textContent = "Calibration complete and saved ✅";
+            }
+          });
+          overlay.appendChild(dot);
+        }
       }
-    };
+    }
 
-    
-    GazeCloudAPI.OnCalibrationComplete = () => {
-      console.log('Calibration complete!');
-    };
+    document.getElementById('start-calib-btn').addEventListener('click', showCalibrationGrid);
 
-    GazeCloudAPI.OnCamDenied = () => {
-      alert('Camera access denied! Please enable it.');
-    };
-
-    GazeCloudAPI.OnError = (msg) => {
-      console.error('EyeTracker Error:', msg);
-    };
+    startWebGazer();
   </script>
 </body>
 </html>
