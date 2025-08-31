@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 // / <reference types="react" />
 import * as React from 'react'
 

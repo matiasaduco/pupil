@@ -21,8 +21,7 @@ const usePupilKeyboard = () => {
 	const display = {
 		'{bksp}': 'backspace',
 		'{enter}': '< enter',
-		'@': 'at',
-		'{comment}': '/* */',
+		'{comment}': '//',
 		'{lock}': 'caps',
 		'{shift}': 'shift',
 		'{tab}': 'tab',

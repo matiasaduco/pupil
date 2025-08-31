@@ -3,17 +3,25 @@ import { usePupilEditor } from './hooks/usePupilEditor.js'
 import { forwardRef } from 'react'
 import { PupilEditorHandle } from '../../types/PupilEditorHandle.js'
 
-const PupilEditor = forwardRef<PupilEditorHandle, {}>((_, ref) => {
+type PupilEditorProps = {
+	keyboardVisible?: boolean
+}
+
+const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(({ keyboardVisible }, ref) => {
 	const { theme, language, value, handleOnChange, handleOnMount } = usePupilEditor(ref)
+	const editorHeight = keyboardVisible ? '60vh' : '100vh'
 
 	return (
-		<Editor
-			theme={theme}
-			language={language}
-			value={value}
-			onChange={handleOnChange}
-			onMount={handleOnMount}
-		/>
+		<div style={{ height: editorHeight }}>
+			<Editor
+				theme={theme}
+				language={language}
+				value={value}
+				onChange={handleOnChange}
+				onMount={handleOnMount}
+				height="100%"
+			/>
+		</div>
 	)
 })
 
