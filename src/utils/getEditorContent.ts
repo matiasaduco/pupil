@@ -2,22 +2,24 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 
 export function getEditorContent(
-  context: vscode.ExtensionContext,
-  webview: vscode.Webview
+	context: vscode.ExtensionContext,
+	webview: vscode.Webview
 ): string {
-  const assetsPath = vscode.Uri.joinPath(context.extensionUri, 'dist', 'webview', 'assets')
-  let jsFile = ''
-  let cssFile = ''
-  try {
-    const files = fs.readdirSync(assetsPath.fsPath)
-    jsFile = files.find((f: string) => f.endsWith('.js')) || ''
-    cssFile = files.find((f: string) => f.endsWith('.css')) || ''
-  } catch (e) {}
+	const assetsPath = vscode.Uri.joinPath(context.extensionUri, 'dist', 'webview', 'assets')
+	let jsFile = ''
+	let cssFile = ''
+	try {
+		const files = fs.readdirSync(assetsPath.fsPath)
+		jsFile = files.find((f: string) => f.endsWith('.js')) || ''
+		cssFile = files.find((f: string) => f.endsWith('.css')) || ''
+	} catch (e) {
+		console.error(e)
+	}
 
-  const scriptUri = jsFile ? webview.asWebviewUri(vscode.Uri.joinPath(assetsPath, jsFile)) : ''
-  const styleUri = cssFile ? webview.asWebviewUri(vscode.Uri.joinPath(assetsPath, cssFile)) : ''
+	const scriptUri = jsFile ? webview.asWebviewUri(vscode.Uri.joinPath(assetsPath, jsFile)) : ''
+	const styleUri = cssFile ? webview.asWebviewUri(vscode.Uri.joinPath(assetsPath, cssFile)) : ''
 
-  return `
+	return `
 		<!DOCTYPE html>
 		<html lang="en">
 			<head>

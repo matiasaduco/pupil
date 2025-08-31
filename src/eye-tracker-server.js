@@ -11,5 +11,5 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 app.use(express.static(path.join(__dirname, 'webview')))
 
 app.listen(PORT, () => {
-  console.log(`Eye Tracker running at http://localhost:${PORT}/eye-tracker.html`)
+	console.log(`Eye Tracker running at http://localhost:${PORT}/eye-tracker.html`)
 })
