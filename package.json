@@ -54,6 +54,7 @@
 		"build": "vite build --config vite.config.ts"
 	},
 	"devDependencies": {
+		"@types/css-modules": "^1.0.5",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "22.x",
 		"@types/react": "^19.1.11",
