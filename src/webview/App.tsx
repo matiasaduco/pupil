@@ -12,6 +12,8 @@ const App = () => {
             editorRef.current?.deleteAtCursor();
         } else if (input === "{enter}") {
             editorRef.current?.enterAtCursor();
+        } else if (input === "{comment}") {
+            editorRef.current?.commentAtCursor();
         } else {
             editorRef.current?.insertAtCursor(input);
         }

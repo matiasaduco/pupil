@@ -7,16 +7,11 @@ const useEditorState = () => {
 
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            switch (event.data.type) {
-            case 'set-theme':
+            if (event.data.type === 'set-theme') {
                 setEditorTheme(event);
-                break;
-            case 'init':
+            }
+            else if (event.data.type === 'init') {
                 setDocumentText(event);
-                break;
-            default:
-                console.error(`Unknown message type: ${event.data.type}`);
-                break;
             }
         };
 

@@ -33,7 +33,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 
 		webviewPanel.webview.html = getEditorContent(this.context, webviewPanel.webview);
 
-		const eventsListener = vscode.window.onDidChangeActiveColorTheme(() => {
+		const onDidChangeActiveColorThemeListener = vscode.window.onDidChangeActiveColorTheme(() => {
 			this.updateTheme(webviewPanel);
 		});
 
@@ -47,16 +47,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			}
 		});
 
-		const changeTextDocListener = vscode.workspace.onDidChangeTextDocument((e) => {
+		const onDidChangeTextDocumentListener = vscode.workspace.onDidChangeTextDocument((e) => {
 			if (e.document.uri.toString() === document.uri.toString()) {
 				this.openTextDocument(webviewPanel, e.document);
 			}
 		});
 
 		webviewPanel.onDidDispose(() => {
-			eventsListener.dispose();
+			onDidChangeActiveColorThemeListener.dispose();
 			onDidReceiveMessageListener.dispose();
-			changeTextDocListener.dispose();
+			onDidChangeTextDocumentListener.dispose();
 		});
 	}
 

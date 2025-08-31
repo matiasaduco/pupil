@@ -141,11 +141,60 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
     }
   };
 
+  const commentAtCursor = () => {
+    const editor = editorRef.current;
+    const position = editor?.getPosition();
+
+    if (monaco && editor && position) {
+      const model = editor.getModel();
+      if (model) {
+        const lineContent = model.getLineContent(position.lineNumber);
+        const trimmedLine = lineContent.trim();
+        let newText: string;
+        let cursorOffset: number;
+
+        if (trimmedLine.startsWith("//")) {
+          // Si ya está comentada, descomentar
+          newText = lineContent.replace("//", "");
+          cursorOffset = -2; // Ajuste del cursor al eliminar "//"
+        } else {
+          // Comentar la línea
+          newText = "//" + lineContent;
+          cursorOffset = 2; // Ajuste del cursor al agregar "//"
+        }
+
+        const range = new monaco.Range(
+          position.lineNumber,
+          1,
+          position.lineNumber,
+          lineContent.length + 1
+        );
+
+        editor.executeEdits(null, [{
+          range,
+          text: newText,
+          forceMoveMarkers: true
+        }]);
+
+        // Ajustar la posición del cursor
+        editor.setPosition({
+          lineNumber: position.lineNumber,
+          column: position.column + cursorOffset
+        });
+
+        setTimeout(() => {
+          editor.focus();
+        }, 0);
+      }
+    }
+  };
+
   useImperativeHandle(ref, () => ({
     getCursorPosition,
     insertAtCursor,
     deleteAtCursor,
-    enterAtCursor
+    enterAtCursor,
+    commentAtCursor
   }), [monaco]);
 
   return { handleOnMount };
