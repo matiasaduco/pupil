@@ -3,4 +3,5 @@ export type PupilEditorHandle = {
 	insertAtCursor: (text: string) => void;
 	deleteAtCursor: () => void;
 	enterAtCursor: () => void;
+	commentAtCursor: () => void;
 };
