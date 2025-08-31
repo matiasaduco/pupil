@@ -1,20 +1,22 @@
 import { Editor } from '@monaco-editor/react';
-import { usePupilEditor } from './hooks/usePupilEditor.js';
 import { forwardRef } from 'react';
-import { PupilEditorHandle } from '../../types/PupilEditorHandle.js';
+import useEditorState from './hooks/useEditorState.js';
+import useForwardRef from './hooks/useForwardRef.js';
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js';
 
-const PupilEditor = forwardRef<PupilEditorHandle, {}>((_, ref) => {
-	const { theme, language, value, handleOnChange, handleOnMount } = usePupilEditor(ref);
+const PupilEditor = forwardRef<PupilEditorHandle, object>((_, ref) => {
+  const { theme, value, language, handleOnChange } = useEditorState();
+  const { handleOnMount } = useForwardRef(ref);
 
-	return (
-		<Editor
-			theme={theme}
-			language={language}
-			value={value}
-			onChange={handleOnChange}
-			onMount={handleOnMount}
-		/>
-	);
+  return (
+    <Editor
+      theme={theme}
+      language={language}
+      value={value}
+      onChange={handleOnChange}
+      onMount={handleOnMount}
+    />
+  );
 });
 
-export default PupilEditor
+export default PupilEditor;

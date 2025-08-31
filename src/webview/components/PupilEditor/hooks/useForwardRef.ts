@@ -1,7 +1,7 @@
-import { useMonaco } from "@monaco-editor/react";
-import { Ref, useImperativeHandle, useRef } from "react";
+import { useMonaco } from '@monaco-editor/react';
+import { Ref, useImperativeHandle, useRef } from 'react';
 import type { editor } from 'monaco-editor';
-import { PupilEditorHandle } from "../../../types/PupilEditorHandle.js";
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js';
 
 const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -13,9 +13,9 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 
   const getCursorPosition = () => {
     const pos = editorRef.current?.getPosition();
-      if (pos && typeof pos.lineNumber === 'number' && typeof pos.column === 'number') {
-        return { lineNumber: pos.lineNumber, column: pos.column };
-      }
+    if (pos && typeof pos.lineNumber === 'number' && typeof pos.column === 'number') {
+      return { lineNumber: pos.lineNumber, column: pos.column };
+    }
     return undefined;
   };
 
@@ -31,11 +31,13 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
         position.column
       );
 
-      editor.executeEdits(null, [{
-        range,
-        text,
-        forceMoveMarkers: true
-      }]);
+      editor.executeEdits(null, [
+        {
+          range,
+          text,
+          forceMoveMarkers: true,
+        },
+      ]);
 
       editor.focus();
 
@@ -59,18 +61,15 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
             const prevLineLength = model.getLineLength(prevLine);
 
             // Rango desde el final de la línea anterior hasta el inicio de la actual
-            const range = new monaco.Range(
-              prevLine,
-              prevLineLength + 1,
-              position.lineNumber,
-              1
-            );
+            const range = new monaco.Range(prevLine, prevLineLength + 1, position.lineNumber, 1);
 
-            editor.executeEdits(null, [{
-              range,
-              text: "",
-              forceMoveMarkers: true
-            }]);
+            editor.executeEdits(null, [
+              {
+                range,
+                text: '',
+                forceMoveMarkers: true,
+              },
+            ]);
 
             // Mover el cursor al final de la línea anterior
             editor.setPosition({ lineNumber: prevLine, column: prevLineLength + 1 });
@@ -90,11 +89,13 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
         position.column
       );
 
-      editor.executeEdits(null, [{
-        range,
-        text: "",
-        forceMoveMarkers: true
-      }]);
+      editor.executeEdits(null, [
+        {
+          range,
+          text: '',
+          forceMoveMarkers: true,
+        },
+      ]);
 
       setTimeout(() => {
         editor.focus();
@@ -112,9 +113,9 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
         const lineContent = model.getLineContent(position.lineNumber);
         // Detectar indentación (espacios o tabs al inicio de la línea)
         const indentMatch = lineContent.match(/^(\s*)/);
-        const indent = indentMatch ? indentMatch[1] : "";
+        const indent = indentMatch ? indentMatch[1] : '';
         // Insertar salto de línea y la indentación
-        const text = "\n" + indent;
+        const text = '\n' + indent;
         const range = new monaco.Range(
           position.lineNumber,
           position.column,
@@ -122,16 +123,18 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
           position.column
         );
 
-        editor.executeEdits(null, [{
-          range,
-          text,
-          forceMoveMarkers: true
-        }]);
+        editor.executeEdits(null, [
+          {
+            range,
+            text,
+            forceMoveMarkers: true,
+          },
+        ]);
 
         // Mover el cursor a la nueva línea, después de la indentación
         editor.setPosition({
           lineNumber: position.lineNumber + 1,
-          column: indent.length + 1
+          column: indent.length + 1,
         });
 
         setTimeout(() => {
@@ -141,12 +144,16 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
     }
   };
 
-  useImperativeHandle(ref, () => ({
-    getCursorPosition,
-    insertAtCursor,
-    deleteAtCursor,
-    enterAtCursor
-  }), [monaco]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      getCursorPosition,
+      insertAtCursor,
+      deleteAtCursor,
+      enterAtCursor,
+    }),
+    [monaco]
+  );
 
   return { handleOnMount };
 };

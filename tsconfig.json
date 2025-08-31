@@ -1,26 +1,30 @@
 {
-	"compilerOptions": {
-		"module": "Node16",
-		"target": "ES2022",
-		"outDir": "out",
-		"lib": [
-			"ES2022",
-			"DOM"
-		],
-		"sourceMap": true,
-		"rootDir": "src",
-		"strict": true,
-		"jsx": "react-jsx",
-		"esModuleInterop": true,
-		"allowJs": true,
-		"typeRoots": ["./node_modules/@types"],
-		"resolveJsonModule": true,
-		"skipLibCheck": true
-		/* Additional Checks */
-		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
-		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
-	},
-	"include": ["src", "src/global.d.ts"],
-	"exclude": ["node_modules", "dist", "**/*.mjs", "vite.config.ts", "node_modules/@types/webgl2"]
+  "compilerOptions": {
+    "module": "Node16",
+    "target": "ES2022",
+    "outDir": "out",
+    "lib": ["ES2022", "DOM"],
+    "sourceMap": true,
+    "rootDir": "src",
+    "strict": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "typeRoots": ["./node_modules/@types"],
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "baseUrl": "src",
+    "paths": {
+      "@providers/*": ["providers/*"],
+      "@utils/*": ["utils/*"],
+      "@webview/*": ["webview/*"],
+      "@components/*": ["webview/components/*"]
+    }
+    /* Additional Checks */
+    // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+    // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
+    // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+  },
+  "include": ["src", "src/global.d.ts"],
+  "exclude": ["node_modules", "dist", "**/*.mjs", "vite.config.ts", "node_modules/@types/webgl2"]
 }

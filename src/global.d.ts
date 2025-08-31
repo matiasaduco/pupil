@@ -2,9 +2,9 @@
 import * as React from 'react';
 
 declare global {
-    declare function acquireVsCodeApi(): {
-        postMessage: (msg: any) => void;
-        getState: () => any;
-        setState: (newState: any) => void;
-    };
+  declare function acquireVsCodeApi(): {
+    postMessage: (msg: any) => void;
+    getState: () => any;
+    setState: (newState: any) => void;
+  };
 }

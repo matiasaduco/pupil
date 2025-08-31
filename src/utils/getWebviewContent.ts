@@ -1,5 +1,5 @@
 export function getWebviewContent(): string {
-    return `
+  return `
             <!DOCTYPE html>
             <html>
             <head>
