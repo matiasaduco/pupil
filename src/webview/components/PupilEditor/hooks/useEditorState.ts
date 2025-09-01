@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useVsCodeApi } from '../../../contexts/VsCodeApiContext.js'
 
 const useEditorState = () => {
 	const [theme, setTheme] = useState<string>('vs-dark')
 	const [value, setValue] = useState<string>('')
 	const [language, setLanguage] = useState<string>('plaintext')
+	const vscode = useVsCodeApi()
 
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
@@ -15,8 +17,6 @@ const useEditorState = () => {
 		}
 
 		window.addEventListener('message', handleMessage)
-
-		const vscode = acquireVsCodeApi()
 		vscode.postMessage({ type: 'ready' })
 
 		return () => window.removeEventListener('message', handleMessage)
@@ -49,7 +49,6 @@ const useEditorState = () => {
 	}
 
 	const handleOnChange = (value: string | undefined) => {
-		const vscode = acquireVsCodeApi()
 		vscode.postMessage({
 			type: 'edit',
 			content: value || ''
