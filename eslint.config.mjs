@@ -14,6 +14,7 @@ export default [
 			ecmaVersion: 2022,
 			sourceType: 'module'
 		},
+		ignores: ['src/global.d.ts'],
 		rules: {
 			...typescriptEslint.configs.recommended.rules,
 			'prettier/prettier': [
