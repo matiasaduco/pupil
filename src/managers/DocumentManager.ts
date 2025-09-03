@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-class DocumentManager {
+abstract class DocumentManager {
 	static openTextDocument(document: vscode.TextDocument) {
 		const content = document.getText()
 		const fileName = document.fileName

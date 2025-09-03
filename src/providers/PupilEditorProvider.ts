@@ -53,6 +53,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				if (message.type === 'edit') {
 					this.updateTextDocument(document, message.content)
 				}
+				if (message.type === 'open-terminal') {
+					this.openTerminal()
+				}
 			} catch (error) {
 				console.error('Error en onDidReceiveMessage:', error)
 			}
@@ -97,5 +100,10 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private getSnippets(webviewPanel: vscode.WebviewPanel) {
 		const snippets = SnippetManager.getAllSnippets()
 		webviewPanel.webview.postMessage({ type: 'snippets', snippets })
+	}
+
+	private openTerminal() {
+		const terminal = vscode.window.createTerminal('Pupil Terminal')
+		terminal.show()
 	}
 }

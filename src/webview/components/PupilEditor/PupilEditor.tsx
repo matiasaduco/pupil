@@ -1,14 +1,16 @@
 import { Editor } from '@monaco-editor/react'
-import { usePupilEditor } from './hooks/usePupilEditor.js'
 import { forwardRef } from 'react'
 import { PupilEditorHandle } from '../../types/PupilEditorHandle.js'
+import useEditorState from './hooks/useEditorState.js'
+import useForwardRef from './hooks/useForwardRef.js'
 
 type PupilEditorProps = {
 	keyboardVisible?: boolean
 }
 
 const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(({ keyboardVisible }, ref) => {
-	const { theme, language, value, handleOnChange, handleOnMount } = usePupilEditor(ref)
+	const { handleOnMount } = useForwardRef(ref)
+	const { theme, language, value, handleOnChange } = useEditorState()
 	const editorHeight = keyboardVisible ? '60vh' : '100vh'
 
 	return (
