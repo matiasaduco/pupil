@@ -7,15 +7,16 @@ const usePupilEditorContainer = () => {
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const vscode = useVsCodeApi()
 
+	const editorActions: Record<string, () => void> = {
+		'{bksp}': () => editorRef.current?.deleteAtCursor(),
+		'{enter}': () => editorRef.current?.enterAtCursor(),
+		'{comment}': () => editorRef.current?.commentAtCursor(),
+		'{terminal}': () => vscode.postMessage({ type: 'create-terminal' })
+	}
+
 	const handleKeyboardInput = (input: string) => {
-		if (input === '{bksp}') {
-			editorRef.current?.deleteAtCursor()
-		} else if (input === '{enter}') {
-			editorRef.current?.enterAtCursor()
-		} else if (input === '{comment}') {
-			editorRef.current?.commentAtCursor()
-		} else if (input === '{terminal}') {
-			vscode.postMessage({ type: 'open-terminal' })
+		if (input in editorActions) {
+			editorActions[input]()
 		} else {
 			editorRef.current?.insertAtCursor(input)
 		}

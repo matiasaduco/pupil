@@ -68,6 +68,7 @@
 		"@vscode/test-cli": "^0.0.11",
 		"@vscode/test-electron": "^2.5.2",
 		"eslint": "^9.32.0",
+		"eslint-plugin-prettier": "^5.5.4",
 		"typescript": "^5.9.2",
 		"vite": "^7.1.2"
 	},
