@@ -35,6 +35,7 @@ const useScroll = () => {
 			const el = containerRef.current
 			if (el) {
 				el.scrollBy({ left: direction === 'left' ? -SCROLL_AMOUNT : SCROLL_AMOUNT })
+				checkScrollPosition()
 			}
 		}, SCROLL_INTERVAL)
 	}
@@ -46,7 +47,7 @@ const useScroll = () => {
 		}
 	}
 
-	return { containerRef, atStart, atEnd, startScroll, stopScroll }
+	return { containerRef, atStart, atEnd, startScroll, stopScroll, checkScrollPosition }
 }
 
 export default useScroll
