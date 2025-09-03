@@ -20,11 +20,25 @@ const App = () => {
 		}
 	}
 
+	const handleSnippetPress = (snippet: string | string[]) => {
+		if (Array.isArray(snippet)) {
+			snippet.forEach((line, index) => {
+				editorRef.current?.insertAtCursor(line)
+				if (index < snippet.length - 1) {
+					editorRef.current?.enterAtCursor()
+				}
+			})
+		} else {
+			editorRef.current?.insertAtCursor(snippet)
+		}
+	}
+
 	return (
 		<div className="container">
 			<PupilEditor ref={editorRef} keyboardVisible={keyboardVisible} />
 			<PupilKeyboard
 				onInput={handleKeyboardInput}
+				onSnippetInput={handleSnippetPress}
 				visible={keyboardVisible}
 				setVisible={setKeyboardVisible}
 			/>

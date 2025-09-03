@@ -1,0 +1,35 @@
+.snippets-section {
+    position: relative;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.snippets-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    position: relative;
+    padding: 0 40px;
+}
+
+.overflow-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.overflow-left {
+    left: 0;
+}
+
+.overflow-right {
+    right: 0;
+}

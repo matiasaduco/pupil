@@ -1,5 +1,8 @@
 import * as vscode from 'vscode'
 import { getEditorContent } from '../utils/getEditorContent.js'
+import SnippetManager from '../managers/SnippetManager.js'
+import ThemeManager from '../managers/ThemeManager.js'
+import DocumentManager from '../managers/DocumentManager.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	constructor(private readonly context: vscode.ExtensionContext) {}
@@ -20,6 +23,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_token: vscode.CancellationToken
 	): Promise<void> {
 		let webviewReady = false
@@ -32,22 +36,35 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.html = getEditorContent(this.context, webviewPanel.webview)
 
 		const onDidChangeActiveColorThemeListener = vscode.window.onDidChangeActiveColorTheme(() => {
-			this.updateTheme(webviewPanel)
+			try {
+				this.updateTheme(webviewPanel)
+			} catch (error) {
+				console.error('Error en onDidChangeActiveColorTheme:', error)
+			}
 		})
 
 		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage((message) => {
-			if (message.type === 'ready' && !webviewReady) {
-				webviewReady = true
-				this.openTextDocument(webviewPanel, document)
-			}
-			if (message.type === 'edit') {
-				this.updateTextDocument(document, message.content)
+			try {
+				if (message.type === 'ready' && !webviewReady) {
+					webviewReady = true
+					this.openTextDocument(webviewPanel, document)
+					this.getSnippets(webviewPanel)
+				}
+				if (message.type === 'edit') {
+					this.updateTextDocument(document, message.content)
+				}
+			} catch (error) {
+				console.error('Error en onDidReceiveMessage:', error)
 			}
 		})
 
 		const onDidChangeTextDocumentListener = vscode.workspace.onDidChangeTextDocument((e) => {
-			if (e.document.uri.toString() === document.uri.toString()) {
-				this.openTextDocument(webviewPanel, e.document)
+			try {
+				if (e.document.uri.toString() === document.uri.toString()) {
+					this.openTextDocument(webviewPanel, e.document)
+				}
+			} catch (error) {
+				console.error('Error en onDidChangeTextDocument:', error)
 			}
 		})
 
@@ -59,10 +76,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private openTextDocument(webviewPanel: vscode.WebviewPanel, document: vscode.TextDocument) {
-		const content = document.getText()
-		const fileName = document.fileName
-		const fileExtension = fileName.split('.').pop() || ''
-
+		const { content, fileName, fileExtension } = DocumentManager.openTextDocument(document)
 		webviewPanel.webview.postMessage({
 			type: 'init',
 			content,
@@ -72,31 +86,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private updateTextDocument(document: vscode.TextDocument, value: string) {
-		const edit = new vscode.WorkspaceEdit()
-		const fullRange = new vscode.Range(
-			document.positionAt(0),
-			document.positionAt(document.getText().length)
-		)
-		edit.replace(document.uri, fullRange, value)
-		return vscode.workspace.applyEdit(edit)
+		DocumentManager.updateTextDocument(document, value)
 	}
 
 	private updateTheme(webviewPanel: vscode.WebviewPanel) {
-		const themeKind = vscode.window.activeColorTheme.kind
-		let theme: string
-
-		switch (themeKind) {
-			case vscode.ColorThemeKind.Dark:
-				theme = 'vs-dark'
-				break
-			case vscode.ColorThemeKind.HighContrast:
-				theme = 'hc-black'
-				break
-			default:
-				theme = 'vs'
-				break
-		}
-
+		let theme = ThemeManager.getCurrentTheme()
 		webviewPanel.webview.postMessage({ type: 'set-theme', theme })
+	}
+
+	private getSnippets(webviewPanel: vscode.WebviewPanel) {
+		const snippets = SnippetManager.getAllSnippets()
+		webviewPanel.webview.postMessage({ type: 'snippets', snippets })
 	}
 }
