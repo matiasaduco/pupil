@@ -53,7 +53,10 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				if (message.type === 'edit') {
 					this.updateTextDocument(document, message.content)
 				}
-				if (message.type === 'new-terminal') {
+				if (message.type === 'open-terminal') {
+					this.openTerminal()
+				}
+				if (message.type === 'create-terminal') {
 					this.createTerminal()
 				}
 			} catch (error) {
@@ -110,4 +113,5 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		const terminal = vscode.window.createTerminal('Pupil Terminal')
 		terminal.show()
 	}
+
 }

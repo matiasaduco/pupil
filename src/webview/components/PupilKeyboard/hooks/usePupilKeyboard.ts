@@ -1,5 +1,5 @@
 const usePupilKeyboard = () => {
-	const shortcuts = '{comment} {terminal}'
+	const shortcuts = '{comment} {terminal} {new-terminal}'
 
 	const layout = {
 		default: [
@@ -28,7 +28,9 @@ const usePupilKeyboard = () => {
 		'{shift}': 'shift',
 		'{tab}': 'tab',
 		'{space}': 'space',
-		'{terminal}': '>_'
+		'{terminal}': '>_',
+		'{new-terminal}': '+>_'
+		
 	}
 
 	return { layout, display }
