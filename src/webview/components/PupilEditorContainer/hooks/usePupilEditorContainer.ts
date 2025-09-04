@@ -11,7 +11,8 @@ const usePupilEditorContainer = () => {
 		'{bksp}': () => editorRef.current?.deleteAtCursor(),
 		'{enter}': () => editorRef.current?.enterAtCursor(),
 		'{comment}': () => editorRef.current?.commentAtCursor(),
-		'{terminal}': () => vscode.postMessage({ type: 'create-terminal' })
+		'{terminal}': () => vscode.postMessage({ type: 'create-terminal' }),
+		'{new-terminal}': () => vscode.postMessage({ type: 'open-terminal' })
 	}
 
 	const handleKeyboardInput = (input: string) => {

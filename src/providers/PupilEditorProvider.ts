@@ -5,6 +5,9 @@ import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
+	private static readonly viewType = 'pupil.editor'
+	private terminal: vscode.Terminal | null = null // keep reference to one terminal
+
 	constructor(private readonly context: vscode.ExtensionContext) {}
 
 	public static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -18,12 +21,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		)
 	}
 
-	private static readonly viewType = 'pupil.editor'
-
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_token: vscode.CancellationToken
 	): Promise<void> {
 		let webviewReady = false
@@ -53,7 +53,10 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				if (message.type === 'edit') {
 					this.updateTextDocument(document, message.content)
 				}
-				if (message.type === 'new-terminal') {
+				if (message.type === 'open-terminal') {
+					this.openTerminal()
+				}
+				if (message.type === 'create-terminal') {
 					this.createTerminal()
 				}
 			} catch (error) {
@@ -102,8 +105,13 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.postMessage({ type: 'snippets', snippets })
 	}
 
+	private openTerminal() {
+		this.terminal = this.terminal || vscode.window.createTerminal('Pupil Terminal')
+		this.terminal.show()
+	}
 	private createTerminal() {
 		const terminal = vscode.window.createTerminal('Pupil Terminal')
 		terminal.show()
 	}
+
 }
