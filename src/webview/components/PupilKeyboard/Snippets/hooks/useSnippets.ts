@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-
+import { useVsCodeApi } from '../../../../contexts/VsCodeApiContext.js';
 type Snippet = {
 	extension: string
 	file: string
@@ -14,19 +14,24 @@ type SnippetMessage = {
 }
 
 const useSnippets = () => {
+	const vscode = useVsCodeApi()
 	const [snippets, setSnippets] = useState<SnippetMessage>()
 
-	useEffect(() => {
+		useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
 			const message = event.data
 			if (message.type === 'snippets') {
-				setSnippets(message.snippets)
+			setSnippets(message.snippets)
 			}
 		}
-
+        
 		window.addEventListener('message', handleMessage)
+
+		
+		vscode.postMessage({ type: 'get-snippets' })
+
 		return () => window.removeEventListener('message', handleMessage)
-	}, [])
+		}, [])
 
 	return { snippets }
 }

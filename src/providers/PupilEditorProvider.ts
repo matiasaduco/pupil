@@ -6,7 +6,7 @@ import DocumentManager from '../managers/DocumentManager.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
-	private terminal: vscode.Terminal | null = null // keep reference to one terminal
+	private terminal: vscode.Terminal | null = null 
 
 	constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -48,6 +48,8 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				if (message.type === 'ready' && !webviewReady) {
 					webviewReady = true
 					this.openTextDocument(webviewPanel, document)
+					this.getSnippets(webviewPanel)
+				}if (message.type === 'get-snippets') {
 					this.getSnippets(webviewPanel)
 				}
 				if (message.type === 'edit') {
