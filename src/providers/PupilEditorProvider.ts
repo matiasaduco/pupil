@@ -6,7 +6,7 @@ import DocumentManager from '../managers/DocumentManager.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
-	private terminal: vscode.Terminal | null = null 
+	private terminal: vscode.Terminal | null = null // keep reference to one terminal
 
 	constructor(private readonly context: vscode.ExtensionContext) {}
 
