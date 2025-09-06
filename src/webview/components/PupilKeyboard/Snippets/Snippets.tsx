@@ -2,6 +2,11 @@ import useScroll from './hooks/useScroll.js'
 import useSnippets from './hooks/useSnippets.js'
 import './Snippets.css'
 import { useEffect } from 'react'
+import * as React from 'react'
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import HtmlTooltip from '@mui/material/Tooltip';
 type SnippetsProps = {
 	onSnippetPress?: (input: string | string[]) => void
 }
@@ -42,13 +47,18 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 			<div ref={containerRef} className="snippets-container !bg-white flex space-x-3 overflow-x-auto whitespace-nowrap py-2 px-2">
 				{snippets?.all.flat().map((snippet) =>
 					Object.entries(snippet.snippets).map(([key, { body }]) => (
-						<button className='snippets-button !bg-white !border !border-gray-200 hover:!bg-gray-100 '
-							key={key}
-							onClick={() => onSnippetPress?.(body)}
-							style={{ margin: '0 3px 6px 0' }}
-						>
-							{key}
-						</button>
+					<HtmlTooltip title= 
+							{<React.Fragment>
+								<Typography color="inherit">{snippet.snippets[key]?.description || ""} </Typography>								
+							 </React.Fragment>
+							} placement='top' arrow>
+							<button className='snippets-button !bg-white !border !border-gray-200 hover:!bg-gray-400 active:!bg-gray-500'
+								key={key}
+								onClick={() => onSnippetPress?.(body)}
+								style={{ margin: '0 3px 6px 0' }}>
+								{key}
+							</button>
+					</HtmlTooltip>
 					))
 				)}
 			</div>

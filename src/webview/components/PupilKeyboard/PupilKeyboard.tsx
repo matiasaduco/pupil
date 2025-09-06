@@ -20,9 +20,9 @@ const PupilKeyboard = ({ onInput, onSnippetInput, visible, setVisible }: PupilKe
 				{visible ? 'Hide Keyboard' : 'Show Keyboard'}
 			</button>
 			{visible && (
-				<>
+				<>					
 					<Snippets onSnippetPress={onSnippetInput} />
-					<KeyboardReact onKeyPress={onInput} layout={layout} display={display} />
+					<KeyboardReact onKeyPress={onInput} layout={layout} display={display} />					
 				</>
 			)}
 		</div>
