@@ -106,9 +106,9 @@ abstract class SnippetManager {
 	private static getBasePaths(platform: string) {
 		switch (platform) {
 			case 'win32':
-				const vscodeExe = process.execPath; 
-      			const vscodeDir = path.dirname(vscodeExe); 
-      			const builtinPath = path.join(vscodeDir, "resources", "app", "extensions");
+				const vscodeExe = process.execPath
+				const vscodeDir = path.dirname(vscodeExe)
+				const builtinPath = path.join(vscodeDir, 'resources', 'app', 'extensions')
 				return {
 					user: [process.env.APPDATA!, 'Code', 'User', 'snippets'],
 					extension: [process.env.USERPROFILE!, '.vscode', 'extensions'],

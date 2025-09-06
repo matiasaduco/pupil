@@ -6,7 +6,7 @@ import DocumentManager from '../managers/DocumentManager.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
-	private terminal: vscode.Terminal | null = null // keep reference to one terminal
+	private terminal: vscode.Terminal | null = null
 
 	constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -24,6 +24,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_token: vscode.CancellationToken
 	): Promise<void> {
 		let webviewReady = false
@@ -49,7 +50,8 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					webviewReady = true
 					this.openTextDocument(webviewPanel, document)
 					this.getSnippets(webviewPanel)
-				}if (message.type === 'get-snippets') {
+				}
+				if (message.type === 'get-snippets') {
 					this.getSnippets(webviewPanel)
 				}
 				if (message.type === 'edit') {
@@ -60,6 +62,21 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				}
 				if (message.type === 'create-terminal') {
 					this.createTerminal()
+				}
+				if (message.type === 'terminal-input') {
+					this.terminal?.sendText(message.value, false)
+				}
+				if (message.type === 'terminal-bksp') {
+					this.terminal?.sendText('\b', false)
+				}
+				if (message.type === 'terminal-enter') {
+					this.terminal?.sendText('\n', false)
+				}
+				if (message.type === 'terminal-clear') {
+					this.terminal?.sendText('clear', true)
+				}
+				if (message.type === 'hide-terminal') {
+					this.terminal?.hide()
 				}
 			} catch (error) {
 				console.error('Error en onDidReceiveMessage:', error)
@@ -111,9 +128,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		this.terminal = this.terminal || vscode.window.createTerminal('Pupil Terminal')
 		this.terminal.show()
 	}
-	private createTerminal() {
-		const terminal = vscode.window.createTerminal('Pupil Terminal')
-		terminal.show()
-	}
 
+	private createTerminal() {
+		this.terminal = vscode.window.createTerminal('Pupil Terminal')
+		this.terminal.show()
+	}
 }

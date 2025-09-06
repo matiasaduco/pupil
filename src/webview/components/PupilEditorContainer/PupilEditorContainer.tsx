@@ -6,19 +6,23 @@ const PupilEditorContainer = () => {
 	const {
 		editorRef,
 		keyboardVisible,
-		setKeyboardVisible,
+		toggle,
 		handleKeyboardInput,
-		handleSnippetPress
+		handleSnippetPress,
+		focus,
+		switchFocus
 	} = usePupilEditorContainer()
 
 	return (
-		<div className="container">
-			<PupilEditor ref={editorRef} keyboardVisible={keyboardVisible} />
+		<div className="flex flex-col">
+			<PupilEditor ref={editorRef} keyboardVisible={keyboardVisible} visible={focus === 'editor'} />
 			<PupilKeyboard
 				onInput={handleKeyboardInput}
 				onSnippetInput={handleSnippetPress}
 				visible={keyboardVisible}
-				setVisible={setKeyboardVisible}
+				toggle={toggle}
+				focus={focus}
+				switchFocus={switchFocus}
 			/>
 		</div>
 	)
