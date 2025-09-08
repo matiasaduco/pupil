@@ -1,10 +1,13 @@
 import React, { createContext, useContext } from 'react'
 import { VsCodeApi } from '../../global.js'
+import VsCodeMessage from '@webview/types/VsCodeMessage.js'
 
 const VsCodeApiContext = createContext<VsCodeApi | null>(null)
 
 export const VsCodeApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const vscode = acquireVsCodeApi()
+	const isDev = window.location.hostname === 'localhost'
+	const vscode: VsCodeApi = isDev ? mockVsCodeApi() : acquireVsCodeApi()
+
 	return <VsCodeApiContext.Provider value={vscode}>{children}</VsCodeApiContext.Provider>
 }
 
@@ -14,4 +17,19 @@ export const useVsCodeApi = () => {
 		throw new Error('useVsCodeApi must be used within a VsCodeApiProvider')
 	}
 	return context
+}
+
+const mockVsCodeApi = (): VsCodeApi => {
+	return {
+		postMessage: (message: VsCodeMessage) => {
+			console.log('Mock VSCode API - postMessage:', message)
+		},
+		getState: () => {
+			console.log('Mock VSCode API - getState')
+			return null
+		},
+		setState: (state: VsCodeMessage) => {
+			console.log('Mock VSCode API - setState:', state)
+		}
+	}
 }
