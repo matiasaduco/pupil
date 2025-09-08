@@ -1,5 +1,5 @@
+import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useEffect, useState } from 'react'
-import { useVsCodeApi } from '../../../contexts/VsCodeApiContext.js'
 
 const useEditorState = () => {
 	const [theme, setTheme] = useState<string>('vs-dark')

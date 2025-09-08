@@ -1,5 +1,6 @@
+import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useEffect, useState } from 'react'
-import { useVsCodeApi } from '../../../../contexts/VsCodeApiContext.js'
+
 type Snippet = {
 	extension: string
 	file: string
