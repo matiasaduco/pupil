@@ -27,6 +27,12 @@ const useScroll = () => {
 		return () => el?.removeEventListener('scroll', checkScrollPosition)
 	}, [])
 
+	useEffect(() => {
+		if (containerRef.current) {
+			checkScrollPosition()
+		}
+	}, [containerRef, checkScrollPosition])
+
 	const startScroll = (direction: ScrollDirection) => {
 		if (scrollIntervalRef.current) {
 			return
@@ -47,7 +53,7 @@ const useScroll = () => {
 		}
 	}
 
-	return { containerRef, atStart, atEnd, startScroll, stopScroll, checkScrollPosition }
+	return { containerRef, atStart, atEnd, startScroll, stopScroll }
 }
 
 export default useScroll

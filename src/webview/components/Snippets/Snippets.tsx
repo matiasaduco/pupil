@@ -1,11 +1,12 @@
 import useScroll from './hooks/useScroll.js'
 import useSnippets from './hooks/useSnippets.js'
 import './Snippets.css'
-import { useEffect } from 'react'
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import HtmlTooltip from '@mui/material/Tooltip'
-import { Button } from '@mui/material'
+import { Button, IconButton } from '@mui/material'
+import ArrowBack from '@mui/icons-material/ArrowBack'
+import ArrowForward from '@mui/icons-material/ArrowForward'
 
 type SnippetsProps = {
 	onSnippetPress?: (input: string | string[]) => void
@@ -13,40 +14,33 @@ type SnippetsProps = {
 
 const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 	const { snippets } = useSnippets()
-	const { containerRef, atStart, atEnd, startScroll, stopScroll, checkScrollPosition } = useScroll()
-
-	useEffect(() => {
-		if (containerRef.current) {
-			checkScrollPosition()
-		}
-	}, [containerRef, checkScrollPosition])
+	const { containerRef, atStart, atEnd, startScroll, stopScroll } = useScroll()
 
 	return (
 		<section className="snippets-section">
 			{!atStart && (
-				<Button
+				<IconButton
 					className="overflow-button left-0"
 					onMouseEnter={() => startScroll('left')}
 					onMouseLeave={stopScroll}
+					color="primary"
 					aria-label="Scroll left"
 				>
-					&#8592;
-				</Button>
+					<ArrowBack />
+				</IconButton>
 			)}
 			{!atEnd && (
-				<Button
+				<IconButton
 					className="overflow-button right-0"
 					onMouseEnter={() => startScroll('right')}
 					onMouseLeave={stopScroll}
+					color="primary"
 					aria-label="Scroll right"
 				>
-					&#8594;
-				</Button>
+					<ArrowForward />
+				</IconButton>
 			)}
-			<div
-				ref={containerRef}
-				className="snippets-container !bg-white flex space-x-3 overflow-x-auto whitespace-nowrap py-2 px-2"
-			>
+			<div ref={containerRef} className="snippets-container space-x-3 whitespace-nowrap">
 				{snippets?.all.flat().map((snippet) =>
 					Object.entries(snippet.snippets).map(([key, { body }]) => (
 						<HtmlTooltip
@@ -61,7 +55,7 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 							arrow
 						>
 							<Button
-								className="snippets-button !bg-white !border !border-gray-200 hover:!bg-gray-400 active:!bg-gray-500"
+								className="snippets-button"
 								key={key}
 								onClick={() => onSnippetPress?.(body)}
 								style={{ margin: '0 3px 6px 0' }}
