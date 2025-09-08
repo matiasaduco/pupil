@@ -43,10 +43,7 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 					&#8594;
 				</Button>
 			)}
-			<div
-				ref={containerRef}
-				className="snippets-container !bg-white flex space-x-3 overflow-x-auto whitespace-nowrap py-2 px-2"
-			>
+			<div ref={containerRef} className="snippets-container space-x-3 whitespace-nowrap">
 				{snippets?.all.flat().map((snippet) =>
 					Object.entries(snippet.snippets).map(([key, { body }]) => (
 						<HtmlTooltip
@@ -61,7 +58,7 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 							arrow
 						>
 							<Button
-								className="snippets-button !bg-white !border !border-gray-200 hover:!bg-gray-400 active:!bg-gray-500"
+								className="snippets-button rounded"
 								key={key}
 								onClick={() => onSnippetPress?.(body)}
 								style={{ margin: '0 3px 6px 0' }}

@@ -1,6 +1,4 @@
-import { KeyboardReact } from 'react-simple-keyboard'
-import 'react-simple-keyboard/build/css/index.css'
-import usePupilKeyboard from './hooks/usePupilKeyboard.js'
+import Keyboard from './Keyboard/Keyboard.js'
 import Snippets from './Snippets/Snippets.js'
 import { Button } from '@mui/material'
 
@@ -21,8 +19,6 @@ const PupilKeyboard = ({
 	focus,
 	switchFocus
 }: PupilKeyboardProps) => {
-	const { layout, display } = usePupilKeyboard()
-
 	return (
 		<div className="flex flex-col">
 			<div>
@@ -32,7 +28,7 @@ const PupilKeyboard = ({
 			{visible && (
 				<>
 					<Snippets onSnippetPress={onSnippetInput} />
-					<KeyboardReact onKeyPress={onInput} layout={layout} display={display} />
+					<Keyboard onKeyPress={onInput} />
 				</>
 			)}
 		</div>
