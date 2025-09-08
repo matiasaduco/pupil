@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { Ref, useImperativeHandle, useRef } from 'react'
 import type { editor } from 'monaco-editor'
-import { PupilEditorHandle } from '../../../types/PupilEditorHandle.js'
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 
 const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)

@@ -1,5 +1,5 @@
 {
-	"compilerOptions": {
+		"compilerOptions": {
 		"module": "Node16",
 		"target": "ES2022",
 		"outDir": "out",
@@ -12,7 +12,12 @@
 		"allowJs": true,
 		"typeRoots": ["./node_modules/@types"],
 		"resolveJsonModule": true,
-		"skipLibCheck": true
+			"skipLibCheck": true,
+			"baseUrl": "src/webview",
+			"paths": {
+				"@webview/*": ["*"],
+				"@components/*": ["components/*"],
+			}
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
