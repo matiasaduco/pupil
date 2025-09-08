@@ -1,6 +1,6 @@
 import { Editor } from '@monaco-editor/react'
 import { forwardRef } from 'react'
-import { PupilEditorHandle } from '../../types/PupilEditorHandle.js'
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import useEditorState from './hooks/useEditorState.js'
 import useForwardRef from './hooks/useForwardRef.js'
 

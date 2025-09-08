@@ -1,5 +1,5 @@
-import PupilEditor from '../PupilEditor/PupilEditor.js'
-import PupilKeyboard from '../PupilKeyboard/PupilKeyboard.js'
+import PupilEditor from '@components/PupilEditor/PupilEditor.js'
+import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
 import usePupilEditorContainer from './hooks/usePupilEditorContainer.js'
 
 const PupilEditorContainer = () => {

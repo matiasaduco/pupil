@@ -5,6 +5,8 @@ import { useEffect } from 'react'
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import HtmlTooltip from '@mui/material/Tooltip'
+import { Button } from '@mui/material'
+
 type SnippetsProps = {
 	onSnippetPress?: (input: string | string[]) => void
 }
@@ -22,24 +24,24 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 	return (
 		<section className="snippets-section">
 			{!atStart && (
-				<button
-					className="overflow-button overflow-left"
+				<Button
+					className="overflow-button left-0"
 					onMouseEnter={() => startScroll('left')}
 					onMouseLeave={stopScroll}
 					aria-label="Scroll left"
 				>
 					&#8592;
-				</button>
+				</Button>
 			)}
 			{!atEnd && (
-				<button
-					className="overflow-button overflow-right"
+				<Button
+					className="overflow-button right-0"
 					onMouseEnter={() => startScroll('right')}
 					onMouseLeave={stopScroll}
 					aria-label="Scroll right"
 				>
 					&#8594;
-				</button>
+				</Button>
 			)}
 			<div
 				ref={containerRef}
@@ -58,14 +60,14 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 							placement="top"
 							arrow
 						>
-							<button
+							<Button
 								className="snippets-button !bg-white !border !border-gray-200 hover:!bg-gray-400 active:!bg-gray-500"
 								key={key}
 								onClick={() => onSnippetPress?.(body)}
 								style={{ margin: '0 3px 6px 0' }}
 							>
 								{key}
-							</button>
+							</Button>
 						</HtmlTooltip>
 					))
 				)}

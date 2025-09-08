@@ -1,6 +1,6 @@
+import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { useRef, useState } from 'react'
-import { PupilEditorHandle } from '../../../types/PupilEditorHandle.js'
-import { useVsCodeApi } from '../../../contexts/VsCodeApiContext.js'
 
 type ActionsProps = {
 	editor: Record<string, () => void>

@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+
 .snippets-section {
 	position: relative;
 	overflow-x: auto;
@@ -7,11 +8,10 @@
 
 .snippets-button {
 	@apply py-2.5 px-5 text-sm font-medium text-gray-400
-         focus:outline-none bg-white rounded-lg border border-gray-200
-         hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100
-         dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400
-         dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700;
-
+			focus:outline-none bg-white rounded-lg border border-gray-200
+			hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100
+			dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400
+			dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700;
 	display: inline-flex;
 	align-items: center;
 	justify-content: start;
@@ -26,21 +26,23 @@
 
 .snippets-container {
 	@apply py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900
-         focus:outline-none bg-white rounded-lg border border-gray-200
-         hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100
-         dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400
-         dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700;
+			focus:outline-none bg-white rounded-lg border border-gray-200
+			hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100
+			dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400
+			dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700;
 	overflow-x: auto;
 	white-space: nowrap;
 	position: relative;
+	display: flex;
+	padding: 2px;
 }
 
 .overflow-button {
 	@apply !py-2.5 !px-5 !me-2 !mb-2 !text-sm !font-medium 
-						!text-gray-900 !bg-white !rounded-lg !border !border-gray-200 
-						hover:!bg-gray-100 hover:!text-blue-700 focus:!z-10 focus:!ring-4 focus:!ring-gray-100
-						dark:focus:!ring-gray-700 dark:!bg-gray-800 dark:!text-gray-400 
-						dark:!border-gray-600 dark:hover:!text-white dark:hover:!bg-gray-700;
+			!text-gray-900 !bg-white !rounded-lg !border !border-gray-200 
+			hover:!bg-gray-100 hover:!text-blue-700 focus:!z-10 focus:!ring-4 focus:!ring-gray-100
+			dark:focus:!ring-gray-700 dark:!bg-gray-800 dark:!text-gray-400 
+			dark:!border-gray-600 dark:hover:!text-white dark:hover:!bg-gray-700;
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -53,12 +55,4 @@
 	height: 32px;
 	cursor: pointer;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.overflow-left {
-	left: 0;
-}
-
-.overflow-right {
-	right: 0;
 }
