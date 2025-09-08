@@ -13,7 +13,7 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 	({ keyboardVisible, visible }, ref) => {
 		const { handleOnMount } = useForwardRef(ref)
 		const { theme, language, value, handleOnChange } = useEditorState()
-		const editorHeight = keyboardVisible ? '50vh' : '90vh'
+		const editorHeight = keyboardVisible ? '60vh' : '90vh'
 
 		return (
 			<div style={{ height: editorHeight, display: visible ? 'block' : 'none' }}>
