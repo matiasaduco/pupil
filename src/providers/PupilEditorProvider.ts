@@ -48,6 +48,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			try {
 				if (message.type === 'ready' && !webviewReady) {
 					webviewReady = true
+					this.updateTheme(webviewPanel)
 					this.openTextDocument(webviewPanel, document)
 					this.getSnippets(webviewPanel)
 				}
