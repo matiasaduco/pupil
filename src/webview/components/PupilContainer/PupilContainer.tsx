@@ -11,6 +11,7 @@ import SimpleBrowserDialog from '../Toolbar/components/SimpleBrowserDialog.js'
 import CreateFileFolderDialog from '../Toolbar/components/CreateFileFolderDialog.js'
 import TranscriptDialog from '../Toolbar/components/TranscriptDialog/TranscriptDialog.js'
 import SettingsDialog from '../Toolbar/components/SettingsDialog.js'
+import BlinkDialog from '../Toolbar/components/BlinkDialog.js'
 import useDialog from './hooks/useDialog.js'
 
 const PupilContainer = () => {
@@ -36,10 +37,12 @@ const PupilContainer = () => {
 		openFileFolderDialog,
 		openTranscriptDialog,
 		openSettingsDialog,
+		openBlinkDialog,
 		setOpenSimpleBrowserDialog,
 		setOpenFileFolderDialog,
 		setOpenTranscriptDialog,
-		setOpenSettingsDialog
+		setOpenSettingsDialog,
+		setOpenBlinkDialog
 	} = useDialog()
 
 	const theme = createTheme({
@@ -85,6 +88,7 @@ const PupilContainer = () => {
 					openFileFolderDialog={() => setOpenFileFolderDialog(true)}
 					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
 					openSettingsDialog={() => setOpenSettingsDialog(true)}
+					openBlinkDialog={() => setOpenBlinkDialog(true)}
 				/>
 				<PupilKeyboard
 					onInput={handleKeyboardInput}
@@ -119,6 +123,10 @@ const PupilContainer = () => {
 					onStartServer={handleStartServer}
 					onStopServer={handleStopServer}
 					connectionStatus={connectionStatus}
+				/>
+				<BlinkDialog
+					open={openBlinkDialog}
+					onClose={() => setOpenBlinkDialog(false)}
 				/>
 			</div>
 		</ThemeProvider>

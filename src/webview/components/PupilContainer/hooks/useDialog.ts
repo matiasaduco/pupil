@@ -5,16 +5,19 @@ const useDialog = () => {
 	const [openFileFolderDialog, setOpenFileFolderDialog] = useState(false)
 	const [openTranscriptDialog, setOpenTranscriptDialog] = useState(false)
 	const [openSettingsDialog, setOpenSettingsDialog] = useState(false)
+	const [openBlinkDialog, setOpenBlinkDialog] = useState(false)
 
 	return {
 		openSimpleBrowserDialog,
 		openFileFolderDialog,
 		openTranscriptDialog,
 		openSettingsDialog,
+		openBlinkDialog,
 		setOpenSimpleBrowserDialog,
 		setOpenFileFolderDialog,
 		setOpenTranscriptDialog,
-		setOpenSettingsDialog
+		setOpenSettingsDialog,
+		setOpenBlinkDialog
 	}
 }
 
