@@ -11,7 +11,7 @@ type PupilKeyboardProps = {
 
 const PupilKeyboard = ({ onInput, visible, toggle, focus, switchFocus }: PupilKeyboardProps) => {
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col mx-3 my-2 gap-2">
 			<div>
 				<Button onClick={toggle}>{visible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
 				<Button onClick={switchFocus}>{focus}</Button>

@@ -1,6 +1,6 @@
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 type ActionsProps = {
 	editor: Record<string, () => void>
@@ -12,6 +12,18 @@ const usePupilEditorContainer = () => {
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const [focus, setFocus] = useState<'editor' | 'terminal'>('editor')
 	const vscode = useVsCodeApi()
+	const [colorScheme, setColorScheme] = useState<string>('vs')
+
+	useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			if (event.data.type === 'set-theme') {
+				setColorScheme(event.data.theme)
+			}
+		}
+
+		window.addEventListener('message', handleMessage)
+		return () => window.removeEventListener('message', handleMessage)
+	}, [])
 
 	const actions: ActionsProps = {
 		editor: {
@@ -57,23 +69,26 @@ const usePupilEditorContainer = () => {
 		}
 	}
 
+	const switchFocus = () =>
+		setFocus((prev) => {
+			if (prev === 'editor') {
+				vscode.postMessage({ type: 'open-terminal' })
+				return 'terminal'
+			} else {
+				vscode.postMessage({ type: 'hide-terminal' })
+				return 'editor'
+			}
+		})
+
 	return {
 		editorRef,
 		keyboardVisible,
 		toggle: () => setKeyboardVisible(!keyboardVisible),
 		handleKeyboardInput,
 		handleSnippetPress,
+		colorScheme,
 		focus,
-		switchFocus: () =>
-			setFocus((prev) => {
-				if (prev === 'editor') {
-					vscode.postMessage({ type: 'open-terminal' })
-					return 'terminal'
-				} else {
-					vscode.postMessage({ type: 'hide-terminal' })
-					return 'editor'
-				}
-			})
+		switchFocus
 	}
 }
 

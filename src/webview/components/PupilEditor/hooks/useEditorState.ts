@@ -2,16 +2,13 @@ import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useEffect, useState } from 'react'
 
 const useEditorState = () => {
-	const [theme, setTheme] = useState<string>('vs-dark')
 	const [value, setValue] = useState<string>('')
 	const [language, setLanguage] = useState<string>('plaintext')
 	const vscode = useVsCodeApi()
 
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
-			if (event.data.type === 'set-theme') {
-				setEditorTheme(event)
-			} else if (event.data.type === 'init') {
+			if (event.data.type === 'init') {
 				setDocumentText(event)
 			}
 		}
@@ -21,10 +18,6 @@ const useEditorState = () => {
 
 		return () => window.removeEventListener('message', handleMessage)
 	}, [])
-
-	const setEditorTheme = (event: MessageEvent) => {
-		setTheme(event.data.theme)
-	}
 
 	const setDocumentText = (event: MessageEvent) => {
 		const msg = event.data
@@ -56,7 +49,7 @@ const useEditorState = () => {
 		setValue(value || '')
 	}
 
-	return { theme, value, language, handleOnChange, setEditorTheme, setDocumentText }
+	return { value, language, handleOnChange, setDocumentText }
 }
 
 export default useEditorState

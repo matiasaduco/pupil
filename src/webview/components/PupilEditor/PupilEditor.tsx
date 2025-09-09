@@ -7,12 +7,13 @@ import useForwardRef from './hooks/useForwardRef.js'
 type PupilEditorProps = {
 	keyboardVisible?: boolean
 	visible?: boolean
+	theme?: string
 }
 
 const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
-	({ keyboardVisible, visible }, ref) => {
+	({ keyboardVisible, visible, theme }, ref) => {
 		const { handleOnMount } = useForwardRef(ref)
-		const { theme, language, value, handleOnChange } = useEditorState()
+		const { language, value, handleOnChange } = useEditorState()
 		const editorHeight = keyboardVisible ? '60vh' : '90vh'
 
 		return (
