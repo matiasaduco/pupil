@@ -22,6 +22,31 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	const insertAtCursor = (text: string) => {
 		const editor = editorRef.current
 		const position = editor?.getPosition()
+		const selection = editor?.getSelection()
+
+		// Si hay selección activa, reemplazarla
+		if (selection && !selection.isEmpty() && editor) {
+			editor.executeEdits(null, [
+				{
+					range: selection,
+					text,
+					forceMoveMarkers: true
+				}
+			])
+
+			// Mover el cursor al final del texto insertado
+			const endPosition = editor.getPosition()
+			if (endPosition) {
+				editor.setPosition({
+					lineNumber: endPosition.lineNumber,
+					column: endPosition.column + text.length
+				})
+			}
+
+			setTimeout(() => editor.focus(), 0)
+
+			return
+		}
 
 		if (monaco && editor && position) {
 			const range = new monaco.Range(
@@ -50,8 +75,30 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	const deleteAtCursor = () => {
 		const editor = editorRef.current
 		const position = editor?.getPosition()
+		const selection = editor?.getSelection()
 
-		if (monaco && editor && position) {
+		if (monaco && editor && position && selection) {
+			// Si hay selección activa (más de un carácter o varias líneas)
+			if (!selection.isEmpty()) {
+				editor.executeEdits(null, [
+					{
+						range: selection,
+						text: '',
+						forceMoveMarkers: true
+					}
+				])
+
+				// Mover el cursor al inicio de la selección borrada
+				editor.setPosition({
+					lineNumber: selection.startLineNumber,
+					column: selection.startColumn
+				})
+
+				setTimeout(() => editor.focus(), 0)
+
+				return
+			}
+
 			if (position.column === 1) {
 				// Si no es la primera línea, unir con la anterior
 				if (position.lineNumber > 1) {
@@ -73,9 +120,8 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 
 						// Mover el cursor al final de la línea anterior
 						editor.setPosition({ lineNumber: prevLine, column: prevLineLength + 1 })
-						setTimeout(() => {
-							editor.focus()
-						}, 0)
+
+						setTimeout(() => editor.focus(), 0)
 					}
 				}
 				return
@@ -97,9 +143,7 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 				}
 			])
 
-			setTimeout(() => {
-				editor.focus()
-			}, 0)
+			setTimeout(() => editor.focus(), 0)
 		}
 	}
 
@@ -137,9 +181,7 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 					column: indent.length + 1
 				})
 
-				setTimeout(() => {
-					editor.focus()
-				}, 0)
+				setTimeout(() => editor.focus(), 0)
 			}
 		}
 	}
@@ -147,49 +189,62 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	const commentAtCursor = () => {
 		const editor = editorRef.current
 		const position = editor?.getPosition()
+		const selection = editor?.getSelection()
 
 		if (monaco && editor && position) {
 			const model = editor.getModel()
 			if (model) {
-				const lineContent = model.getLineContent(position.lineNumber)
-				const trimmedLine = lineContent.trim()
-				let newText: string
-				let cursorOffset: number
-
-				if (trimmedLine.startsWith('//')) {
-					// Si ya está comentada, descomentar
-					newText = lineContent.replace('//', '')
-					cursorOffset = -2 // Ajuste del cursor al eliminar "//"
-				} else {
-					// Comentar la línea
-					newText = '//' + lineContent
-					cursorOffset = 2 // Ajuste del cursor al agregar "//"
+				let startLine = position.lineNumber
+				let endLine = position.lineNumber
+				if (selection && !selection.isEmpty()) {
+					startLine = selection.startLineNumber
+					endLine = selection.endLineNumber
 				}
 
-				const range = new monaco.Range(
-					position.lineNumber,
-					1,
-					position.lineNumber,
-					lineContent.length + 1
-				)
+				// Detectar si todas las líneas están comentadas
+				let allCommented = true
+				for (let i = startLine; i <= endLine; i++) {
+					const lineContent = model.getLineContent(i).trim()
+					if (!lineContent.startsWith('//')) {
+						allCommented = false
+						break
+					}
+				}
 
-				editor.executeEdits(null, [
-					{
-						range,
+				const edits = []
+				for (let i = startLine; i <= endLine; i++) {
+					const lineContent = model.getLineContent(i)
+					let newText
+					if (allCommented) {
+						// Descomentar
+						newText = lineContent.replace(/^\s*\/\//, '')
+					} else {
+						// Comentar
+						newText = '//' + lineContent
+					}
+					edits.push({
+						range: new monaco.Range(i, 1, i, lineContent.length + 1),
 						text: newText,
 						forceMoveMarkers: true
-					}
-				])
+					})
+				}
+				editor.executeEdits(null, edits)
 
 				// Ajustar la posición del cursor
-				editor.setPosition({
-					lineNumber: position.lineNumber,
-					column: position.column + cursorOffset
-				})
+				if (selection && !selection.isEmpty()) {
+					// Mantener la selección
+					editor.setSelection(
+						new monaco.Selection(startLine, 1, endLine, model.getLineMaxColumn(endLine))
+					)
+				} else {
+					// Mantener la posición del cursor en la línea actual
+					editor.setPosition({
+						lineNumber: position.lineNumber,
+						column: position.column + (allCommented ? -2 : 2)
+					})
+				}
 
-				setTimeout(() => {
-					editor.focus()
-				}, 0)
+				setTimeout(() => editor.focus(), 0)
 			}
 		}
 	}
