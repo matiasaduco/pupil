@@ -12,7 +12,7 @@ const usePupilEditorContainer = () => {
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const [focus, setFocus] = useState<'editor' | 'terminal'>('editor')
 	const vscode = useVsCodeApi()
-	const [colorScheme, setColorScheme] = useState<string>('vs')
+	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
@@ -88,7 +88,8 @@ const usePupilEditorContainer = () => {
 		handleSnippetPress,
 		colorScheme,
 		focus,
-		switchFocus
+		switchFocus,
+		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs'))
 	}
 }
 
