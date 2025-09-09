@@ -1,11 +1,12 @@
 import React, { createContext, useContext } from 'react'
 import { VsCodeApi } from '../../global.js'
 import VsCodeMessage from '@webview/types/VsCodeMessage.js'
+import { useDebuggerContext } from './DebuggerContext.js'
 
 const VsCodeApiContext = createContext<VsCodeApi | null>(null)
 
 export const VsCodeApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const isDev = window.location.hostname === 'localhost'
+	const isDev = useDebuggerContext()
 
 	let vscode: VsCodeApi = isDev
 		? mockVsCodeApi()
