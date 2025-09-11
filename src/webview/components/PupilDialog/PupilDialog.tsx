@@ -1,5 +1,6 @@
 import { Button, Card, CardActions, CardContent, CardHeader } from '@mui/material'
 import { createPortal } from 'react-dom'
+import { useEffect, useState } from 'react'
 
 type PupilDialogProps = {
 	open: boolean
@@ -10,6 +11,31 @@ type PupilDialogProps = {
 }
 
 const PupilDialog = ({ open, title, children, onSubmit, onCancel }: PupilDialogProps) => {
+	const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(
+		typeof window !== 'undefined' ? document.getElementById('pupil-dialog-portal') : null
+	)
+
+	useEffect(() => {
+		if (portalTarget || typeof window === 'undefined') {
+			return
+		}
+
+		const observer = new MutationObserver(() => {
+			const portal = document.getElementById('pupil-dialog-portal')
+			if (portal) {
+				setPortalTarget(portal)
+				observer.disconnect()
+			}
+		})
+
+		observer.observe(document.body, { childList: true, subtree: true })
+		return () => observer.disconnect()
+	}, [portalTarget])
+
+	if (!portalTarget) {
+		return null
+	}
+
 	return createPortal(
 		open && (
 			<>
@@ -24,8 +50,7 @@ const PupilDialog = ({ open, title, children, onSubmit, onCancel }: PupilDialogP
 				</Card>
 			</>
 		),
-
-		document.getElementById('pupil-dialog-portal')!
+		portalTarget
 	)
 }
 

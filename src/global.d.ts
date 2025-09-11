@@ -9,4 +9,8 @@ export type VsCodeApi = {
 
 declare global {
 	function acquireVsCodeApi(): VsCodeApi
+
+	interface Window {
+	    __vscodeApiInstance?: VsCodeApi
+	}
 }

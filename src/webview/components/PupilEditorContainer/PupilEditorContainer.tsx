@@ -38,15 +38,12 @@ const PupilEditorContainer = () => {
 				</IconButton>
 			)}
 			<div className="flex flex-col">
-				<div className="relative">
-					<PupilEditor
-						ref={editorRef}
-						keyboardVisible={keyboardVisible}
-						visible={focus === 'editor'}
-						theme={colorScheme}
-					/>
-					<span id="pupil-dialog-portal" />
-				</div>
+				<PupilEditor
+					ref={editorRef}
+					keyboardVisible={keyboardVisible}
+					visible={focus === 'editor'}
+					theme={colorScheme}
+				/>
 				<Snippets onSnippetPress={handleSnippetPress} />
 				<PupilKeyboard
 					onInput={handleKeyboardInput}
