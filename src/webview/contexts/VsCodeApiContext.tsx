@@ -6,7 +6,12 @@ const VsCodeApiContext = createContext<VsCodeApi | null>(null)
 
 export const VsCodeApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const isDev = window.location.hostname === 'localhost'
-	const vscode: VsCodeApi = isDev ? mockVsCodeApi() : acquireVsCodeApi()
+
+	let vscode: VsCodeApi = isDev
+		? mockVsCodeApi()
+		: !window.__vscodeApiInstance
+			? (window.__vscodeApiInstance = acquireVsCodeApi())
+			: window.__vscodeApiInstance
 
 	return <VsCodeApiContext.Provider value={vscode}>{children}</VsCodeApiContext.Provider>
 }

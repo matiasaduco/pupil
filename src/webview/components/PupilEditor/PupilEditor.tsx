@@ -17,7 +17,10 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 		const editorHeight = keyboardVisible ? '60vh' : '90vh'
 
 		return (
-			<div style={{ height: editorHeight, display: visible ? 'block' : 'none' }}>
+			<div
+				className="relative"
+				style={{ height: editorHeight, display: visible ? 'block' : 'none' }}
+			>
 				<Editor
 					theme={theme}
 					language={language}
@@ -26,6 +29,7 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 					onMount={handleOnMount}
 					height="100%"
 				/>
+				<span id="pupil-dialog-portal" />
 			</div>
 		)
 	}
