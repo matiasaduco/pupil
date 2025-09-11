@@ -23,13 +23,6 @@ const mockVsCodeApi = (): VsCodeApi => {
 	return {
 		postMessage: (message: VsCodeMessage) => {
 			console.log('Mock VSCode API - postMessage:', message)
-		},
-		getState: () => {
-			console.log('Mock VSCode API - getState')
-			return null
-		},
-		setState: (state: VsCodeMessage) => {
-			console.log('Mock VSCode API - setState:', state)
 		}
 	}
 }
