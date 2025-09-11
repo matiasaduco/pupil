@@ -2,9 +2,18 @@ import PupilEditor from '@components/PupilEditor/PupilEditor.js'
 import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
 import usePupilEditorContainer from './hooks/usePupilEditorContainer.js'
 import Snippets from '../Snippets/Snippets.js'
+<<<<<<< Updated upstream
 import { createTheme, ThemeProvider } from '@mui/material'
 
 const PupilEditorContainer = () => {
+=======
+import { createTheme, IconButton, ThemeProvider } from '@mui/material'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+
+const PupilEditorContainer = () => {
+	const isDev = window.location.hostname === 'localhost'
+>>>>>>> Stashed changes
 	const {
 		editorRef,
 		keyboardVisible,
