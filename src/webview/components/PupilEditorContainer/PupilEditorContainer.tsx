@@ -5,8 +5,50 @@ import Snippets from '../Snippets/Snippets.js'
 import { Button, createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
+import blink from './blink.js'
+import { useRef, useState } from 'react'
 
 const PupilEditorContainer = () => {
+	const videoRef = useRef(null)
+	const [blinkCount, setBlinkCount] = useState(0)
+	const [detecting, setDetecting] = useState(false)
+	const detectingRef = useRef(false)
+
+	const startBlinkDetection = async () => {
+		setDetecting(true)
+		detectingRef.current = true
+		if (videoRef.current) {
+			await blink.loadModel()
+			await blink.setUpCamera(videoRef.current)
+			let blinkCounter = 0
+			let prevBlink = false
+			const detectLoop = async () => {
+				const event = await blink.getBlinkPrediction()
+				if (event) {
+					// Detectar transición de abierto a cerrado
+					if (!prevBlink && event.blink) {
+						blinkCounter++
+						setBlinkCount(blinkCounter)
+					}
+					prevBlink = event.blink
+				}
+				if (detectingRef.current) {
+					requestAnimationFrame(detectLoop)
+				}
+			}
+			detectLoop()
+		}
+	}
+
+	// Opcional: función para detener la detección
+	const stopBlinkDetection = () => {
+		setDetecting(false)
+		detectingRef.current = false
+		if (blink && blink.stopPrediction) {
+			blink.stopPrediction()
+		}
+	}
+
 	const isDev = window.location.hostname === 'localhost'
 	const {
 		editorRef,
@@ -28,6 +70,25 @@ const PupilEditorContainer = () => {
 
 	return (
 		<ThemeProvider theme={theme}>
+			{/* Ejemplo de integración de blink-detection */}
+			<div style={{ marginBottom: 16, position: 'absolute', zIndex: 10 }}>
+				<video
+					ref={videoRef}
+					width={320}
+					height={240}
+					autoPlay
+					style={{ display: detecting ? 'block' : 'none' }}
+				/>
+				<button onClick={startBlinkDetection} disabled={detecting}>
+					{detecting ? 'Detectando...' : 'Iniciar detección de parpadeos'}
+				</button>
+				{detecting && (
+					<button onClick={stopBlinkDetection} style={{ marginLeft: 8 }}>
+						Detener detección
+					</button>
+				)}
+				<div>Parpadeos detectados: {blinkCount}</div>
+			</div>
 			{isDev && (
 				<IconButton className="absolute border-2 border-gray-500 top-2 right-2 z-50" size="small">
 					{colorScheme === 'vs' ? (
