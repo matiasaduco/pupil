@@ -8,10 +8,10 @@ type ActionsProps = {
 }
 
 const usePupilEditorContainer = () => {
+	const vscode = useVsCodeApi()
 	const editorRef = useRef<PupilEditorHandle>(null)
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const [focus, setFocus] = useState<'editor' | 'terminal'>('editor')
-	const vscode = useVsCodeApi()
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 
 	useEffect(() => {
@@ -31,16 +31,15 @@ const usePupilEditorContainer = () => {
 			'{bksp}': () => editorRef.current?.deleteAtCursor(),
 			'{enter}': () => editorRef.current?.enterAtCursor(),
 			'{comment}': () => editorRef.current?.commentAtCursor(),
-			'{create-terminal}': () => vscode.postMessage({ type: 'create-terminal' }),
-			'{open-terminal}': () => vscode.postMessage({ type: 'open-terminal' })
+			'{create-terminal}': () => vscode.postMessage({ type: 'terminal-create' }),
+			'{open-terminal}': () => vscode.postMessage({ type: 'terminal-open' })
 		},
 		terminal: {
-			'{space}': () => editorRef.current?.insertAtCursor(' '),
+			'{space}': () => vscode.postMessage({ type: 'terminal-space' }),
 			'{bksp}': () => vscode.postMessage({ type: 'terminal-bksp' }),
 			'{enter}': () => vscode.postMessage({ type: 'terminal-enter' }),
-			'{clear}': () => vscode.postMessage({ type: 'terminal-clear' }),
-			'{create-terminal}': () => vscode.postMessage({ type: 'create-terminal' }),
-			'{open-terminal}': () => vscode.postMessage({ type: 'open-terminal' }),
+			'{create-terminal}': () => vscode.postMessage({ type: 'terminal-create' }),
+			'{open-terminal}': () => vscode.postMessage({ type: 'terminal-open' }),
 			'{cls}': () => vscode.postMessage({ type: 'terminal-clear' })
 		}
 	}
@@ -56,26 +55,13 @@ const usePupilEditorContainer = () => {
 		}
 	}
 
-	const handleSnippetPress = (snippet: string | string[]) => {
-		if (Array.isArray(snippet)) {
-			snippet.forEach((line, index) => {
-				editorRef.current?.insertAtCursor(line)
-				if (index < snippet.length - 1) {
-					editorRef.current?.enterAtCursor()
-				}
-			})
-		} else {
-			editorRef.current?.insertAtCursor(snippet)
-		}
-	}
-
 	const switchFocus = () =>
 		setFocus((prev) => {
 			if (prev === 'editor') {
-				vscode.postMessage({ type: 'open-terminal' })
+				vscode.postMessage({ type: 'terminal-open' })
 				return 'terminal'
 			} else {
-				vscode.postMessage({ type: 'hide-terminal' })
+				vscode.postMessage({ type: 'terminal-hide' })
 				return 'editor'
 			}
 		})
@@ -85,7 +71,6 @@ const usePupilEditorContainer = () => {
 		keyboardVisible,
 		toggle: () => setKeyboardVisible(!keyboardVisible),
 		handleKeyboardInput,
-		handleSnippetPress,
 		colorScheme,
 		focus,
 		switchFocus,

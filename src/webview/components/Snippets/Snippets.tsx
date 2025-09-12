@@ -1,19 +1,21 @@
 import useScroll from './hooks/useScroll.js'
 import useSnippets from './hooks/useSnippets.js'
 import './Snippets.css'
-import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import HtmlTooltip from '@mui/material/Tooltip'
 import { Button, IconButton } from '@mui/material'
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import ArrowForward from '@mui/icons-material/ArrowForward'
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
+import { RefObject } from 'react'
 
 type SnippetsProps = {
+	editorRef: RefObject<PupilEditorHandle | null>
 	onSnippetPress?: (input: string | string[]) => void
 }
 
-const Snippets = ({ onSnippetPress }: SnippetsProps) => {
-	const { snippets } = useSnippets()
+const Snippets = ({ editorRef }: SnippetsProps) => {
+	const { snippets, handleSnippetPress } = useSnippets(editorRef)
 	const { containerRef, atStart, atEnd, startScroll, stopScroll } = useScroll()
 
 	return (
@@ -45,11 +47,11 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 					Object.entries(snippet.snippets).map(([key, { body }]) => (
 						<HtmlTooltip
 							title={
-								<React.Fragment>
+								<>
 									<Typography color="inherit">
 										{snippet.snippets[key]?.description || ''}{' '}
 									</Typography>
-								</React.Fragment>
+								</>
 							}
 							placement="top"
 							arrow
@@ -57,7 +59,7 @@ const Snippets = ({ onSnippetPress }: SnippetsProps) => {
 							<Button
 								className="snippets-button"
 								key={key}
-								onClick={() => onSnippetPress?.(body)}
+								onClick={() => handleSnippetPress?.(body)}
 								style={{ margin: '0 3px 6px 0' }}
 							>
 								{key}
