@@ -3,6 +3,7 @@ import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
+import { Message } from '@webview/types/Message.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
@@ -44,45 +45,56 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			}
 		})
 
-		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage((message) => {
-			try {
-				if (message.type === 'ready' && !webviewReady) {
-					webviewReady = true
-					this.updateTheme(webviewPanel)
-					this.openTextDocument(webviewPanel, document)
-					this.getSnippets(webviewPanel)
+		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage(
+			(message: Message) => {
+				try {
+					if (message.type === 'ready' && !webviewReady) {
+						webviewReady = true
+						this.updateTheme(webviewPanel)
+						this.openTextDocument(webviewPanel, document)
+						this.getSnippets(webviewPanel)
+					}
+					if (message.type === 'get-snippets') {
+						this.getSnippets(webviewPanel)
+					}
+					if (message.type === 'edit' && message.content) {
+						this.updateTextDocument(document, message.content)
+					}
+					if (message.type === 'terminal-open') {
+						this.openTerminal()
+					}
+					if (message.type === 'terminal-create') {
+						this.createTerminal()
+					}
+					if (message.type === 'terminal-input' && message.content) {
+						this.terminal?.sendText(message.content, false)
+					}
+					if (message.type === 'terminal-space') {
+						this.terminal?.sendText(' ', false)
+					}
+					if (message.type === 'terminal-bksp') {
+						this.terminal?.sendText('\b', false)
+					}
+					if (message.type === 'terminal-enter') {
+						this.terminal?.sendText('\n', false)
+					}
+					if (message.type === 'terminal-clear') {
+						this.terminal?.sendText('clear', true)
+					}
+					if (message.type === 'terminal-hide') {
+						this.terminal?.hide()
+					}
+					if (message.type === 'terminal-list') {
+						this.getTerminals(webviewPanel)
+					}
+					if (message.type === 'terminal-show' && message.content) {
+						this.showTerminal(message.content)
+					}
+				} catch (error) {
+					console.error('Error en onDidReceiveMessage:', error)
 				}
-				if (message.type === 'get-snippets') {
-					this.getSnippets(webviewPanel)
-				}
-				if (message.type === 'edit') {
-					this.updateTextDocument(document, message.content)
-				}
-				if (message.type === 'open-terminal') {
-					this.openTerminal()
-				}
-				if (message.type === 'create-terminal') {
-					this.createTerminal()
-				}
-				if (message.type === 'terminal-input') {
-					this.terminal?.sendText(message.value, false)
-				}
-				if (message.type === 'terminal-bksp') {
-					this.terminal?.sendText('\b', false)
-				}
-				if (message.type === 'terminal-enter') {
-					this.terminal?.sendText('\n', false)
-				}
-				if (message.type === 'terminal-clear') {
-					this.terminal?.sendText('clear', true)
-				}
-				if (message.type === 'hide-terminal') {
-					this.terminal?.hide()
-				}
-			} catch (error) {
-				console.error('Error en onDidReceiveMessage:', error)
 			}
-		})
+		)
 
 		const onDidChangeTextDocumentListener = vscode.workspace.onDidChangeTextDocument((e) => {
 			try {
@@ -133,5 +145,20 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private createTerminal() {
 		this.terminal = vscode.window.createTerminal('Pupil Terminal')
 		this.terminal.show()
+	}
+
+	private getTerminals(webviewPanel: vscode.WebviewPanel) {
+		webviewPanel.webview.postMessage({
+			type: 'set-terminals',
+			content: vscode.window.terminals
+		})
+	}
+
+	private showTerminal(index: number) {
+		const terminal = vscode.window.terminals[index]
+		if (terminal) {
+			this.terminal = terminal
+			this.terminal.show()
+		}
 	}
 }
