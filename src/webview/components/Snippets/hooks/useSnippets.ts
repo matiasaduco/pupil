@@ -1,5 +1,6 @@
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
-import { useEffect, useState } from 'react'
+import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
+import { RefObject, useEffect, useState } from 'react'
 
 type Snippet = {
 	extension: string
@@ -14,7 +15,7 @@ type SnippetMessage = {
 	all: Snippet[]
 }
 
-const useSnippets = () => {
+const useSnippets = (editorRef: RefObject<PupilEditorHandle | null>) => {
 	const vscode = useVsCodeApi()
 	const [snippets, setSnippets] = useState<SnippetMessage>()
 
@@ -33,7 +34,20 @@ const useSnippets = () => {
 		return () => window.removeEventListener('message', handleMessage)
 	}, [])
 
-	return { snippets }
+	const handleSnippetPress = (snippet: string | string[]) => {
+		if (Array.isArray(snippet)) {
+			snippet.forEach((line, index) => {
+				editorRef.current?.insertAtCursor(line)
+				if (index < snippet.length - 1) {
+					editorRef.current?.enterAtCursor()
+				}
+			})
+		} else {
+			editorRef.current?.insertAtCursor(snippet)
+		}
+	}
+
+	return { snippets, handleSnippetPress }
 }
 
 export default useSnippets

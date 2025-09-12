@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 import { VsCodeApi } from '../../global.js'
-import VsCodeMessage from '@webview/types/VsCodeMessage.js'
+import mockVsCodeApi from '@webview/mocks/MockVsCodeApi.js'
 
 const VsCodeApiContext = createContext<VsCodeApi | null>(null)
 
@@ -22,12 +22,4 @@ export const useVsCodeApi = () => {
 		throw new Error('useVsCodeApi must be used within a VsCodeApiProvider')
 	}
 	return context
-}
-
-const mockVsCodeApi = (): VsCodeApi => {
-	return {
-		postMessage: (message: VsCodeMessage) => {
-			console.log('Mock VSCode API - postMessage:', message)
-		}
-	}
 }
