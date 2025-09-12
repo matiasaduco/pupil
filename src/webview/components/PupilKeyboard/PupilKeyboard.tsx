@@ -1,23 +1,32 @@
-import Keyboard from './Keyboard/Keyboard.js'
 import { Button } from '@mui/material'
+import usePupilKeyboard from './hooks/usePupilKeyboard.js'
 
 type PupilKeyboardProps = {
 	onInput?: (input: string) => void
 	visible: boolean
-	toggle: () => void
-	focus: 'editor' | 'terminal'
-	switchFocus: () => void
 }
 
-const PupilKeyboard = ({ onInput, visible, toggle, focus, switchFocus }: PupilKeyboardProps) => {
+const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
+	const { layout } = usePupilKeyboard()
+
 	return (
-		<div className="flex flex-col mx-3 my-2 gap-2">
-			<div>
-				<Button onClick={toggle}>{visible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
-				<Button onClick={switchFocus}>{focus}</Button>
+		visible && (
+			<div className="grid grid-cols-30 gap-1 bg-gray-400 rounded p-2">
+				{layout.default.map((key) => {
+					const Icon = key.icon
+					return (
+						<Button
+							key={key.value}
+							onClick={() => onInput?.(key.value)}
+							className="rounded bg-gray-200 hover:bg-gray-300 active:bg-gray-400"
+							style={{ gridColumn: `span ${key.col || 2} / span ${key.col || 2}` }}
+						>
+							{Icon ? <Icon /> : key.label || key.value}
+						</Button>
+					)
+				})}
 			</div>
-			{visible && <Keyboard onKeyPress={onInput} />}
-		</div>
+		)
 	)
 }
 

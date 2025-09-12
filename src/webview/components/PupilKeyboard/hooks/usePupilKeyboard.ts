@@ -4,19 +4,9 @@ import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock'
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import SpaceBarIcon from '@mui/icons-material/SpaceBar'
+import { Layout } from '../entities/layout.js'
 
-type Key = {
-	value: string
-	label?: string
-	icon?: React.ElementType
-	col?: number
-}
-
-type Layout = {
-	[key: string]: Key[]
-}
-
-const useKeyboard = () => {
+const usePupilKeyboard = () => {
 	// const layout = {
 	// 	shift: [
 	// 		shortcuts,
@@ -97,4 +87,4 @@ const useKeyboard = () => {
 	return { layout }
 }
 
-export default useKeyboard
+export default usePupilKeyboard

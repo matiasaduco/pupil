@@ -27,7 +27,6 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 					value={value}
 					onChange={handleOnChange}
 					onMount={handleOnMount}
-					height="100%"
 				/>
 				<span id="pupil-dialog-portal" />
 			</div>

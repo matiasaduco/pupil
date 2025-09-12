@@ -2,7 +2,7 @@ import PupilEditor from '@components/PupilEditor/PupilEditor.js'
 import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
 import usePupilEditorContainer from './hooks/usePupilEditorContainer.js'
 import Snippets from '../Snippets/Snippets.js'
-import { createTheme, IconButton, ThemeProvider } from '@mui/material'
+import { Button, createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 
@@ -45,13 +45,9 @@ const PupilEditorContainer = () => {
 					theme={colorScheme}
 				/>
 				<Snippets onSnippetPress={handleSnippetPress} />
-				<PupilKeyboard
-					onInput={handleKeyboardInput}
-					visible={keyboardVisible}
-					toggle={toggle}
-					focus={focus}
-					switchFocus={switchFocus}
-				/>
+				<Button onClick={toggle}>{keyboardVisible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
+				<Button onClick={switchFocus}>{focus}</Button>
+				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
 			</div>
 		</ThemeProvider>
 	)
