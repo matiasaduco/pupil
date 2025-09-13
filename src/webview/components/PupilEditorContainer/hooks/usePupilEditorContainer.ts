@@ -55,7 +55,7 @@ const usePupilEditorContainer = () => {
 		}
 	}
 
-	const switchFocus = () =>
+	const switchFocus = () => {
 		setFocus((prev) => {
 			if (prev === 'editor') {
 				vscode.postMessage({ type: 'terminal-open' })
@@ -65,6 +65,11 @@ const usePupilEditorContainer = () => {
 				return 'editor'
 			}
 		})
+	}
+
+	const openWeb = () => {
+		vscode.postMessage({ type: 'openWeb' })
+	}
 
 	return {
 		editorRef,
@@ -74,7 +79,8 @@ const usePupilEditorContainer = () => {
 		colorScheme,
 		focus,
 		switchFocus,
-		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs'))
+		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs')),
+		openWeb
 	}
 }
 

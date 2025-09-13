@@ -4,6 +4,7 @@ import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
 import { Message } from '@webview/types/Message.js'
+import { WebPreviewProvider } from './WebPreviewProvider.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
@@ -89,6 +90,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'terminal-show' && message.content) {
 						this.showTerminal(message.content)
+					}
+					if (message.type === 'openWeb') {
+						WebPreviewProvider.showPanel()
 					}
 				} catch (error) {
 					console.error('Error en onDidReceiveMessage:', error)

@@ -17,7 +17,8 @@ const PupilEditorContainer = () => {
 		colorScheme,
 		focus,
 		switchFocus,
-		switchColorScheme
+		switchColorScheme,
+		openWeb
 	} = usePupilEditorContainer()
 
 	const theme = createTheme({
@@ -48,6 +49,7 @@ const PupilEditorContainer = () => {
 				<section className="flex flex-wrap">
 					<Button onClick={toggle}>{keyboardVisible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
 					<Button onClick={switchFocus}>{focus}</Button>
+					<Button onClick={openWeb}>Localhost</Button>
 					<TerminalsDialog />
 				</section>
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />

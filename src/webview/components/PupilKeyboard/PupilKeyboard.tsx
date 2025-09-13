@@ -11,7 +11,7 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 
 	return (
 		visible && (
-			<div className="grid grid-cols-30 gap-1 bg-gray-400 rounded p-2">
+			<div className="grid grid-cols-30 gap-1 bg-gray-400 rounded p-2 h-[30vh]">
 				{layout.default.map((key) => {
 					const Icon = key.icon
 					return (
