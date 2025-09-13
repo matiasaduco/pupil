@@ -1,10 +1,11 @@
 import PupilEditor from '@components/PupilEditor/PupilEditor.js'
 import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
 import usePupilEditorContainer from './hooks/usePupilEditorContainer.js'
-import Snippets from '../Snippets/Snippets.js'
 import { Button, createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
+import Snippets from '../Snippets/Snippets.js'
+import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
 
 const PupilEditorContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
@@ -13,7 +14,6 @@ const PupilEditorContainer = () => {
 		keyboardVisible,
 		toggle,
 		handleKeyboardInput,
-		handleSnippetPress,
 		colorScheme,
 		focus,
 		switchFocus,
@@ -44,9 +44,12 @@ const PupilEditorContainer = () => {
 					visible={focus === 'editor'}
 					theme={colorScheme}
 				/>
-				<Snippets onSnippetPress={handleSnippetPress} />
-				<Button onClick={toggle}>{keyboardVisible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
-				<Button onClick={switchFocus}>{focus}</Button>
+				<Snippets editorRef={editorRef} />
+				<section className="flex flex-wrap">
+					<Button onClick={toggle}>{keyboardVisible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
+					<Button onClick={switchFocus}>{focus}</Button>
+					<TerminalsDialog />
+				</section>
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
 			</div>
 		</ThemeProvider>
