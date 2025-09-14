@@ -17,3 +17,4 @@ type MessageType =
 	| 'terminal-hide'
 	| 'terminal-list'
 	| 'terminal-show'
+	| 'openWeb'

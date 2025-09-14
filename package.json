@@ -12,12 +12,7 @@
 	"activationEvents": [],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "pupil.openWebview",
-				"title": "Start Pupil"
-			}
-		],
+		"commands": [],
 		"customEditors": [
 			{
 				"viewType": "pupil.editor",
