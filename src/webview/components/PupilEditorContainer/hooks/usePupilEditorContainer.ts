@@ -31,15 +31,27 @@ const usePupilEditorContainer = () => {
 			'{bksp}': () => editorRef.current?.deleteAtCursor(),
 			'{enter}': () => editorRef.current?.enterAtCursor(),
 			'{comment}': () => editorRef.current?.commentAtCursor(),
-			'{create-terminal}': () => vscode.postMessage({ type: 'terminal-create' }),
-			'{open-terminal}': () => vscode.postMessage({ type: 'terminal-open' })
+			'{create-terminal}': () => {
+				vscode.postMessage({ type: 'terminal-create' })
+				setFocus('terminal')
+			},
+			'{open-terminal}': () => {
+				vscode.postMessage({ type: 'terminal-open' })
+				setFocus('terminal')
+			}
 		},
 		terminal: {
 			'{space}': () => vscode.postMessage({ type: 'terminal-space' }),
 			'{bksp}': () => vscode.postMessage({ type: 'terminal-bksp' }),
 			'{enter}': () => vscode.postMessage({ type: 'terminal-enter' }),
-			'{create-terminal}': () => vscode.postMessage({ type: 'terminal-create' }),
-			'{open-terminal}': () => vscode.postMessage({ type: 'terminal-open' }),
+			'{create-terminal}': () => {
+				vscode.postMessage({ type: 'terminal-create' })
+				setFocus('terminal')
+			},
+			'{open-terminal}': () => {
+				vscode.postMessage({ type: 'terminal-open' })
+				setFocus('terminal')
+			},
 			'{cls}': () => vscode.postMessage({ type: 'terminal-clear' })
 		}
 	}
@@ -51,7 +63,7 @@ const usePupilEditorContainer = () => {
 		} else if (focus === 'editor') {
 			editorRef.current?.insertAtCursor(input)
 		} else if (focus === 'terminal') {
-			vscode.postMessage({ type: 'terminal-input', value: input })
+			vscode.postMessage({ type: 'terminal-input', content: input })
 		}
 	}
 
@@ -80,7 +92,8 @@ const usePupilEditorContainer = () => {
 		focus,
 		switchFocus,
 		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs')),
-		openWeb
+		openWeb,
+		stopProcess: () => vscode.postMessage({ type: 'terminal-stop-process' })
 	}
 }
 
