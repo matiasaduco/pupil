@@ -82,6 +82,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					if (message.type === 'terminal-clear') {
 						this.terminal?.sendText('clear', true)
 					}
+					if (message.type === 'terminal-stop-process') {
+						this.terminal?.sendText('\x03', true)
+					}
 					if (message.type === 'terminal-hide') {
 						this.terminal?.hide()
 					}
