@@ -65,7 +65,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.openTerminal()
 					}
 					if (message.type === 'terminal-create') {
-						this.createTerminal()
+						this.createTerminal(message.content || 'Pupil Terminal')
 					}
 					if (message.type === 'terminal-input' && message.content) {
 						this.terminal?.sendText(message.content, false)
@@ -113,10 +113,19 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			}
 		})
 
+		const onDidCloseTerminalListener = vscode.window.onDidCloseTerminal((closedTerminal) => {
+			try {
+				this.dittachTerminal(closedTerminal)
+			} catch (error) {
+				console.error('Error en onDidCloseTerminal:', error)
+			}
+		})
+
 		webviewPanel.onDidDispose(() => {
 			onDidChangeActiveColorThemeListener.dispose()
 			onDidReceiveMessageListener.dispose()
 			onDidChangeTextDocumentListener.dispose()
+			onDidCloseTerminalListener.dispose()
 		})
 	}
 
@@ -144,13 +153,13 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.postMessage({ type: 'snippets', snippets })
 	}
 
-	private openTerminal() {
-		this.terminal = this.terminal || vscode.window.createTerminal('Pupil Terminal')
+	private openTerminal(title?: string) {
+		this.terminal = this.terminal || vscode.window.createTerminal(title)
 		this.terminal.show()
 	}
 
-	private createTerminal() {
-		this.terminal = vscode.window.createTerminal('Pupil Terminal')
+	private createTerminal(title: string) {
+		this.terminal = vscode.window.createTerminal(title)
 		this.terminal.show()
 	}
 
@@ -166,6 +175,12 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		if (terminal) {
 			this.terminal = terminal
 			this.terminal.show()
+		}
+	}
+
+	private dittachTerminal(closedTerminal: vscode.Terminal) {
+		if (this.terminal && closedTerminal === this.terminal) {
+			this.terminal = null
 		}
 	}
 }
