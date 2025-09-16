@@ -66,7 +66,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					this.openTerminal()
 				}
 				if (message.type === 'terminal-create') {
-					this.createTerminal()
+					this.createTerminal(message.content)
 				}
 				if (message.type === 'terminal-input' && message.content) {
 					this.terminal?.sendText(message.content, false)
@@ -118,10 +118,19 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			}
 		})
 
+		const onDidCloseTerminalListener = vscode.window.onDidCloseTerminal((closedTerminal) => {
+			try {
+				this.dittachTerminal(closedTerminal, webviewPanel)
+			} catch (error) {
+				console.error('Error en onDidCloseTerminal:', error)
+			}
+		})
+
 		webviewPanel.onDidDispose(() => {
 			onDidChangeActiveColorThemeListener.dispose()
 			onDidReceiveMessageListener.dispose()
 			onDidChangeTextDocumentListener.dispose()
+			onDidCloseTerminalListener.dispose()
 		})
 	}
 
@@ -162,13 +171,13 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		webviewPanel.webview.postMessage({ type: 'snippets', snippets })
 	}
 
-	private openTerminal() {
-		this.terminal = this.terminal || vscode.window.createTerminal('Pupil Terminal')
+	private openTerminal(title?: string) {
+		this.terminal = this.terminal || vscode.window.createTerminal(title)
 		this.terminal.show()
 	}
 
-	private createTerminal() {
-		this.terminal = vscode.window.createTerminal('Pupil Terminal')
+	private createTerminal(title?: string) {
+		this.terminal = vscode.window.createTerminal(title)
 		this.terminal.show()
 	}
 
@@ -226,5 +235,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private async openWeb(url: string = DEFAULT_URL) {
 		await vscode.commands.executeCommand('workbench.action.focusSecondEditorGroup')
 		await vscode.commands.executeCommand('simpleBrowser.show', url)
+	}
+
+	private dittachTerminal(closedTerminal: vscode.Terminal, webviewPanel: vscode.WebviewPanel) {
+		if (this.terminal && closedTerminal === this.terminal) {
+			this.terminal = null
+
+			webviewPanel.webview.postMessage({
+				type: 'set-focus',
+				focus: 'editor'
+			})
+		}
 	}
 }

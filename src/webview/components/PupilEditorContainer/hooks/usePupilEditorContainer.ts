@@ -20,6 +20,9 @@ const usePupilEditorContainer = () => {
 			if (event.data.type === 'set-theme') {
 				setColorScheme(event.data.theme)
 			}
+			if (event.data.type === 'set-focus') {
+				setFocus(event.data.focus)
+			}
 		}
 
 		window.addEventListener('message', handleMessage)
