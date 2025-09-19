@@ -6,6 +6,7 @@ import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Snippets from '../Snippets/Snippets.js'
 import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
+import CreateButton from '../PupilKeyboard/CreateButton.js'
 
 const PupilEditorContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
@@ -19,7 +20,7 @@ const PupilEditorContainer = () => {
 		switchFocus,
 		switchColorScheme,
 		openWeb,
-		stopProcess
+		stopProcess,
 	} = usePupilEditorContainer()
 
 	const theme = createTheme({
@@ -54,6 +55,7 @@ const PupilEditorContainer = () => {
 					<Button onClick={stopProcess}>Stop Process</Button>
 					<TerminalsDialog />
 				</section>
+				<CreateButton />
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
 			</div>
 		</ThemeProvider>

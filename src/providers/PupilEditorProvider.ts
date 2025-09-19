@@ -47,7 +47,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		})
 
 		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage(
-			(message: Message) => {
+			(message) => {
 				try {
 					if (message.type === 'ready' && !webviewReady) {
 						webviewReady = true
@@ -55,7 +55,13 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.openTextDocument(webviewPanel, document)
 						this.getSnippets(webviewPanel)
 					}
-					if (message.type === 'get-snippets') {
+					if (message.type === 'create-folder') {
+					this.createNewFolder(message.name)
+				}
+				if (message.type === 'create-file') {
+					this.createNewFile(message.name)
+					}
+				if (message.type === 'get-snippets') {
 						this.getSnippets(webviewPanel)
 					}
 					if (message.type === 'edit' && message.content) {
@@ -168,4 +174,42 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			this.terminal.show()
 		}
 	}
+
+	private async createNewFile(fileName: string) {
+		const folders = vscode.workspace.workspaceFolders
+		if (!folders || folders.length === 0) {
+			vscode.window.showErrorMessage("No workspace folder open.")
+			return
+		}
+
+		const rootUri = folders[0].uri
+		const fileUri = vscode.Uri.joinPath(rootUri, fileName)
+
+		const wsedit = new vscode.WorkspaceEdit()
+		wsedit.createFile(fileUri, { ignoreIfExists: true })
+		await vscode.workspace.applyEdit(wsedit)
+
+		const doc = await vscode.workspace.openTextDocument(fileUri)
+		await vscode.window.showTextDocument(doc)
+	}
+	
+	private async createNewFolder(folderName: string) {
+		const folders = vscode.workspace.workspaceFolders
+		if (!folders || folders.length === 0) {
+			vscode.window.showErrorMessage("No workspace folder open.")
+			return
+		}
+
+		const rootUri = folders[0].uri
+		const folderUri = vscode.Uri.joinPath(rootUri, folderName)
+
+		try {
+			await vscode.workspace.fs.createDirectory(folderUri)
+			vscode.window.showInformationMessage(`Folder "${folderName}" created.`)
+		} catch (err) {
+			vscode.window.showErrorMessage(`Could not create folder: ${err}`)
+		}
+}
+
+
 }
