@@ -17,8 +17,5 @@ type MessageType =
 	| 'terminal-hide'
 	| 'terminal-list'
 	| 'terminal-show'
-<<<<<<< Updated upstream
 	| 'openWeb'
-=======
 	| 'terminal-stop-process'
->>>>>>> Stashed changes
