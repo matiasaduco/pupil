@@ -56,8 +56,7 @@ const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
         <RadioGroup
           row
           value={type}
-          onChange={(e) => setType(e.target.value as 'file' | 'folder')}          
-        >
+          onChange={(e) => setType(e.target.value as 'file' | 'folder')}>
           <FormControlLabel value="file" control={<Radio />} label="File" />
           <FormControlLabel value="folder" control={<Radio />} label="Folder" />
         </RadioGroup>
