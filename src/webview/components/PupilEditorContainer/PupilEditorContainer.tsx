@@ -7,6 +7,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Snippets from '../Snippets/Snippets.js'
 import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
 import CreateButton from '../PupilKeyboard/CreateButton.js'
+import SimpleBrowser from '../SimpleBrowser/SimpleBrowser.js'
 
 const PupilEditorContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
@@ -51,11 +52,11 @@ const PupilEditorContainer = () => {
 				<section className="flex flex-wrap">
 					<Button onClick={toggle}>{keyboardVisible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
 					<Button onClick={switchFocus}>{focus}</Button>
-					<Button onClick={openWeb}>Localhost</Button>
+					<SimpleBrowser onClick={openWeb} />
 					<Button onClick={stopProcess}>Stop Process</Button>
 					<TerminalsDialog />
+					<CreateButton />
 				</section>
-				<CreateButton />
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
 			</div>
 		</ThemeProvider>

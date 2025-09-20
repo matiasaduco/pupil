@@ -3,7 +3,6 @@ import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
-import { WebPreviewProvider } from './WebPreviewProvider.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
@@ -47,9 +46,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 
 		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage((message) => {
 			try {
-        if (message.type === 'ready') {
-          this.init(webviewReady, webviewPanel, document)
-        }
+				if (message.type === 'ready') {
+					this.init(webviewReady, webviewPanel, document)
+				}
 				if (message.type === 'create-folder') {
 					this.createNewFolder(message.name)
 				}
@@ -96,7 +95,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					this.showTerminal(message.content)
 				}
 				if (message.type === 'openWeb') {
-					WebPreviewProvider.showPanel()
+					this.openWeb(message.url)
 				}
 			} catch (error) {
 				console.error('Error en onDidReceiveMessage:', error)
@@ -216,5 +215,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		} catch (err) {
 			vscode.window.showErrorMessage(`Could not create folder: ${err}`)
 		}
+	}
+
+	private async openWeb(url: string = 'http://localhost:3000') {
+		await vscode.commands.executeCommand('simpleBrowser.show', url)
 	}
 }

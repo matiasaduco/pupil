@@ -79,8 +79,8 @@ const usePupilEditorContainer = () => {
 		})
 	}
 
-	const openWeb = () => {
-		vscode.postMessage({ type: 'openWeb' })
+	const openWeb = (url: string = 'http://localhost', port: string = '3000') => {
+		vscode.postMessage({ type: 'openWeb', url: `${url}:${port}` })
 	}
 
 	return {
