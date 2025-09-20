@@ -3,7 +3,6 @@ import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
-import { Message } from '@webview/types/Message.js'
 import { WebPreviewProvider } from './WebPreviewProvider.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
@@ -48,12 +47,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 
 		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage((message) => {
 			try {
-				if (message.type === 'ready' && !webviewReady) {
-					webviewReady = true
-					this.updateTheme(webviewPanel)
-					this.openTextDocument(webviewPanel, document)
-					this.getSnippets(webviewPanel)
-				}
+        if (message.type === 'ready') {
+          this.init(webviewReady, webviewPanel, document)
+        }
 				if (message.type === 'create-folder') {
 					this.createNewFolder(message.name)
 				}
@@ -122,6 +118,19 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			onDidReceiveMessageListener.dispose()
 			onDidChangeTextDocumentListener.dispose()
 		})
+	}
+
+	private init(
+		webviewReady: boolean,
+		webviewPanel: vscode.WebviewPanel,
+		document: vscode.TextDocument
+	) {
+		if (!webviewReady) {
+			webviewReady = true
+			this.updateTheme(webviewPanel)
+			this.openTextDocument(webviewPanel, document)
+			this.getSnippets(webviewPanel)
+		}
 	}
 
 	private openTextDocument(webviewPanel: vscode.WebviewPanel, document: vscode.TextDocument) {
