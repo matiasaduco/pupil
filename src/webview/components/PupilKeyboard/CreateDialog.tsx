@@ -13,13 +13,12 @@ const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [type, setType] = useState<'file' | 'folder'>('file')
-  const [coords, setCoords] = useState({ x: 0, y: 0 })
+  
 
   useEffect(() => {
     const handleMiddleClick = (e: MouseEvent) => {
       if (e.button === 1) {
         e.preventDefault()
-        setCoords({ x: e.clientX, y: e.clientY })
         setOpen(true)
       }
     }
@@ -30,7 +29,6 @@ const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
   
   useEffect(() => {
     if (externalOpen) {
-      setCoords({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
       setOpen(true)
     }
   }, [externalOpen])
@@ -58,8 +56,7 @@ const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
         <RadioGroup
           row
           value={type}
-          onChange={(e) => setType(e.target.value as 'file' | 'folder')}
-          style={{ marginBottom: 16 }}
+          onChange={(e) => setType(e.target.value as 'file' | 'folder')}          
         >
           <FormControlLabel value="file" control={<Radio />} label="File" />
           <FormControlLabel value="folder" control={<Radio />} label="Folder" />
@@ -67,7 +64,6 @@ const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
 
         <TextField
           autoFocus
-          margin="dense"
           label={`${type === 'file' ? 'File' : 'Folder'} name`}
           fullWidth
           variant="outlined"

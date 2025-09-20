@@ -8,10 +8,7 @@ const CreateButton = () => {
 
   return (
     <>
-      <Button
-        variant="contained"
-        onClick={() => setOpen(true)}
-      >
+      <Button  onClick={() => setOpen(true)}>
         New File/Folder
       </Button>
 
