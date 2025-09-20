@@ -11,6 +11,6 @@ declare global {
 	function acquireVsCodeApi(): VsCodeApi
 
 	interface Window {
-	    __vscodeApiInstance?: VsCodeApi
+		__vscodeApiInstance?: VsCodeApi
 	}
 }

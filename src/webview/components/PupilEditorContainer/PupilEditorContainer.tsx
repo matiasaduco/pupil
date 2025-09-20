@@ -20,7 +20,7 @@ const PupilEditorContainer = () => {
 		switchFocus,
 		switchColorScheme,
 		openWeb,
-		stopProcess,
+		stopProcess
 	} = usePupilEditorContainer()
 
 	const theme = createTheme({
@@ -28,7 +28,7 @@ const PupilEditorContainer = () => {
 			mode: colorScheme === 'vs' ? 'light' : 'dark'
 		}
 	})
-	
+
 	return (
 		<ThemeProvider theme={theme}>
 			{isDev && (
