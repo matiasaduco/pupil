@@ -4,4 +4,5 @@ export type PupilEditorHandle = {
 	deleteAtCursor: () => void
 	enterAtCursor: () => void
 	commentAtCursor: () => void
+	copySelection: () => void
 }

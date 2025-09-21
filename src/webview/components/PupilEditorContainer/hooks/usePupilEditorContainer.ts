@@ -1,6 +1,7 @@
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { useEffect, useRef, useState } from 'react'
+import { DEFAULT_PORT, LOCALHOST } from '../../../../constants.js'
 
 type ActionsProps = {
 	editor: Record<string, () => void>
@@ -31,6 +32,7 @@ const usePupilEditorContainer = () => {
 			'{bksp}': () => editorRef.current?.deleteAtCursor(),
 			'{enter}': () => editorRef.current?.enterAtCursor(),
 			'{comment}': () => editorRef.current?.commentAtCursor(),
+			'{copy}': () => editorRef.current?.copySelection(),
 			'{create-terminal}': () => {
 				vscode.postMessage({ type: 'terminal-create' })
 				setFocus('terminal')
@@ -79,7 +81,7 @@ const usePupilEditorContainer = () => {
 		})
 	}
 
-	const openWeb = (url: string = 'http://localhost', port: string = '3000') => {
+	const openWeb = (url: string = LOCALHOST, port: string = DEFAULT_PORT) => {
 		vscode.postMessage({ type: 'openWeb', url: `${url}:${port}` })
 	}
 

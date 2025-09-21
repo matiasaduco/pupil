@@ -3,6 +3,7 @@ import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
+import { DEFAULT_URL } from '../constants.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
@@ -217,7 +218,8 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		}
 	}
 
-	private async openWeb(url: string = 'http://localhost:3000') {
+	private async openWeb(url: string = DEFAULT_URL) {
+		await vscode.commands.executeCommand('workbench.action.focusSecondEditorGroup')
 		await vscode.commands.executeCommand('simpleBrowser.show', url)
 	}
 }

@@ -249,6 +249,18 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 		}
 	}
 
+	const copySelection = () => {
+		const editor = editorRef.current
+		const selection = editor?.getSelection()
+		const model = editor?.getModel()
+		if (editor && selection && model && !selection.isEmpty()) {
+			const selectedText = model.getValueInRange(selection)
+			if (selectedText) {
+				navigator.clipboard.writeText(selectedText)
+			}
+		}
+	}
+
 	useImperativeHandle(
 		ref,
 		() => ({
@@ -256,7 +268,8 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 			insertAtCursor,
 			deleteAtCursor,
 			enterAtCursor,
-			commentAtCursor
+			commentAtCursor,
+			copySelection
 		}),
 		[monaco]
 	)

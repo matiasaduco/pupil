@@ -13,7 +13,7 @@ type PupilEditorProps = {
 const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 	({ keyboardVisible, visible, theme }, ref) => {
 		const { handleOnMount } = useForwardRef(ref)
-		const { language, value, handleOnChange } = useEditorState()
+		const { language, value, handleOnChange, initialValue } = useEditorState()
 		const editorHeight = keyboardVisible ? '65vh' : '90vh'
 
 		return (
@@ -25,6 +25,7 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 					theme={theme}
 					language={language}
 					value={value}
+					defaultValue={initialValue}
 					onChange={handleOnChange}
 					onMount={handleOnMount}
 				/>

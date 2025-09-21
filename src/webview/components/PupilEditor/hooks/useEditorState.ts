@@ -5,6 +5,7 @@ const useEditorState = () => {
 	const [value, setValue] = useState<string>('')
 	const [language, setLanguage] = useState<string>('plaintext')
 	const vscode = useVsCodeApi()
+	const [initialValue, setInitialValue] = useState('')
 
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
@@ -37,7 +38,7 @@ const useEditorState = () => {
 			lang = 'html'
 		}
 
-		setValue(msg.content || '')
+		setInitialValue(msg.content || '')
 		setLanguage(lang)
 	}
 
@@ -49,7 +50,7 @@ const useEditorState = () => {
 		setValue(value || '')
 	}
 
-	return { value, language, handleOnChange, setDocumentText }
+	return { language, value, handleOnChange, initialValue }
 }
 
 export default useEditorState
