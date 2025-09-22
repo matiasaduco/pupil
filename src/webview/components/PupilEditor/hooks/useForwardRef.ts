@@ -261,6 +261,16 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 		}
 	}
 
+	const pasteClipboard = async () => {
+		const editor = editorRef.current
+		if (editor) {
+			const clipboardText = await navigator.clipboard.readText()
+			if (clipboardText) {
+				insertAtCursor(clipboardText)
+			}
+		}
+	}
+
 	useImperativeHandle(
 		ref,
 		() => ({
@@ -269,7 +279,8 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 			deleteAtCursor,
 			enterAtCursor,
 			commentAtCursor,
-			copySelection
+			copySelection,
+			pasteClipboard
 		}),
 		[monaco]
 	)

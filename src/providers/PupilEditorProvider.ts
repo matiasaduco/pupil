@@ -98,6 +98,11 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				if (message.type === 'openWeb') {
 					this.openWeb(message.url)
 				}
+				if (message.type === 'terminal-paste') {
+					vscode.env.clipboard.readText().then((text) => {
+						this.terminal?.sendText(text, false)
+					})
+				}
 			} catch (error) {
 				console.error('Error en onDidReceiveMessage:', error)
 			}
