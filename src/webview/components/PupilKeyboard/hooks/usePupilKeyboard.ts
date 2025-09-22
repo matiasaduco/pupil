@@ -20,10 +20,11 @@ const usePupilKeyboard = () => {
 
 	const layout: Layout = {
 		default: [
-			{ value: '{comment}', label: '//', col: 8 },
-			{ value: '{create-terminal}', label: '>_', icon: TerminalIcon, col: 8 },
-			{ value: '{open-terminal}', label: '+>_', col: 8 },
+			{ value: '{comment}', label: '//', col: 6 },
+			{ value: '{create-terminal}', label: '>_', icon: TerminalIcon, col: 6 },
+			{ value: '{open-terminal}', label: '+>_', col: 6 },
 			{ value: '{cls}', label: 'CLS', col: 6 },
+			{ value: '{copy}', label: 'Copy', col: 6 },
 
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
