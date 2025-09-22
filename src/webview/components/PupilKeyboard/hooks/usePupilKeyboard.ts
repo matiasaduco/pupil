@@ -4,7 +4,7 @@ import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock'
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import SpaceBarIcon from '@mui/icons-material/SpaceBar'
-import { Layout } from '../entities/layout.js'
+import { Layout } from '../types/layout.js'
 
 const usePupilKeyboard = () => {
 	// const layout = {
@@ -20,11 +20,12 @@ const usePupilKeyboard = () => {
 
 	const layout: Layout = {
 		default: [
-			{ value: '{comment}', label: '//', col: 6 },
-			{ value: '{create-terminal}', label: '>_', icon: TerminalIcon, col: 6 },
-			{ value: '{open-terminal}', label: '+>_', col: 6 },
-			{ value: '{cls}', label: 'CLS', col: 6 },
-			{ value: '{copy}', label: 'Copy', col: 6 },
+			{ value: '{comment}', label: '//', col: 5 },
+			{ value: '{create-terminal}', label: '>_', icon: TerminalIcon, col: 5 },
+			{ value: '{open-terminal}', label: '+>_', col: 5 },
+			{ value: '{cls}', label: 'CLS', col: 5 },
+			{ value: '{copy}', label: 'Copy', col: 5 },
+			{ value: '{paste}', label: 'Paste', col: 5 },
 
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
