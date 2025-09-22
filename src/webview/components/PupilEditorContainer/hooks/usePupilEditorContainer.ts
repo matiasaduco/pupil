@@ -33,6 +33,7 @@ const usePupilEditorContainer = () => {
 			'{enter}': () => editorRef.current?.enterAtCursor(),
 			'{comment}': () => editorRef.current?.commentAtCursor(),
 			'{copy}': () => editorRef.current?.copySelection(),
+			'{cut}': () => editorRef.current?.cutSelection(),
 			'{create-terminal}': () => {
 				vscode.postMessage({ type: 'terminal-create' })
 				setFocus('terminal')
