@@ -6,4 +6,5 @@ export type PupilEditorHandle = {
 	commentAtCursor: () => void
 	copySelection: () => void
 	pasteClipboard: () => void
+	cutSelection: () => void
 }

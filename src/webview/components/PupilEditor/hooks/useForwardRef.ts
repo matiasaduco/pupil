@@ -271,6 +271,34 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 		}
 	}
 
+	const cutSelection = () => {
+		const editor = editorRef.current
+		const selection = editor?.getSelection()
+		const model = editor?.getModel()
+		if (editor && selection && model && !selection.isEmpty()) {
+			const selectedText = model.getValueInRange(selection)
+			if (selectedText) {
+				navigator.clipboard.writeText(selectedText)
+				// Borrar la selección del editor
+				editor.executeEdits(null, [
+					{
+						range: selection,
+						text: '',
+						forceMoveMarkers: true
+					}
+				])
+
+				// Mover el cursor al inicio de la selección cortada
+				editor.setPosition({
+					lineNumber: selection.startLineNumber,
+					column: selection.startColumn
+				})
+
+				setTimeout(() => editor.focus(), 0)
+			}
+		}
+	}
+
 	useImperativeHandle(
 		ref,
 		() => ({
@@ -280,7 +308,8 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 			enterAtCursor,
 			commentAtCursor,
 			copySelection,
-			pasteClipboard
+			pasteClipboard,
+			cutSelection
 		}),
 		[monaco]
 	)
