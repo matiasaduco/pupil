@@ -309,7 +309,8 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 			commentAtCursor,
 			copySelection,
 			pasteClipboard,
-			cutSelection
+			cutSelection,
+			focus: () => editorRef.current?.focus()
 		}),
 		[monaco]
 	)

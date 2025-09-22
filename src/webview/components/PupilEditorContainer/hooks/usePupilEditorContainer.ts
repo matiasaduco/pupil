@@ -46,7 +46,11 @@ const usePupilEditorContainer = () => {
 				setFocus('terminal')
 			},
 			'{cls}': () => vscode.postMessage({ type: 'terminal-clear' }),
-			'{paste}': () => editorRef.current?.pasteClipboard()
+			'{paste}': () => editorRef.current?.pasteClipboard(),
+			'{save}': () => {
+				vscode.postMessage({ type: 'save-file' })
+				editorRef.current?.focus()
+			}
 		},
 		terminal: {
 			'{space}': () => vscode.postMessage({ type: 'terminal-space' }),
@@ -61,7 +65,8 @@ const usePupilEditorContainer = () => {
 				setFocus('terminal')
 			},
 			'{cls}': () => vscode.postMessage({ type: 'terminal-clear' }),
-			'{paste}': () => vscode.postMessage({ type: 'terminal-paste' })
+			'{paste}': () => vscode.postMessage({ type: 'terminal-paste' }),
+			'{save}': () => vscode.postMessage({ type: 'save-file' })
 		}
 	}
 

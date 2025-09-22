@@ -103,6 +103,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.terminal?.sendText(text, false)
 					})
 				}
+				if (message.type === 'save-file') {
+					document.save()
+				}
 			} catch (error) {
 				console.error('Error en onDidReceiveMessage:', error)
 			}

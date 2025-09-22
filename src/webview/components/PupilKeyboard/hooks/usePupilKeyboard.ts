@@ -27,6 +27,7 @@ const usePupilKeyboard = () => {
 			{ value: '{copy}', label: 'Copy', col: 4 },
 			{ value: '{paste}', label: 'Paste', col: 4 },
 			{ value: '{cut}', label: 'Cut', col: 4 },
+			{ value: '{save}', label: 'Save', col: 4 },
 
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
