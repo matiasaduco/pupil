@@ -50,7 +50,9 @@ const usePupilEditorContainer = () => {
 			'{save}': () => {
 				vscode.postMessage({ type: 'save-file' })
 				editorRef.current?.focus()
-			}
+			},
+			'{undo}': () => editorRef.current?.undo(),
+			'{redo}': () => editorRef.current?.redo()
 		},
 		terminal: {
 			'{space}': () => vscode.postMessage({ type: 'terminal-space' }),

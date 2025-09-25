@@ -8,4 +8,6 @@ export type PupilEditorHandle = {
 	pasteClipboard: () => void
 	cutSelection: () => void
 	focus: () => void
+	undo: () => void
+	redo: () => void
 }
