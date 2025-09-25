@@ -3,6 +3,9 @@ import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
+import { Message } from '@webview/types/Message.js'
+import { WebPreviewProvider } from './WebPreviewProvider.js'
+import * as path from 'path'
 import { DEFAULT_URL } from '../constants.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
@@ -52,11 +55,11 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				}
 				if (message.type === 'create-folder') {
 					this.createNewFolder(message.name)
-				}
-				if (message.type === 'create-file') {
+					}
+					if (message.type === 'create-file') {
 					this.createNewFile(message.name)
 				}
-				if (message.type === 'get-snippets') {
+					if (message.type === 'get-snippets') {
 					this.getSnippets(webviewPanel)
 				}
 				if (message.type === 'edit' && message.content) {
@@ -200,41 +203,73 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private async createNewFile(fileName: string) {
-		const folders = vscode.workspace.workspaceFolders
-		if (!folders || folders.length === 0) {
-			vscode.window.showErrorMessage('No workspace folder open.')
-			return
-		}
+		const dest = await this.pickDestinationFolder();
+		if (!dest) { return; }
 
-		const rootUri = folders[0].uri
-		const fileUri = vscode.Uri.joinPath(rootUri, fileName)
+		const fileUri = vscode.Uri.joinPath(dest, fileName);
 
-		const wsedit = new vscode.WorkspaceEdit()
-		wsedit.createFile(fileUri, { ignoreIfExists: true })
-		await vscode.workspace.applyEdit(wsedit)
+		const wsedit = new vscode.WorkspaceEdit();
+		wsedit.createFile(fileUri, { ignoreIfExists: true });
+		await vscode.workspace.applyEdit(wsedit);
 
-		const doc = await vscode.workspace.openTextDocument(fileUri)
-		await vscode.window.showTextDocument(doc)
+		const doc = await vscode.workspace.openTextDocument(fileUri);
+		await vscode.window.showTextDocument(doc);
 	}
 
 	private async createNewFolder(folderName: string) {
-		const folders = vscode.workspace.workspaceFolders
-		if (!folders || folders.length === 0) {
-			vscode.window.showErrorMessage('No workspace folder open.')
+		const dest = await this.pickDestinationFolder();
+		if (!dest) {
 			return
-		}
+		 }
 
-		const rootUri = folders[0].uri
-		const folderUri = vscode.Uri.joinPath(rootUri, folderName)
+		const folderUri = vscode.Uri.joinPath(dest, folderName)
 
 		try {
 			await vscode.workspace.fs.createDirectory(folderUri)
-			vscode.window.showInformationMessage(`Folder "${folderName}" created.`)
+			vscode.window.showInformationMessage(`Folder "${folderName}" created in ${folderUri.fsPath}`)
 		} catch (err) {
 			vscode.window.showErrorMessage(`Could not create folder: ${err}`)
 		}
 	}
 
+	private async pickDestinationFolder(): Promise<vscode.Uri | undefined> {
+		const folders = vscode.workspace.workspaceFolders
+		if (!folders) {
+			vscode.window.showErrorMessage("No workspace folder open.")
+			return
+		}
+
+		let todas: vscode.Uri[] = []
+		for (const f of folders) {
+			todas = todas.concat(await this.listarCarpetasRecursivo(f.uri))
+		}
+
+		const items = todas.map(uri => ({
+			label: path.relative(folders[0].uri.fsPath, uri.fsPath) || path.basename(uri.fsPath),
+			description: uri.fsPath,
+			uri
+		}));
+
+		const elegido = await vscode.window.showQuickPick(items, {
+			placeHolder: "Elegí la carpeta destino"
+		});
+
+		return elegido?.uri
+	}
+
+	private  listarCarpetasRecursivo = async (uri: vscode.Uri, acc: vscode.Uri[] = []): Promise<vscode.Uri[]> => {
+		const IGNORAR = new Set(['node_modules', 'public'])
+		const entries = await vscode.workspace.fs.readDirectory(uri)
+		for (const [name, tipo] of entries) {
+			if (tipo === vscode.FileType.Directory) {
+				if (IGNORAR.has(name)) continue
+				const sub = vscode.Uri.joinPath(uri, name)
+				acc.push(sub);
+				await this.listarCarpetasRecursivo(sub, acc)
+			}
+		}
+		return acc
+	}
 	private async openWeb(url: string = DEFAULT_URL) {
 		await vscode.commands.executeCommand('workbench.action.focusSecondEditorGroup')
 		await vscode.commands.executeCommand('simpleBrowser.show', url)

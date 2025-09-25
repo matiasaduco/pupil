@@ -11,7 +11,7 @@ const App = () => {
 			<VsCodeApiProvider>
 				<StyledEngineProvider enableCssLayer>
 					<GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
-					<PupilEditorContainer />
+					<PupilEditorContainer />					
 				</StyledEngineProvider>
 			</VsCodeApiProvider>
 		</MockPupilEditorProvider>
