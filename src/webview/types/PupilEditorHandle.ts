@@ -7,4 +7,5 @@ export type PupilEditorHandle = {
 	copySelection: () => void
 	pasteClipboard: () => void
 	cutSelection: () => void
+	focus: () => void
 }
