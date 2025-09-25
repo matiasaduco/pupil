@@ -310,7 +310,9 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 			copySelection,
 			pasteClipboard,
 			cutSelection,
-			focus: () => editorRef.current?.focus()
+			focus: () => editorRef.current?.focus(),
+			undo: () => editorRef.current?.trigger('keyboard', 'undo', {}),
+			redo: () => editorRef.current?.trigger('keyboard', 'redo', {})
 		}),
 		[monaco]
 	)

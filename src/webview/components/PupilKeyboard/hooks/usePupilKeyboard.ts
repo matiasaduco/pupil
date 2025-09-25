@@ -20,14 +20,16 @@ const usePupilKeyboard = () => {
 
 	const layout: Layout = {
 		default: [
-			{ value: '{comment}', label: '//', col: 4 },
-			{ value: '{open-terminal}', label: '>_', icon: TerminalIcon, col: 4 },
-			{ value: '{create-terminal}', label: '+>_', col: 4 },
-			{ value: '{cls}', label: 'CLS', col: 4 },
-			{ value: '{copy}', label: 'Copy', col: 4 },
-			{ value: '{paste}', label: 'Paste', col: 4 },
-			{ value: '{cut}', label: 'Cut', col: 4 },
-			{ value: '{save}', label: 'Save', col: 4 },
+			{ value: '{comment}', label: '//', col: 3 },
+			{ value: '{open-terminal}', label: '>_', icon: TerminalIcon, col: 3 },
+			{ value: '{create-terminal}', label: '+>_', col: 3 },
+			{ value: '{cls}', label: 'CLS', col: 3 },
+			{ value: '{copy}', label: 'Copy', col: 3 },
+			{ value: '{paste}', label: 'Paste', col: 3 },
+			{ value: '{cut}', label: 'Cut', col: 3 },
+			{ value: '{save}', label: 'Save', col: 3 },
+			{ value: '{undo}', label: 'Undo', col: 3 },
+			{ value: '{redo}', label: 'Redo', col: 3 },
 
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
