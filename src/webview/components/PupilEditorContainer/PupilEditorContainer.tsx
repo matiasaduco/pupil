@@ -48,14 +48,22 @@ const PupilEditorContainer = () => {
 					visible={focus === 'editor'}
 					theme={colorScheme}
 				/>
-				<Snippets editorRef={editorRef} />
 				<section className="flex flex-wrap">
+					<Snippets editorRef={editorRef} />
 					<Button onClick={toggle}>{keyboardVisible ? 'Hide Keyboard' : 'Show Keyboard'}</Button>
 					<Button onClick={switchFocus}>{focus}</Button>
 					<SimpleBrowser onClick={openWeb} />
 					<Button onClick={stopProcess}>Stop Process</Button>
 					<TerminalsDialog />
 					<CreateButton />
+					{/* { value: '{comment}', label: '//', col: 4 }, */}
+					{/* { value: '{open-terminal}', label: '>_', icon: TerminalIcon, col: 4 }, */}
+					{/* { value: '{create-terminal}', label: '+>_', col: 4 }, */}
+					{/* { value: '{cls}', label: 'CLS', col: 4 }, */}
+					{/* { value: '{copy}', label: 'Copy', col: 4 }, */}
+					{/* { value: '{paste}', label: 'Paste', col: 4 }, */}
+					{/* { value: '{cut}', label: 'Cut', col: 4 }, */}
+					{/* { value: '{save}', label: 'Save', col: 4 }, */}
 				</section>
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
 			</div>
