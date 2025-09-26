@@ -6,11 +6,13 @@ import DocumentManager from '../managers/DocumentManager.js'
 import { Message } from '@webview/types/Message.js'
 import { WebPreviewProvider } from './WebPreviewProvider.js'
 import * as path from 'path'
+import { FolderNode } from '@webview/components/FolderTree/FolderTree.js'
 import { DEFAULT_URL } from '../constants.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
 	private terminal: vscode.Terminal | null = null
+	private pendingAction: { type: 'file' | 'folder', name: string } | null = null
 
 	constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -54,11 +56,14 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					this.init(webviewReady, webviewPanel, document)
 				}
 				if (message.type === 'create-folder') {
-					this.createNewFolder(message.name)
-					}
-					if (message.type === 'create-file') {
-					this.createNewFile(message.name)
+					await this.createNewFolder(message.name, webviewPanel)
 				}
+				if (message.type === 'create-file') {
+						await this.createNewFile(message.name, webviewPanel)
+					}
+					if (message.type === 'folder-selected' && this.pendingAction) {
+						await this.handleFolderSelection(message.path, webviewPanel)
+					}
 					if (message.type === 'get-snippets') {
 					this.getSnippets(webviewPanel)
 				}
@@ -201,63 +206,101 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			this.terminal.show()
 		}
 	}
-
-	private async createNewFile(fileName: string) {
-		const dest = await this.pickDestinationFolder();
-		if (!dest) { return; }
-
-		const fileUri = vscode.Uri.joinPath(dest, fileName);
-
-		const wsedit = new vscode.WorkspaceEdit();
-		wsedit.createFile(fileUri, { ignoreIfExists: true });
-		await vscode.workspace.applyEdit(wsedit);
-
-		const doc = await vscode.workspace.openTextDocument(fileUri);
-		await vscode.window.showTextDocument(doc);
+	
+	private async createNewFile(fileName: string, webviewPanel: vscode.WebviewPanel) {
+		this.pendingAction = { type: 'file', name: fileName }
+		await this.showFolderTreeSelector(webviewPanel)
 	}
 
-	private async createNewFolder(folderName: string) {
-		const dest = await this.pickDestinationFolder();
-		if (!dest) {
-			return
-		 }
+	private async createNewFolder(folderName: string, webviewPanel: vscode.WebviewPanel) {
+		this.pendingAction = { type: 'folder', name: folderName }
+		await this.showFolderTreeSelector(webviewPanel)
+	}
 
-		const folderUri = vscode.Uri.joinPath(dest, folderName)
+	private async handleFolderSelection(selectedPath: string, webviewPanel: vscode.WebviewPanel) {
+		if (!this.pendingAction) return
+
+		const destUri = vscode.Uri.file(selectedPath)
 
 		try {
-			await vscode.workspace.fs.createDirectory(folderUri)
-			vscode.window.showInformationMessage(`Folder "${folderName}" created in ${folderUri.fsPath}`)
+			if (this.pendingAction.type === 'file') {
+				const fileUri = vscode.Uri.joinPath(destUri, this.pendingAction.name)
+				const wsedit = new vscode.WorkspaceEdit()
+				wsedit.createFile(fileUri, { ignoreIfExists: true })
+				await vscode.workspace.applyEdit(wsedit)
+
+				const doc = await vscode.workspace.openTextDocument(fileUri)
+				await vscode.window.showTextDocument(doc)
+			} else if (this.pendingAction.type === 'folder') {
+				const folderUri = vscode.Uri.joinPath(destUri, this.pendingAction.name)
+				await vscode.workspace.fs.createDirectory(folderUri)
+				vscode.window.showInformationMessage(`Folder "${this.pendingAction.name}" created in ${folderUri.fsPath}`)
+			}
 		} catch (err) {
-			vscode.window.showErrorMessage(`Could not create folder: ${err}`)
+			vscode.window.showErrorMessage(`Could not create ${this.pendingAction.type}: ${err}`)
+		} finally {
+			this.pendingAction = null
 		}
 	}
 
-	private async pickDestinationFolder(): Promise<vscode.Uri | undefined> {
+	private async showFolderTreeSelector(webviewPanel: vscode.WebviewPanel) {
 		const folders = vscode.workspace.workspaceFolders
 		if (!folders) {
 			vscode.window.showErrorMessage("No workspace folder open.")
 			return
 		}
 
-		let todas: vscode.Uri[] = []
-		for (const f of folders) {
-			todas = todas.concat(await this.listarCarpetasRecursivo(f.uri))
-		}
+		const tree = await this.buildFolderTree(folders)
 
-		const items = todas.map(uri => ({
-			label: path.relative(folders[0].uri.fsPath, uri.fsPath) || path.basename(uri.fsPath),
-			description: uri.fsPath,
-			uri
-		}));
-
-		const elegido = await vscode.window.showQuickPick(items, {
-			placeHolder: "Elegí la carpeta destino"
-		});
-
-		return elegido?.uri
+		webviewPanel.webview.postMessage({
+			type: 'show-folder-tree',
+			items: tree
+		})
 	}
 
-	private  listarCarpetasRecursivo = async (uri: vscode.Uri, acc: vscode.Uri[] = []): Promise<vscode.Uri[]> => {
+	private async buildFolderTree(folders: readonly vscode.WorkspaceFolder[]): Promise<FolderNode[]> {
+		const tree: FolderNode[] = []
+
+		for (const folder of folders) {
+			const rootNode: FolderNode = {
+				id: folder.uri.fsPath,
+				name: folder.name,
+				fullPath: folder.uri.fsPath,
+				children: await this.buildFolderChildren(folder.uri)
+			}
+			tree.push(rootNode)
+		}
+
+		return tree
+	}
+
+	private async buildFolderChildren(uri: vscode.Uri): Promise<FolderNode[]> {
+		const IGNORAR = new Set(['node_modules', 'public', '.git', 'dist', 'build'])
+		const children: FolderNode[] = []
+
+		try {
+			const entries = await vscode.workspace.fs.readDirectory(uri)
+
+			for (const [name, tipo] of entries) {
+				if (tipo === vscode.FileType.Directory && !IGNORAR.has(name)) {
+					const childUri = vscode.Uri.joinPath(uri, name)
+					const childNode: FolderNode = {
+						id: childUri.fsPath,
+						name: name,
+						fullPath: childUri.fsPath,
+						children: await this.buildFolderChildren(childUri)
+					}
+					children.push(childNode)
+				}
+			}
+		} catch (error) {
+			console.error('Error reading directory:', error)
+		}
+
+		return children
+	}
+
+	private listarCarpetasRecursivo = async (uri: vscode.Uri, acc: vscode.Uri[] = []): Promise<vscode.Uri[]> => {
 		const IGNORAR = new Set(['node_modules', 'public'])
 		const entries = await vscode.workspace.fs.readDirectory(uri)
 		for (const [name, tipo] of entries) {
