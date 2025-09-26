@@ -29,7 +29,7 @@ const PupilEditorContainer = () => {
 			mode: colorScheme === 'vs' ? 'light' : 'dark'
 		}
 	})
-
+	
 	return (
 		<ThemeProvider theme={theme}>
 			{isDev && (

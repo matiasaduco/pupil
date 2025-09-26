@@ -4,6 +4,7 @@ import PupilEditorContainer from '@components/PupilEditorContainer/PupilEditorCo
 import { StyledEngineProvider } from '@mui/material/styles'
 import { GlobalStyles } from '@mui/styled-engine'
 import MockPupilEditorProvider from './mocks/MockPupilProvider.js'
+import FolderTreeContainer from './components/FolderTree/FolderTreeContainer.js' 
 
 const App = () => {
 	return (
@@ -11,7 +12,8 @@ const App = () => {
 			<VsCodeApiProvider>
 				<StyledEngineProvider enableCssLayer>
 					<GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
-					<PupilEditorContainer />
+					<PupilEditorContainer />	
+					<FolderTreeContainer />				
 				</StyledEngineProvider>
 			</VsCodeApiProvider>
 		</MockPupilEditorProvider>
