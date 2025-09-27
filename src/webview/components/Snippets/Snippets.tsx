@@ -1,13 +1,10 @@
-import useScroll from './hooks/useScroll.js'
 import useSnippets from './hooks/useSnippets.js'
-import './Snippets.css'
 import Typography from '@mui/material/Typography'
 import HtmlTooltip from '@mui/material/Tooltip'
-import { Button, IconButton } from '@mui/material'
-import ArrowBack from '@mui/icons-material/ArrowBack'
-import ArrowForward from '@mui/icons-material/ArrowForward'
+import { Button } from '@mui/material'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { RefObject } from 'react'
+import PupilDialog from '../PupilDialog/PupilDialog.js'
 
 type SnippetsProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
@@ -15,60 +12,57 @@ type SnippetsProps = {
 }
 
 const Snippets = ({ editorRef }: SnippetsProps) => {
-	const { snippets, handleSnippetPress } = useSnippets(editorRef)
-	const { containerRef, atStart, atEnd, startScroll, stopScroll } = useScroll()
+	const { snippets, handleSnippetPress, open, openModal, onClose } = useSnippets(editorRef)
 
 	return (
-		<section className="snippets-section">
-			{!atStart && (
-				<IconButton
-					className="overflow-button left-0"
-					onMouseEnter={() => startScroll('left')}
-					onMouseLeave={stopScroll}
-					color="primary"
-					aria-label="Scroll left"
-				>
-					<ArrowBack />
-				</IconButton>
-			)}
-			{!atEnd && (
-				<IconButton
-					className="overflow-button right-0"
-					onMouseEnter={() => startScroll('right')}
-					onMouseLeave={stopScroll}
-					color="primary"
-					aria-label="Scroll right"
-				>
-					<ArrowForward />
-				</IconButton>
-			)}
-			<div ref={containerRef} className="snippets-container space-x-3 whitespace-nowrap">
-				{snippets?.all.flat().map((snippet) =>
-					Object.entries(snippet.snippets).map(([key, { body }]) => (
-						<HtmlTooltip
-							title={
-								<>
-									<Typography color="inherit">
-										{snippet.snippets[key]?.description || ''}{' '}
-									</Typography>
-								</>
-							}
-							placement="top"
-							arrow
-						>
-							<Button
-								className="snippets-button"
-								key={key}
-								onClick={() => handleSnippetPress?.(body)}
-								style={{ margin: '0 3px 6px 0' }}
+		<>
+			<Button onClick={openModal}>Snippets</Button>
+			<PupilDialog open={open} onClose={onClose} title="Snippets">
+				<div className="flex flex-wrap gap-3 justify-center overflow-auto max-h-[30em]">
+					{snippets?.all.flat().map((snippet) =>
+						Object.entries(snippet.snippets).map(([key, { body, description }]) => (
+							<HtmlTooltip
+								title={
+									<>
+										<Typography color="inherit" fontWeight={600}>
+											{description || ''}
+										</Typography>
+										<hr style={{ margin: '8px 0' }} />
+										<Typography color="inherit" fontFamily="monospace" fontSize={14}>
+											<pre
+												style={{
+													background: '#222',
+													color: '#fff',
+													padding: '8px',
+													borderRadius: '6px',
+													fontFamily: 'monospace',
+													fontSize: 14,
+													maxWidth: '30em',
+													whiteSpace: 'pre-wrap'
+												}}
+											>
+												{Array.isArray(body) ? body.join('\n') : body}
+											</pre>
+										</Typography>
+									</>
+								}
+								placement="top"
+								arrow
 							>
-								{key}
-							</Button>
-						</HtmlTooltip>
-					))
-				)}
-			</div>
-		</section>
+								<Button
+									className="w-[10em] h-[3em] truncate"
+									key={key}
+									onClick={() => handleSnippetPress?.(body)}
+									style={{ margin: '0 3px 6px 0' }}
+								>
+									{key}
+								</Button>
+							</HtmlTooltip>
+						))
+					)}
+				</div>
+			</PupilDialog>
+		</>
 	)
 }
 

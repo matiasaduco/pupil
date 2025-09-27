@@ -3,6 +3,7 @@ import { forwardRef } from 'react'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import useEditorState from './hooks/useEditorState.js'
 import useForwardRef from './hooks/useForwardRef.js'
+import { Skeleton } from '@mui/material'
 
 type PupilEditorProps = {
 	keyboardVisible?: boolean
@@ -21,14 +22,18 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(
 				className="relative"
 				style={{ height: editorHeight, display: visible ? 'block' : 'none' }}
 			>
-				<Editor
-					theme={theme}
-					language={language}
-					value={value}
-					defaultValue={initialValue}
-					onChange={handleOnChange}
-					onMount={handleOnMount}
-				/>
+				{initialValue ? (
+					<Editor
+						theme={theme}
+						language={language}
+						value={value}
+						defaultValue={initialValue}
+						onChange={handleOnChange}
+						onMount={handleOnMount}
+					/>
+				) : (
+					<Skeleton variant="rectangular" width="100%" height="90vh" />
+				)}
 				<span id="pupil-dialog-portal" />
 			</div>
 		)

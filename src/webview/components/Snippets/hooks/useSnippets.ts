@@ -18,6 +18,7 @@ type SnippetMessage = {
 const useSnippets = (editorRef: RefObject<PupilEditorHandle | null>) => {
 	const vscode = useVsCodeApi()
 	const [snippets, setSnippets] = useState<SnippetMessage>()
+	const [open, setOpen] = useState<boolean>(false)
 
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
@@ -28,7 +29,6 @@ const useSnippets = (editorRef: RefObject<PupilEditorHandle | null>) => {
 		}
 
 		window.addEventListener('message', handleMessage)
-
 		vscode.postMessage({ type: 'get-snippets' })
 
 		return () => window.removeEventListener('message', handleMessage)
@@ -45,9 +45,13 @@ const useSnippets = (editorRef: RefObject<PupilEditorHandle | null>) => {
 		} else {
 			editorRef.current?.insertAtCursor(snippet)
 		}
+		setOpen(false)
 	}
 
-	return { snippets, handleSnippetPress }
+	const openModal = () => setOpen(true)
+	const onClose = () => setOpen(false)
+
+	return { snippets, handleSnippetPress, open, openModal, onClose }
 }
 
 export default useSnippets
