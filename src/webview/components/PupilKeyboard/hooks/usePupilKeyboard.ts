@@ -2,7 +2,6 @@ import BackspaceIcon from '@mui/icons-material/Backspace'
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn'
 import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock'
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab'
-import TerminalIcon from '@mui/icons-material/Terminal'
 import SpaceBarIcon from '@mui/icons-material/SpaceBar'
 import { Layout } from '../types/layout.js'
 
@@ -20,17 +19,6 @@ const usePupilKeyboard = () => {
 
 	const layout: Layout = {
 		default: [
-			{ value: '{comment}', label: '//', col: 3 },
-			{ value: '{open-terminal}', label: '>_', icon: TerminalIcon, col: 3 },
-			{ value: '{create-terminal}', label: '+>_', col: 3 },
-			{ value: '{cls}', label: 'CLS', col: 3 },
-			{ value: '{copy}', label: 'Copy', col: 3 },
-			{ value: '{paste}', label: 'Paste', col: 3 },
-			{ value: '{cut}', label: 'Cut', col: 3 },
-			{ value: '{save}', label: 'Save', col: 3 },
-			{ value: '{undo}', label: 'Undo', col: 3 },
-			{ value: '{redo}', label: 'Redo', col: 3 },
-
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
 			{ value: '2', label: '2' },

@@ -3,16 +3,13 @@ import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
-import { Message } from '@webview/types/Message.js'
-import { WebPreviewProvider } from './WebPreviewProvider.js'
-import * as path from 'path'
 import { FolderNode } from '@webview/components/FolderTree/FolderTree.js'
 import { DEFAULT_URL } from '../constants.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
 	private terminal: vscode.Terminal | null = null
-	private pendingAction: { type: 'file' | 'folder', name: string } | null = null
+	private pendingAction: { type: 'file' | 'folder'; name: string } | null = null
 
 	constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -50,74 +47,76 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			}
 		})
 
-		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage((message) => {
-			try {
-				if (message.type === 'ready') {
-					this.init(webviewReady, webviewPanel, document)
-				}
-				if (message.type === 'create-folder') {
-					await this.createNewFolder(message.name, webviewPanel)
-				}
-				if (message.type === 'create-file') {
+		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage(
+			async (message) => {
+				try {
+					if (message.type === 'ready') {
+						this.init(webviewReady, webviewPanel, document)
+					}
+					if (message.type === 'create-folder') {
+						await this.createNewFolder(message.name, webviewPanel)
+					}
+					if (message.type === 'create-file') {
 						await this.createNewFile(message.name, webviewPanel)
 					}
 					if (message.type === 'folder-selected' && this.pendingAction) {
-						await this.handleFolderSelection(message.path, webviewPanel)
+						await this.handleFolderSelection(message.path)
 					}
 					if (message.type === 'get-snippets') {
-					this.getSnippets(webviewPanel)
+						this.getSnippets(webviewPanel)
+					}
+					if (message.type === 'edit' && message.content) {
+						this.updateTextDocument(document, message.content)
+					}
+					if (message.type === 'terminal-open') {
+						this.openTerminal()
+					}
+					if (message.type === 'terminal-create') {
+						this.createTerminal(message.content)
+					}
+					if (message.type === 'terminal-input' && message.content) {
+						this.terminal?.sendText(message.content, false)
+					}
+					if (message.type === 'terminal-space') {
+						this.terminal?.sendText(' ', false)
+					}
+					if (message.type === 'terminal-bksp') {
+						this.terminal?.sendText('\b', false)
+					}
+					if (message.type === 'terminal-enter') {
+						this.terminal?.sendText('\n', false)
+					}
+					if (message.type === 'terminal-clear') {
+						this.terminal?.sendText('clear', true)
+					}
+					if (message.type === 'stop-process') {
+						this.terminal?.sendText('\x03', true)
+					}
+					if (message.type === 'terminal-hide') {
+						this.terminal?.hide()
+					}
+					if (message.type === 'terminal-list') {
+						this.getTerminals(webviewPanel)
+					}
+					if (message.type === 'terminal-show' && message.content) {
+						this.showTerminal(message.content)
+					}
+					if (message.type === 'openWeb') {
+						this.openWeb(message.url)
+					}
+					if (message.type === 'terminal-paste') {
+						vscode.env.clipboard.readText().then((text) => {
+							this.terminal?.sendText(text, false)
+						})
+					}
+					if (message.type === 'save-file') {
+						document.save()
+					}
+				} catch (error) {
+					console.error('Error en onDidReceiveMessage:', error)
 				}
-				if (message.type === 'edit' && message.content) {
-					this.updateTextDocument(document, message.content)
-				}
-				if (message.type === 'terminal-open') {
-					this.openTerminal()
-				}
-				if (message.type === 'terminal-create') {
-					this.createTerminal(message.content)
-				}
-				if (message.type === 'terminal-input' && message.content) {
-					this.terminal?.sendText(message.content, false)
-				}
-				if (message.type === 'terminal-space') {
-					this.terminal?.sendText(' ', false)
-				}
-				if (message.type === 'terminal-bksp') {
-					this.terminal?.sendText('\b', false)
-				}
-				if (message.type === 'terminal-enter') {
-					this.terminal?.sendText('\n', false)
-				}
-				if (message.type === 'terminal-clear') {
-					this.terminal?.sendText('clear', true)
-				}
-				if (message.type === 'terminal-stop-process') {
-					this.terminal?.sendText('\x03', true)
-				}
-				if (message.type === 'terminal-hide') {
-					this.terminal?.hide()
-				}
-				if (message.type === 'terminal-list') {
-					this.getTerminals(webviewPanel)
-				}
-				if (message.type === 'terminal-show' && message.content) {
-					this.showTerminal(message.content)
-				}
-				if (message.type === 'openWeb') {
-					this.openWeb(message.url)
-				}
-				if (message.type === 'terminal-paste') {
-					vscode.env.clipboard.readText().then((text) => {
-						this.terminal?.sendText(text, false)
-					})
-				}
-				if (message.type === 'save-file') {
-					document.save()
-				}
-			} catch (error) {
-				console.error('Error en onDidReceiveMessage:', error)
 			}
-		})
+		)
 
 		const onDidChangeTextDocumentListener = vscode.workspace.onDidChangeTextDocument((e) => {
 			try {
@@ -206,7 +205,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			this.terminal.show()
 		}
 	}
-	
+
 	private async createNewFile(fileName: string, webviewPanel: vscode.WebviewPanel) {
 		this.pendingAction = { type: 'file', name: fileName }
 		await this.showFolderTreeSelector(webviewPanel)
@@ -217,8 +216,10 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		await this.showFolderTreeSelector(webviewPanel)
 	}
 
-	private async handleFolderSelection(selectedPath: string, webviewPanel: vscode.WebviewPanel) {
-		if (!this.pendingAction) return
+	private async handleFolderSelection(selectedPath: string) {
+		if (!this.pendingAction) {
+			return
+		}
 
 		const destUri = vscode.Uri.file(selectedPath)
 
@@ -234,7 +235,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			} else if (this.pendingAction.type === 'folder') {
 				const folderUri = vscode.Uri.joinPath(destUri, this.pendingAction.name)
 				await vscode.workspace.fs.createDirectory(folderUri)
-				vscode.window.showInformationMessage(`Folder "${this.pendingAction.name}" created in ${folderUri.fsPath}`)
+				vscode.window.showInformationMessage(
+					`Folder "${this.pendingAction.name}" created in ${folderUri.fsPath}`
+				)
 			}
 		} catch (err) {
 			vscode.window.showErrorMessage(`Could not create ${this.pendingAction.type}: ${err}`)
@@ -246,7 +249,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private async showFolderTreeSelector(webviewPanel: vscode.WebviewPanel) {
 		const folders = vscode.workspace.workspaceFolders
 		if (!folders) {
-			vscode.window.showErrorMessage("No workspace folder open.")
+			vscode.window.showErrorMessage('No workspace folder open.')
 			return
 		}
 
@@ -300,14 +303,19 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		return children
 	}
 
-	private listarCarpetasRecursivo = async (uri: vscode.Uri, acc: vscode.Uri[] = []): Promise<vscode.Uri[]> => {
+	private listarCarpetasRecursivo = async (
+		uri: vscode.Uri,
+		acc: vscode.Uri[] = []
+	): Promise<vscode.Uri[]> => {
 		const IGNORAR = new Set(['node_modules', 'public'])
 		const entries = await vscode.workspace.fs.readDirectory(uri)
 		for (const [name, tipo] of entries) {
 			if (tipo === vscode.FileType.Directory) {
-				if (IGNORAR.has(name)) continue
+				if (IGNORAR.has(name)) {
+					continue
+				}
 				const sub = vscode.Uri.joinPath(uri, name)
-				acc.push(sub);
+				acc.push(sub)
 				await this.listarCarpetasRecursivo(sub, acc)
 			}
 		}
