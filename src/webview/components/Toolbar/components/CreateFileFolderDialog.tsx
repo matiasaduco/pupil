@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material'
+import { RadioGroup, FormControlLabel, Radio, TextField, useTheme } from '@mui/material'
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import PupilDialog from '@webview/components/PupilDialog/PupilDialog.js'
 
@@ -10,6 +10,7 @@ type CreateFileFolderDialogProps = {
 
 const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFolderDialogProps) => {
 	const vscode = useVsCodeApi()
+	const theme = useTheme()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
 	const [type, setType] = useState<'file' | 'folder'>('file')
@@ -51,7 +52,12 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 			onCancel={reset}
 			onClose={reset}
 		>
-			<RadioGroup row value={type} onChange={(e) => setType(e.target.value as 'file' | 'folder')}>
+			<RadioGroup
+				row
+				value={type}
+				onChange={(e) => setType(e.target.value as 'file' | 'folder')}
+				sx={{ color: theme.palette.text.primary }}
+			>
 				<FormControlLabel value="file" control={<Radio />} label="File" />
 				<FormControlLabel value="folder" control={<Radio />} label="Folder" />
 			</RadioGroup>
@@ -63,6 +69,12 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 				variant="outlined"
 				value={name}
 				onChange={(e) => setName(e.target.value)}
+				sx={{
+					mt: 1,
+					input: { color: theme.palette.text.primary },
+					label: { color: theme.palette.text.secondary },
+					fieldset: { borderColor: theme.palette.divider },
+				}}
 			/>
 		</PupilDialog>
 	)

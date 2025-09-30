@@ -1,17 +1,17 @@
-import * as React from 'react';
-import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
-import { Typography } from '@mui/material';
+import * as React from 'react'
+import { SimpleTreeView, TreeItem } from '@mui/x-tree-view'
+import { Typography } from '@mui/material'
 
 export interface FolderNode {
-  id: string;
-  name: string;
-  fullPath: string;      // Ahora obligatorio
-  children?: FolderNode[];
+  id: string
+  name: string
+  fullPath: string
+  children?: FolderNode[]
 }
 
 type FolderTreeProps = {
-  tree: FolderNode[];
-  onSelect: (fullPath: string) => void;
+  tree: FolderNode[]
+  onSelect: (fullPath: string) => void
 };
 
 const FolderTree: React.FC<FolderTreeProps> = ({ tree, onSelect }) => {
