@@ -1,7 +1,6 @@
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { useEffect, useRef, useState } from 'react'
-import { DEFAULT_PORT, LOCALHOST } from '../../../../constants.js'
 
 type ActionsProps = {
 	editor: Record<string, () => void>
@@ -68,7 +67,8 @@ const usePupilEditorContainer = () => {
 			},
 			'{cls}': () => vscode.postMessage({ type: 'terminal-clear' }),
 			'{paste}': () => vscode.postMessage({ type: 'terminal-paste' }),
-			'{save}': () => vscode.postMessage({ type: 'save-file' })
+			'{save}': () => vscode.postMessage({ type: 'save-file' }),
+			'{stop-process}': () => vscode.postMessage({ type: 'stop-process' })
 		}
 	}
 
@@ -95,21 +95,15 @@ const usePupilEditorContainer = () => {
 		})
 	}
 
-	const openWeb = (url: string = LOCALHOST, port: string = DEFAULT_PORT) => {
-		vscode.postMessage({ type: 'openWeb', url: `${url}:${port}` })
-	}
-
 	return {
 		editorRef,
 		keyboardVisible,
-		toggle: () => setKeyboardVisible(!keyboardVisible),
+		toggleKeyboard: () => setKeyboardVisible(!keyboardVisible),
 		handleKeyboardInput,
 		colorScheme,
 		focus,
 		switchFocus,
-		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs')),
-		openWeb,
-		stopProcess: () => vscode.postMessage({ type: 'terminal-stop-process' })
+		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs'))
 	}
 }
 

@@ -18,4 +18,4 @@ type MessageType =
 	| 'terminal-list'
 	| 'terminal-show'
 	| 'openWeb'
-	| 'terminal-stop-process'
+	| 'stop-process'

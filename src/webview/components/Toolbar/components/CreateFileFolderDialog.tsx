@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material'
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
-import PupilDialog from '../PupilDialog/PupilDialog.js'
+import PupilDialog from '@webview/components/PupilDialog/PupilDialog.js'
 
-type CreateDialogProps = {
+type CreateFileFolderDialogProps = {
 	externalOpen?: boolean
 	onExternalClose?: () => void
 }
 
-const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
+const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFolderDialogProps) => {
 	const vscode = useVsCodeApi()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
@@ -68,4 +68,4 @@ const CreateDialog = ({ externalOpen, onExternalClose }: CreateDialogProps) => {
 	)
 }
 
-export default CreateDialog
+export default CreateFileFolderDialog

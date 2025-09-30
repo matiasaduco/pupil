@@ -7,6 +7,15 @@ const MockPupilProvider: React.FC<{ children?: React.ReactNode }> = ({ children 
 		{ name: 'MockedTerminal 3' }
 	]
 
+	const content = `
+// Ejemplo de código en JavaScript
+function greet(name) {
+	console.log('Hello, ' + name + '!');
+}
+
+greet('World');
+`
+
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
 			switch (event.data.type) {
@@ -36,6 +45,14 @@ const MockPupilProvider: React.FC<{ children?: React.ReactNode }> = ({ children 
 						type: 'set-terminals',
 						content: terminals
 					})
+					break
+				case 'ready':
+					window.postMessage({
+						type: 'init',
+						fileExtension: 'js',
+						content
+					})
+					break
 				default:
 					console.log('Mock: mensaje no manejado', event.data)
 			}
