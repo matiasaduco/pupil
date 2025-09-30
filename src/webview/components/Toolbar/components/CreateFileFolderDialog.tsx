@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { RadioGroup, FormControlLabel, Radio } from '@mui/material'
+import { RadioGroup, FormControlLabel, Radio, useTheme } from '@mui/material'
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import PupilDialog from '@webview/components/PupilDialog/PupilDialog.js'
@@ -11,6 +11,7 @@ type CreateFileFolderDialogProps = {
 
 const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFolderDialogProps) => {
 	const vscode = useVsCodeApi()
+	const theme = useTheme()
 	const { setActiveInput } = useKeyboardFocus()
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState('')
@@ -65,7 +66,12 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 			onCancel={reset}
 			onClose={reset}
 		>
-			<RadioGroup row value={type} onChange={(e) => setType(e.target.value as 'file' | 'folder')}>
+			<RadioGroup
+				row
+				value={type}
+				onChange={(e) => setType(e.target.value as 'file' | 'folder')}
+				sx={{ color: theme.palette.text.primary }}
+			>
 				<FormControlLabel value="file" control={<Radio />} label="File" />
 				<FormControlLabel value="folder" control={<Radio />} label="Folder" />
 			</RadioGroup>
