@@ -1,17 +1,22 @@
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
+import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { useEffect, useRef, useState } from 'react'
+
+type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
 type ActionsProps = {
 	editor: Record<string, () => void>
 	terminal: Record<string, () => void>
+	dialog: Record<string, () => void>
 }
 
 const usePupilEditorContainer = () => {
 	const vscode = useVsCodeApi()
 	const editorRef = useRef<PupilEditorHandle>(null)
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
-	const [focus, setFocus] = useState<'editor' | 'terminal'>('editor')
+	const [focus, setFocus] = useState<FocusTarget>('editor')
+	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 
 	useEffect(() => {
@@ -69,10 +74,24 @@ const usePupilEditorContainer = () => {
 			'{paste}': () => vscode.postMessage({ type: 'terminal-paste' }),
 			'{save}': () => vscode.postMessage({ type: 'save-file' }),
 			'{stop-process}': () => vscode.postMessage({ type: 'stop-process' })
+		},
+		dialog: {
+			'{space}': () => insertIntoActiveInput(' '),
+			'{bksp}': () => deleteFromActiveInput(),
+			'{enter}': () => {
+			},
+			'{paste}': async () => {
+				const text = await navigator.clipboard.readText()
+				insertIntoActiveInput(text)
+			}
 		}
 	}
 
 	const handleKeyboardInput = (input: string) => {
+		if (activeInput) {
+			return
+		}
+
 		const actionsF = actions[focus]
 		if (input in actionsF) {
 			actionsF[input]()
@@ -83,16 +102,14 @@ const usePupilEditorContainer = () => {
 		}
 	}
 
-	const switchFocus = () => {
-		setFocus((prev) => {
-			if (prev === 'editor') {
-				vscode.postMessage({ type: 'terminal-open' })
-				return 'terminal'
-			} else {
-				vscode.postMessage({ type: 'terminal-hide' })
-				return 'editor'
-			}
-		})
+	const switchFocus = (current: FocusTarget) => {
+		if (current === 'editor') {
+			vscode.postMessage({ type: 'terminal-open' })
+			setFocus('terminal')
+		} else if (current === 'terminal') {
+			vscode.postMessage({ type: 'terminal-hide' })
+			setFocus('editor')
+		}
 	}
 
 	return {

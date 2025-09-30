@@ -5,19 +5,22 @@ import { StyledEngineProvider } from '@mui/material/styles'
 import { GlobalStyles } from '@mui/styled-engine'
 import MockPupilEditorProvider from './mocks/MockPupilProvider.js'
 import FolderTreeContainer from './components/FolderTree/FolderTreeContainer.js'
+import { KeyboardFocusProvider } from './contexts/KeyboardFocusContext.js'
 
 const App = () => {
-	return (
-		<MockPupilEditorProvider>
-			<VsCodeApiProvider>
-				<StyledEngineProvider enableCssLayer>
-					<GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
-					<PupilContainer />
-					<FolderTreeContainer />
-				</StyledEngineProvider>
-			</VsCodeApiProvider>
-		</MockPupilEditorProvider>
-	)
+  return (
+    <StyledEngineProvider enableCssLayer>
+      <GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
+      <MockPupilEditorProvider>
+        <VsCodeApiProvider>
+          <KeyboardFocusProvider>
+            <PupilContainer visible />
+            <FolderTreeContainer />
+          </KeyboardFocusProvider>
+        </VsCodeApiProvider>
+      </MockPupilEditorProvider>
+    </StyledEngineProvider>
+  )
 }
 
 export default App
