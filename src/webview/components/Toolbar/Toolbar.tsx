@@ -12,6 +12,8 @@ import TranscriptDialog from './components/TranscriptDialog/TranscriptDialog.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
+type FocusTarget = 'editor' | 'terminal' | 'dialog'
+
 type ToolbarProps = {
 	focus: FocusTarget
 	switchFocus: (next: FocusTarget) => void

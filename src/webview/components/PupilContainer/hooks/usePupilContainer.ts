@@ -16,7 +16,7 @@ const usePupilContainer = () => {
 	const editorRef = useRef<PupilEditorHandle>(null)
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const [focus, setFocus] = useState<FocusTarget>('editor')
-	const { insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
+	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 
 	useEffect(() => {
@@ -87,6 +87,10 @@ const usePupilContainer = () => {
 	}
 
 	const handleKeyboardInput = (input: string) => {
+		if (activeInput) {
+			return
+		}
+
 		const actionsF = actions[focus]
 		if (input in actionsF) {
 			actionsF[input]()

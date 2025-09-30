@@ -9,7 +9,11 @@ type SimpleBrowserProps = {
 	onClick: (url: string, port: string) => void
 }
 
-const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) => {
+const SimpleBrowserDialog = ({
+	isOpen,
+	onClose,
+	onClick
+}: SimpleBrowserProps) => {
 	const [url, setUrl] = useState<string>('http://localhost')
 	const [port, setPort] = useState<string>('3000')
 	const { setActiveInput } = useKeyboardFocus()
