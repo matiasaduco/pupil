@@ -29,10 +29,6 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 			onInput?.(key.value)
 		}
 	}
-
-	if (!visible) return null
-
-
 	if (!visible) {
 		return null
 	}
