@@ -13,7 +13,7 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 
 	const handleKeyPress = (key: { value: string; label?: string }) => {
-		if (activeInput) {
+		if (activeInput.current) {
 			if (key.value === '{bksp}') {
 				deleteFromActiveInput()
 			} else if (key.value === '{space}') {
@@ -22,7 +22,9 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 				insertIntoActiveInput('\n')
 			} else if (key.value === '{tab}') {
 				insertIntoActiveInput('\t')
-			} else if (!key.value.startsWith('{')) {
+			} else if (key.value.startsWith('{')) {
+				onInput?.(key.value)
+			} else {
 				insertIntoActiveInput(key.value)
 			}
 		} else {
