@@ -87,10 +87,6 @@ const usePupilContainer = () => {
 	}
 
 	const handleKeyboardInput = (input: string) => {
-		if (activeInput) {
-			return
-		}
-
 		const actionsF = actions[focus]
 		if (input in actionsF) {
 			actionsF[input]()
