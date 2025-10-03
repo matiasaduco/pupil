@@ -5,7 +5,7 @@ import UndoIcon from '@mui/icons-material/Undo'
 import RedoIcon from '@mui/icons-material/Redo'
 import StopCircleIcon from '@mui/icons-material/StopCircle'
 import ClearIcon from '@mui/icons-material/Clear'
-import { SvgIconTypeMap } from '@mui/material'
+import { SvgIconTypeMap, useTheme } from '@mui/material'
 import { OverridableComponent } from '@mui/material/OverridableComponent'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import SaveIcon from '@mui/icons-material/Save'
@@ -26,7 +26,6 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 	const vscode = useVsCodeApi()
 	const [openSimpleBrowserDialog, setOpenSimpleBrowserDialog] = useState<boolean>(false)
 	const [openFileFolderDialog, setOpenFileFolderDialog] = useState<boolean>(false)
-
 	const generalShortcuts = [
 		{
 			tooltipTitle: 'Open Simple Browser',

@@ -1,6 +1,7 @@
 import { Button } from '@mui/material'
 import './PupilKeyboard.css'
 import usePupilKeyboard from './hooks/usePupilKeyboard.js'
+import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 
 type PupilKeyboardProps = {
 	onInput?: (input: string) => void
@@ -9,7 +10,27 @@ type PupilKeyboardProps = {
 
 const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 	const { layout } = usePupilKeyboard()
+	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 
+	const handleKeyPress = (key: { value: string; label?: string }) => {
+		if (activeInput.current) {
+			if (key.value === '{bksp}') {
+				deleteFromActiveInput()
+			} else if (key.value === '{space}') {
+				insertIntoActiveInput(' ')
+			} else if (key.value === '{enter}') {
+				insertIntoActiveInput('\n')
+			} else if (key.value === '{tab}') {
+				insertIntoActiveInput('\t')
+			} else if (key.value.startsWith('{')) {
+				onInput?.(key.value)
+			} else {
+				insertIntoActiveInput(key.value)
+			}
+		} else {
+			onInput?.(key.value)
+		}
+	}
 	if (!visible) {
 		return null
 	}
@@ -24,7 +45,7 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 				return (
 					<Button
 						key={key.value}
-						onClick={() => onInput?.(key.value)}
+						onClick={() => handleKeyPress(key)}
 						className="pupil-keyboard-btn"
 						style={{ gridColumn: `span ${key.col || 2} / span ${key.col || 2}` }}
 					>

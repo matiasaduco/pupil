@@ -9,13 +9,15 @@ import ToolbarButton from './components/ToolbarButton.js'
 import CreateFileFolderDialog from './components/CreateFileFolderDialog.js'
 import SimpleBrowserDialog from './components/SimpleBrowserDialog.js'
 
+type FocusTarget = 'editor' | 'terminal' | 'dialog'
+
 type ToolbarProps = {
+	focus: FocusTarget
+	switchFocus: (next: FocusTarget) => void
+	handleButtonClick: (input: string) => void
 	editorRef: RefObject<PupilEditorHandle | null>
 	keyboardVisible: boolean
 	toggleKeyboard: () => void
-	focus: 'editor' | 'terminal'
-	switchFocus: () => void
-	handleButtonClick: (action: string) => void
 }
 
 const Toolbar = ({
@@ -40,7 +42,7 @@ const Toolbar = ({
 	return (
 		<>
 			<nav className={'toolbar-nav flex items-center gap-2'}>
-				<Button onClick={switchFocus} className="w-35">
+				<Button onClick={() => switchFocus(focus)} className="w-35">
 					{focus}
 				</Button>
 				<Button onClick={toggleKeyboard}>{`${keyboardVisible ? 'Hide' : 'Show'}`} Keyboard</Button>
