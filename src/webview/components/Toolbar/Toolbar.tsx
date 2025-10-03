@@ -1,9 +1,9 @@
 import { Button, Divider } from '@mui/material'
+import './Toolbar.css'
 import Snippets from '../Snippets/Snippets.js'
 import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { RefObject } from 'react'
-import { clsx } from 'clsx'
 import useToolbar from './hooks/useToolbar.js'
 import ToolbarButton from './components/ToolbarButton.js'
 import CreateFileFolderDialog from './components/CreateFileFolderDialog.js'
@@ -39,12 +39,7 @@ const Toolbar = ({
 
 	return (
 		<>
-			<nav
-				className={clsx(
-					'flex items-center gap-2 bg-black',
-					false && 'rounded-2xl absolute z-10 left-1/2 -translate-x-1/2 mt-2 p-1'
-				)}
-			>
+			<nav className={'toolbar-nav flex items-center gap-2'}>
 				<Button onClick={switchFocus} className="w-35">
 					{focus}
 				</Button>
