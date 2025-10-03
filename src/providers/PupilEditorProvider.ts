@@ -8,7 +8,6 @@ import { DEFAULT_URL } from '../constants.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
-	private terminal: vscode.Terminal | null = null
 	private pendingAction: { type: 'file' | 'folder'; name: string } | null = null
 
 	constructor(private readonly context: vscode.ExtensionContext) {}
@@ -75,25 +74,25 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.createTerminal(message.content)
 					}
 					if (message.type === 'terminal-input' && message.content) {
-						this.terminal?.sendText(message.content, false)
+						vscode.window.activeTerminal?.sendText(message.content, false)
 					}
 					if (message.type === 'terminal-space') {
-						this.terminal?.sendText(' ', false)
+						vscode.window.activeTerminal?.sendText(' ', false)
 					}
 					if (message.type === 'terminal-bksp') {
-						this.terminal?.sendText('\b', false)
+						vscode.window.activeTerminal?.sendText('\b', false)
 					}
 					if (message.type === 'terminal-enter') {
-						this.terminal?.sendText('\n', false)
+						vscode.window.activeTerminal?.sendText('\n', false)
 					}
 					if (message.type === 'terminal-clear') {
-						this.terminal?.sendText('clear', true)
+						vscode.window.activeTerminal?.sendText('clear', true)
 					}
 					if (message.type === 'stop-process') {
-						this.terminal?.sendText('\x03', true)
+						vscode.window.activeTerminal?.sendText('\x03', true)
 					}
 					if (message.type === 'terminal-hide') {
-						this.terminal?.hide()
+						vscode.window.activeTerminal?.hide()
 					}
 					if (message.type === 'terminal-list') {
 						this.getTerminals(webviewPanel)
@@ -106,7 +105,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'terminal-paste') {
 						vscode.env.clipboard.readText().then((text) => {
-							this.terminal?.sendText(text, false)
+							vscode.window.activeTerminal?.sendText(text, false)
 						})
 					}
 					if (message.type === 'save-file') {
@@ -172,7 +171,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private updateTheme(webviewPanel: vscode.WebviewPanel) {
-		let theme = ThemeManager.getCurrentTheme()
+		const theme = ThemeManager.getCurrentTheme()
 		webviewPanel.webview.postMessage({ type: 'set-theme', theme })
 	}
 
@@ -182,13 +181,13 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private openTerminal(title?: string) {
-		this.terminal = this.terminal || vscode.window.createTerminal(title)
-		this.terminal.show()
+		const terminal = vscode.window.activeTerminal || vscode.window.createTerminal(title)
+		terminal.show()
 	}
 
 	private createTerminal(title?: string) {
-		this.terminal = vscode.window.createTerminal(title)
-		this.terminal.show()
+		const terminal = vscode.window.createTerminal(title)
+		terminal.show()
 	}
 
 	private getTerminals(webviewPanel: vscode.WebviewPanel) {
@@ -200,10 +199,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 
 	private showTerminal(index: number) {
 		const terminal = vscode.window.terminals[index]
-		if (terminal) {
-			this.terminal = terminal
-			this.terminal.show()
-		}
+		terminal?.show()
 	}
 
 	private async createNewFile(fileName: string, webviewPanel: vscode.WebviewPanel) {
@@ -327,9 +323,8 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private dittachTerminal(closedTerminal: vscode.Terminal, webviewPanel: vscode.WebviewPanel) {
-		if (this.terminal && closedTerminal === this.terminal) {
-			this.terminal = null
-
+		const terminal = vscode.window.activeTerminal
+		if (terminal && closedTerminal === terminal) {
 			webviewPanel.webview.postMessage({
 				type: 'set-focus',
 				focus: 'editor'
