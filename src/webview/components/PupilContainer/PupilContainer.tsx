@@ -5,6 +5,7 @@ import { createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Toolbar from '../Toolbar/Toolbar.js'
+import { useEffect } from 'react'
 
 const PupilContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
@@ -25,6 +26,14 @@ const PupilContainer = () => {
 		}
 	})
 
+	useEffect(() => {
+		if (colorScheme === 'vs') {
+			document.documentElement.classList.remove('dark')
+		} else {
+			document.documentElement.classList.add('dark')
+		}
+	}, [colorScheme])
+
 	return (
 		<ThemeProvider theme={theme}>
 			{isDev && (
@@ -36,7 +45,7 @@ const PupilContainer = () => {
 					)}
 				</IconButton>
 			)}
-			<div className="flex flex-col">
+			<div className="flex flex-col h-screen">
 				<PupilEditor
 					ref={editorRef}
 					keyboardVisible={keyboardVisible}
