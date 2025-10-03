@@ -14,7 +14,7 @@ const App = () => {
 			<MockPupilEditorProvider>
 				<VsCodeApiProvider>
 					<KeyboardFocusProvider>
-						<PupilContainer visible />
+						<PupilContainer />
 						<FolderTreeContainer />
 					</KeyboardFocusProvider>
 				</VsCodeApiProvider>
