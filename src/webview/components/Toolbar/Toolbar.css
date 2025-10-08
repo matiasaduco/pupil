@@ -1,47 +1,57 @@
 .toolbar-nav {
-  background: #f3f4f6;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  padding: 0.5rem 1rem;
-  margin: 0.5rem 0;
-  min-height: 3.5rem;
-  transition: background 0.2s, box-shadow 0.2s;
+	background: #f3f4f6;
+	border-radius: 0.5rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	padding: 0.5rem 1rem;
+	margin: 0.5rem 0;
+	min-height: 3.5rem;
+	transition:
+		background 0.2s,
+		box-shadow 0.2s;
 }
 
 .dark .toolbar-nav {
-  background: #23272f;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+	background: #23272f;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
 }
 
-.toolbar-nav .MuiButton-root, .toolbar-nav .MuiIconButton-root {
-  border-radius: 0.375rem;
-  font-weight: 500;
-  color: #23272f;
-  background: #e5e7eb;
-  margin-right: 0.25rem;
-  transition: background 0.2s, color 0.2s;
+.toolbar-nav .MuiButton-root,
+.toolbar-nav .MuiIconButton-root {
+	border-radius: 0.375rem;
+	font-weight: 500;
+	color: #23272f;
+	background: #e5e7eb;
+	margin-right: 0.25rem;
+	transition:
+		background 0.2s,
+		color 0.2s;
 }
-.toolbar-nav .MuiButton-root:hover, .toolbar-nav .MuiIconButton-root:hover {
-  background: #d1d5db;
+.toolbar-nav .MuiButton-root:hover,
+.toolbar-nav .MuiIconButton-root:hover {
+	background: #d1d5db;
 }
-.toolbar-nav .MuiButton-root:active, .toolbar-nav .MuiIconButton-root:active {
-  background: #cbd5e1;
+.toolbar-nav .MuiButton-root:active,
+.toolbar-nav .MuiIconButton-root:active {
+	background: #cbd5e1;
 }
 
-.dark .toolbar-nav .MuiButton-root, .dark .toolbar-nav .MuiIconButton-root {
-  color: #f3f4f6;
-  background: #31343b;
+.dark .toolbar-nav .MuiButton-root,
+.dark .toolbar-nav .MuiIconButton-root {
+	color: #f3f4f6;
+	background: #31343b;
 }
-.dark .toolbar-nav .MuiButton-root:hover, .dark .toolbar-nav .MuiIconButton-root:hover {
-  background: #3a3f4b;
+.dark .toolbar-nav .MuiButton-root:hover,
+.dark .toolbar-nav .MuiIconButton-root:hover {
+	background: #3a3f4b;
 }
-.dark .toolbar-nav .MuiButton-root:active, .dark .toolbar-nav .MuiIconButton-root:active {
-  background: #181a20;
+.dark .toolbar-nav .MuiButton-root:active,
+.dark .toolbar-nav .MuiIconButton-root:active {
+	background: #181a20;
 }
 
 .toolbar-nav .MuiDivider-root {
-  border-color: #d1d5db;
+	border-color: #d1d5db;
 }
 .dark .toolbar-nav .MuiDivider-root {
-  border-color: #31343b;
+	border-color: #31343b;
 }

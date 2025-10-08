@@ -25,13 +25,24 @@ const PupilDialog = ({ open, title, children, onSubmit, onCancel, onClose }: Pup
 				/>
 				<Card
 					className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
-					sx={{ backgroundColor: theme.palette.background.default, color: theme.palette.text.primary }}
+					sx={{
+						backgroundColor: theme.palette.background.default,
+						color: theme.palette.text.primary
+					}}
 				>
 					<CardHeader title={title} />
 					<CardContent>{children}</CardContent>
 					<CardActions>
-						{onCancel && <Button onClick={onCancel} sx={{ color: theme.palette.text.primary }}>Cancel</Button>}
-						{onSubmit && <Button onClick={onSubmit} sx={{ color: theme.palette.text.primary }}>Submit</Button>}
+						{onCancel && (
+							<Button onClick={onCancel} sx={{ color: theme.palette.text.primary }}>
+								Cancel
+							</Button>
+						)}
+						{onSubmit && (
+							<Button onClick={onSubmit} sx={{ color: theme.palette.text.primary }}>
+								Submit
+							</Button>
+						)}
 					</CardActions>
 				</Card>
 			</>
