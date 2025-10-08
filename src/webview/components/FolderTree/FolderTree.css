@@ -1,58 +1,57 @@
-
 .folder-tree {
-  background-color: #2d2d2d;
-  color: #e0e0e0;
-  padding: 8px;
+	background-color: #2d2d2d;
+	color: #e0e0e0;
+	padding: 8px;
 }
 
 .folder-tree-item {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .folder-tree-item .MuiTreeItem-content:hover {
-  background-color: #505050;
+	background-color: #505050;
 }
 
 .folder-tree-item .MuiTreeItem-content.Mui-selected {
-  background-color: #404040;
+	background-color: #404040;
 }
 
 .folder-tree-text {
-  user-select: none;
-  padding: 2px 4px;
-  color: #e0e0e0;
-  font-size: 0.9rem;
+	user-select: none;
+	padding: 2px 4px;
+	color: #e0e0e0;
+	font-size: 0.9rem;
 }
 
 .folder-tree-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .folder-tree-modal {
-  padding: 20px;
-  background-color: #333333;
-  color: #e0e0e0;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
-  max-height: 80vh;
-  max-width: 600px;
-  min-width: 400px;
-  overflow-y: auto;
-  border: 1px solid #555555;
+	padding: 20px;
+	background-color: #333333;
+	color: #e0e0e0;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+	border-radius: 12px;
+	max-height: 80vh;
+	max-width: 600px;
+	min-width: 400px;
+	overflow-y: auto;
+	border: 1px solid #555555;
 }
 
 .folder-tree-modal-title {
-  margin: 0 0 16px 0;
-  color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: 500;
+	margin: 0 0 16px 0;
+	color: #ffffff;
+	font-size: 1.2rem;
+	font-weight: 500;
 }

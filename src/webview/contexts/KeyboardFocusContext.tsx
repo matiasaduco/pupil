@@ -30,7 +30,9 @@ export const KeyboardFocusProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const insertIntoActiveInput = useCallback((text: string) => {
 		const input = activeInputRef.current
-		if (!input) return
+		if (!input) {
+			return
+		}
 
 		const start = input.selectionStart || 0
 		const end = input.selectionEnd || 0
@@ -48,7 +50,9 @@ export const KeyboardFocusProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const deleteFromActiveInput = useCallback(() => {
 		const input = activeInputRef.current
-		if (!input) return
+		if (!input) {
+			return
+		}
 
 		const start = input.selectionStart || 0
 		const end = input.selectionEnd || 0

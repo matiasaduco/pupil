@@ -1,6 +1,6 @@
 import PupilEditor from '@components/PupilEditor/PupilEditor.js'
 import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
-import usePupilEditorContainer from './hooks/usePupilEditorContainer.js'
+import usePupilEditorContainer from './hooks/usePupilContainer.js'
 import { createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'

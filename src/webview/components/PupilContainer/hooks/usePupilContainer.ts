@@ -11,12 +11,12 @@ type ActionsProps = {
 	dialog: Record<string, () => void>
 }
 
-const usePupilEditorContainer = () => {
+const usePupilContainer = () => {
 	const vscode = useVsCodeApi()
 	const editorRef = useRef<PupilEditorHandle>(null)
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const [focus, setFocus] = useState<FocusTarget>('editor')
-	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
+	const { insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 
 	useEffect(() => {
@@ -78,8 +78,7 @@ const usePupilEditorContainer = () => {
 		dialog: {
 			'{space}': () => insertIntoActiveInput(' '),
 			'{bksp}': () => deleteFromActiveInput(),
-			'{enter}': () => {
-			},
+			'{enter}': () => {},
 			'{paste}': async () => {
 				const text = await navigator.clipboard.readText()
 				insertIntoActiveInput(text)
@@ -120,4 +119,4 @@ const usePupilEditorContainer = () => {
 	}
 }
 
-export default usePupilEditorContainer
+export default usePupilContainer

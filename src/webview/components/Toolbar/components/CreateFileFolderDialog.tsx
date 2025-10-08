@@ -9,10 +9,7 @@ type CreateFileFolderDialogProps = {
 	onExternalClose?: () => void
 }
 
-const CreateFileFolderDialog = ({ 
-	externalOpen, 
-	onExternalClose 
-}: CreateFileFolderDialogProps) => {
+const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFolderDialogProps) => {
 	const vscode = useVsCodeApi()
 	const { setActiveInput } = useKeyboardFocus()
 	const [open, setOpen] = useState(false)
@@ -56,7 +53,7 @@ const CreateFileFolderDialog = ({
 	}
 
 	const handleConfirm = () => {
-		if (!name.trim()) return 
+		if (!name.trim()) return
 		vscode.postMessage({ type: `create-${type}`, name })
 		reset()
 	}
@@ -67,7 +64,6 @@ const CreateFileFolderDialog = ({
 		setActiveInput(nativeInput)
 		console.log('Input focused, registered:', nativeInput)
 	}
-
 
 	return (
 		<PupilDialog
