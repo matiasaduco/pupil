@@ -5,7 +5,7 @@ import UndoIcon from '@mui/icons-material/Undo'
 import RedoIcon from '@mui/icons-material/Redo'
 import StopCircleIcon from '@mui/icons-material/StopCircle'
 import ClearIcon from '@mui/icons-material/Clear'
-import { SvgIconTypeMap, useTheme } from '@mui/material'
+import { SvgIconTypeMap } from '@mui/material'
 import { OverridableComponent } from '@mui/material/OverridableComponent'
 import TerminalIcon from '@mui/icons-material/Terminal'
 import SaveIcon from '@mui/icons-material/Save'
@@ -13,6 +13,7 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder'
 import WebIcon from '@mui/icons-material/Language'
 import { useState } from 'react'
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
+import CommentIcon from '@mui/icons-material/Comment'
 
 type Shortcut = {
 	value?: string
@@ -26,6 +27,8 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 	const vscode = useVsCodeApi()
 	const [openSimpleBrowserDialog, setOpenSimpleBrowserDialog] = useState<boolean>(false)
 	const [openFileFolderDialog, setOpenFileFolderDialog] = useState<boolean>(false)
+	const [transcriptDialogOpen, setTranscriptDialogOpen] = useState<boolean>(false)
+
 	const generalShortcuts = [
 		{
 			tooltipTitle: 'Open Simple Browser',
@@ -50,6 +53,12 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 			icon: SaveIcon,
 			label: 'Save Document',
 			onClick: () => handleButtonClick('{save}')
+		},
+		{
+			tooltipTitle: 'Start Speech to Text',
+			icon: CommentIcon,
+			label: 'Speech to Text',
+			onClick: () => setTranscriptDialogOpen(true)
 		}
 	]
 
@@ -73,8 +82,8 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 		}
 	]
 
-	const openWeb = (url: string, port: string) => {
-		vscode.postMessage({ type: 'openWeb', url: `${url}:${port}` })
+	const openSimpleBrowser = (url: string, port: string) => {
+		vscode.postMessage({ type: 'openSimpleBrowser', url: `${url}:${port}` })
 	}
 
 	return {
@@ -85,7 +94,9 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 		setOpenSimpleBrowserDialog,
 		openFileFolderDialog,
 		setOpenFileFolderDialog,
-		openWeb
+		openSimpleBrowser,
+		transcriptDialogOpen,
+		setTranscriptDialogOpen
 	}
 }
 

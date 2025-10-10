@@ -1,48 +1,70 @@
-import { Button, Card, CardActions, CardContent, CardHeader, useTheme } from '@mui/material'
+import { Card, CardActions, CardContent, CardHeader, useTheme } from '@mui/material'
 import { createPortal } from 'react-dom'
+import clsx from 'clsx'
 import usePupilDialog from './hooks/usePupilDialog.js'
+import ActionButton from './components/ActionButton.js'
 
 type PupilDialogProps = {
 	open: boolean
-	title: string
+	title?: string
 	children?: React.ReactNode
 	onSubmit?: () => void
 	onCancel?: () => void
 	onClose: () => void
+	onSubmitIcon?: React.ReactNode
+	onCancelIcon?: React.ReactNode
+	extraAction?: React.ReactNode
 }
 
-const PupilDialog = ({ open, title, children, onSubmit, onCancel, onClose }: PupilDialogProps) => {
+const PupilDialog = ({
+	open,
+	title,
+	children,
+	onSubmit,
+	onCancel,
+	onClose,
+	onSubmitIcon,
+	onCancelIcon,
+	extraAction
+}: PupilDialogProps) => {
 	const { portalTarget } = usePupilDialog()
-	const theme = useTheme()
+	const { palette } = useTheme()
 
 	const Dialog = () => {
 		return (
 			<>
 				<div
 					className="absolute inset-0 z-10"
-					style={{ backgroundColor: theme.palette.action.disabledBackground }}
+					style={{ backgroundColor: palette.action.disabledBackground }}
 					onClick={onClose}
 				/>
 				<Card
 					className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
 					sx={{
-						backgroundColor: theme.palette.background.default,
-						color: theme.palette.text.primary
+						backgroundColor: palette.background.default,
+						color: palette.text.primary
 					}}
 				>
-					<CardHeader title={title} />
+					{title && <CardHeader title={title} />}
 					<CardContent>{children}</CardContent>
-					<CardActions>
+					<CardActions className={clsx({ hidden: !onCancel && !onSubmit && !extraAction })}>
 						{onCancel && (
-							<Button onClick={onCancel} sx={{ color: theme.palette.text.primary }}>
-								Cancel
-							</Button>
+							<ActionButton
+								text="Cancel"
+								icon={onCancelIcon}
+								color={palette.text.primary}
+								onClick={onCancel}
+							/>
 						)}
 						{onSubmit && (
-							<Button onClick={onSubmit} sx={{ color: theme.palette.text.primary }}>
-								Submit
-							</Button>
+							<ActionButton
+								text="Submit"
+								icon={onSubmitIcon}
+								color={palette.text.primary}
+								onClick={onSubmit}
+							/>
 						)}
+						{extraAction}
 					</CardActions>
 				</Card>
 			</>

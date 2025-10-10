@@ -1,10 +1,11 @@
+import './Snippets.css'
 import useSnippets from './hooks/useSnippets.js'
-import Typography from '@mui/material/Typography'
 import HtmlTooltip from '@mui/material/Tooltip'
 import { Button } from '@mui/material'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { RefObject } from 'react'
 import PupilDialog from '../PupilDialog/PupilDialog.js'
+import TooltipTitle from './components/TooltipTitle.js'
 
 type SnippetsProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
@@ -22,30 +23,7 @@ const Snippets = ({ editorRef }: SnippetsProps) => {
 					{snippets?.all.flat().map((snippet) =>
 						Object.entries(snippet.snippets).map(([key, { body, description }]) => (
 							<HtmlTooltip
-								title={
-									<>
-										<Typography color="inherit" fontWeight={600}>
-											{description || ''}
-										</Typography>
-										<hr style={{ margin: '8px 0' }} />
-										<Typography color="inherit" fontFamily="monospace" fontSize={14}>
-											<pre
-												style={{
-													background: '#222',
-													color: '#fff',
-													padding: '8px',
-													borderRadius: '6px',
-													fontFamily: 'monospace',
-													fontSize: 14,
-													maxWidth: '30em',
-													whiteSpace: 'pre-wrap'
-												}}
-											>
-												{Array.isArray(body) ? body.join('\n') : body}
-											</pre>
-										</Typography>
-									</>
-								}
+								title={<TooltipTitle body={body} description={description} />}
 								placement="top"
 								arrow
 							>

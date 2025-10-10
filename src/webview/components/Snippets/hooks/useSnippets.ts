@@ -36,12 +36,7 @@ const useSnippets = (editorRef: RefObject<PupilEditorHandle | null>) => {
 
 	const handleSnippetPress = (snippet: string | string[]) => {
 		if (Array.isArray(snippet)) {
-			snippet.forEach((line, index) => {
-				editorRef.current?.insertAtCursor(line)
-				if (index < snippet.length - 1) {
-					editorRef.current?.enterAtCursor()
-				}
-			})
+			editorRef.current?.insertMultipleAtCursor(snippet)
 		} else {
 			editorRef.current?.insertAtCursor(snippet)
 		}
