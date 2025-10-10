@@ -1,5 +1,5 @@
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { RefObject } from 'react'
+import { RefObject, useState } from 'react'
 // @ts-expect-error no types available
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
@@ -10,6 +10,7 @@ type TranscriptDialogProps = {
 
 const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 	const { transcript, listening, resetTranscript } = useSpeechRecognition()
+	const [commentTranscription, setCommmentTranscription] = useState<boolean>(true)
 
 	const insertLineBreaks = (text: string, maxLen: number = 50) => {
 		if (!text) {
@@ -58,7 +59,12 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 
 	const onSubmit = (transcript: string) => {
 		const text = transcript.split('\n')
-		editorRef.current?.insertCommentBlockAtCursor(text)
+
+		if (commentTranscription) {
+			editorRef.current?.insertCommentBlockAtCursor(text)
+		} else {
+			editorRef.current?.insertMultipleAtCursor(text)
+		}
 	}
 
 	const handleOnClose = () => {
@@ -76,7 +82,9 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		transcriptWithBreaks,
 		handleSpeechToText,
 		handleOnSubmit,
-		handleOnClose
+		handleOnClose,
+		commentTranscription,
+		setCommmentTranscription
 	}
 }
 
