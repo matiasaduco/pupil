@@ -7,6 +7,41 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 	const monaco = useMonaco()
 
+	// Inserta una lista de strings, selecciona el bloque y lo comenta
+	const insertCommentBlockAtCursor = (texts: string[]) => {
+		const editor = editorRef.current
+		if (!editor || !monaco) {
+			return
+		}
+
+		// Guardar posición inicial antes de insertar
+		const startPosition = editor.getPosition()
+		if (!startPosition) {
+			return
+		}
+
+		insertMultipleAtCursor(texts)
+
+		// Obtener posición final después de insertar
+		const endPosition = editor.getPosition()
+		if (!endPosition) {
+			return
+		}
+
+		// Seleccionar el bloque insertado
+		editor.setSelection(
+			new monaco.Selection(
+				startPosition.lineNumber,
+				1,
+				endPosition.lineNumber,
+				editor.getModel()?.getLineMaxColumn(endPosition.lineNumber) || 1
+			)
+		)
+
+		// Comentar el bloque seleccionado
+		commentAtCursor()
+	}
+
 	const handleOnMount = (editor: editor.IStandaloneCodeEditor) => {
 		editorRef.current = editor
 	}
@@ -17,6 +52,15 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 			return { lineNumber: pos.lineNumber, column: pos.column }
 		}
 		return undefined
+	}
+
+	const insertMultipleAtCursor = (texts: string[]) => {
+		texts.forEach((line, index) => {
+			insertAtCursor(line)
+			if (index < texts.length - 1) {
+				enterAtCursor()
+			}
+		})
 	}
 
 	const insertAtCursor = (text: string) => {
@@ -304,6 +348,8 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 		() => ({
 			getCursorPosition,
 			insertAtCursor,
+			insertMultipleAtCursor,
+			insertCommentBlockAtCursor,
 			deleteAtCursor,
 			enterAtCursor,
 			commentAtCursor,

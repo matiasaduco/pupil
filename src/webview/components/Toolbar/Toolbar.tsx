@@ -8,6 +8,7 @@ import useToolbar from './hooks/useToolbar.js'
 import ToolbarButton from './components/ToolbarButton.js'
 import CreateFileFolderDialog from './components/CreateFileFolderDialog.js'
 import SimpleBrowserDialog from './components/SimpleBrowserDialog.js'
+import TranscriptDialog from './components/TranscriptDialog/TranscriptDialog.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -36,7 +37,9 @@ const Toolbar = ({
 		openSimpleBrowserDialog,
 		setOpenFileFolderDialog,
 		setOpenSimpleBrowserDialog,
-		openWeb
+		openSimpleBrowser,
+		transcriptDialogOpen,
+		setTranscriptDialogOpen
 	} = useToolbar(handleButtonClick)
 
 	return (
@@ -62,7 +65,7 @@ const Toolbar = ({
 						tooltipTitle={shortcut.tooltipTitle!}
 						icon={shortcut.icon}
 						label={shortcut.label}
-						onButtonClick={shortcut.onClick!}
+						onButtonClick={shortcut.onClick}
 					/>
 				))}
 
@@ -124,13 +127,19 @@ const Toolbar = ({
 
 			<SimpleBrowserDialog
 				isOpen={openSimpleBrowserDialog}
-				onClick={openWeb}
+				onClick={openSimpleBrowser}
 				onClose={() => setOpenSimpleBrowserDialog(false)}
 			/>
 
 			<CreateFileFolderDialog
 				externalOpen={openFileFolderDialog}
 				onExternalClose={() => setOpenFileFolderDialog(false)}
+			/>
+
+			<TranscriptDialog
+				isOpen={transcriptDialogOpen}
+				editorRef={editorRef}
+				onClose={() => setTranscriptDialogOpen(false)}
 			/>
 		</>
 	)

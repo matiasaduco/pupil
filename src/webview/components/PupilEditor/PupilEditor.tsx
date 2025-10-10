@@ -14,6 +14,7 @@ type PupilEditorProps = {
 const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(({ visible, theme }, ref) => {
 	const { handleOnMount } = useForwardRef(ref)
 	const { language, value, handleOnChange, initialValue } = useEditorState()
+
 	return (
 		<div className={`relative flex-1 min-h-0 ${visible ? '' : 'hidden'}`}>
 			{initialValue ? (

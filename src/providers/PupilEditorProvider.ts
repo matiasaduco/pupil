@@ -100,8 +100,8 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					if (message.type === 'terminal-show' && message.content) {
 						this.showTerminal(message.content)
 					}
-					if (message.type === 'openWeb') {
-						this.openWeb(message.url)
+					if (message.type === 'openSimpleBrowser') {
+						this.openSimpleBrowser(message.url)
 					}
 					if (message.type === 'terminal-paste') {
 						vscode.env.clipboard.readText().then((text) => {
@@ -317,7 +317,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		}
 		return acc
 	}
-	private async openWeb(url: string = DEFAULT_URL) {
+	private async openSimpleBrowser(url: string = DEFAULT_URL) {
 		await vscode.commands.executeCommand('workbench.action.focusSecondEditorGroup')
 		await vscode.commands.executeCommand('simpleBrowser.show', url)
 	}
