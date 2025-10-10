@@ -3,7 +3,7 @@ import PupilDialog from '@webview/components/PupilDialog/PupilDialog.js'
 import MicrophoneIcon from '@mui/icons-material/Mic'
 import StopCircleIcon from '@mui/icons-material/StopCircle'
 import SendIcon from '@mui/icons-material/Send'
-import { IconButton } from '@mui/material'
+import { IconButton, Switch } from '@mui/material'
 import useTranscriptDialog from './hooks/useTranscriptDialog.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 
@@ -14,17 +14,30 @@ type TranscriptDialogProps = {
 }
 
 const TranscriptDialog = ({ isOpen, editorRef, onClose }: TranscriptDialogProps) => {
-	const { handleSpeechToText, listening, handleOnClose, handleOnSubmit, transcriptWithBreaks } =
-		useTranscriptDialog({ editorRef, onClose })
+	const {
+		handleSpeechToText,
+		listening,
+		handleOnClose,
+		handleOnSubmit,
+		transcriptWithBreaks,
+		commentTranscription,
+		setCommmentTranscription
+	} = useTranscriptDialog({ editorRef, onClose })
 
 	const ActionButton = () => (
-		<IconButton onClick={handleSpeechToText}>
-			{listening ? (
-				<StopCircleIcon color="error" onClick={handleSpeechToText} />
-			) : (
-				<MicrophoneIcon onClick={handleSpeechToText} />
-			)}
-		</IconButton>
+		<>
+			<IconButton onClick={handleSpeechToText}>
+				{listening ? (
+					<StopCircleIcon color="error" onClick={handleSpeechToText} />
+				) : (
+					<MicrophoneIcon onClick={handleSpeechToText} />
+				)}
+			</IconButton>
+			<Switch
+				onClick={() => setCommmentTranscription((prev) => !prev)}
+				defaultChecked={commentTranscription}
+			/>
+		</>
 	)
 
 	return (
