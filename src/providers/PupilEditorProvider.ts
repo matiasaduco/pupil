@@ -1,4 +1,6 @@
 import * as vscode from 'vscode'
+import * as fs from 'fs'
+import * as path from 'path'
 import { getEditorContent } from '../utils/getEditorContent.js'
 import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
@@ -21,6 +23,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	) {
 		this.sendToSpeechWebClient = sendToSpeechWebClient
 		this.stopSpeechServer = stopSpeechServer
+		this.initializeLogsDirectory()
 	}
 
 	public sendMessageToWebview(message: unknown) {
@@ -28,6 +31,47 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			this.webviewPanel.webview.postMessage(message)
 		}
 	}
+
+  private initializeLogsDirectory() {
+    const logsDir = path.join(this.context.extensionPath, 'logs')
+    if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir, { recursive: true })
+    }
+  }
+
+  private getLogFilePath(level: string): string {
+    const logsDir = path.join(this.context.extensionPath, 'logs')
+    const date = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+
+    if (level === 'error') {
+      return path.join(logsDir, `error-${date}.log`)
+    }
+    return path.join(logsDir, `combined-${date}.log`)
+  }
+
+  private writeLog(entry: {
+    timestamp: string
+    level: string
+    message: string
+    meta?: string | object
+  }) {
+    try {
+      const { timestamp, level, message, meta } = entry
+
+      const metaStr = meta ? ` | Meta: ${JSON.stringify(meta)}` : ''
+      const logEntry = `[${timestamp}] ${level.toUpperCase()}: ${message}${metaStr}\n`
+
+      const combinedLogPath = this.getLogFilePath(level)
+      fs.appendFileSync(combinedLogPath, logEntry)
+
+      if (level === 'error') {
+        const errorLogPath = this.getLogFilePath('error')
+        fs.appendFileSync(errorLogPath, logEntry)
+      }
+    } catch (error) {
+      console.error('Failed to write log to file:', error)
+    }
+  }
 
 	public updateConnectionStatus(status: ConnectionStatusType) {
 		this.connectionStatus = status
@@ -43,9 +87,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
-		webviewPanel: vscode.WebviewPanel,
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		_token: vscode.CancellationToken
+		webviewPanel: vscode.WebviewPanel
 	): Promise<void> {
 		let webviewReady = false
 		this.webviewPanel = webviewPanel
@@ -68,6 +110,11 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		const onDidReceiveMessageListener = webviewPanel.webview.onDidReceiveMessage(
 			async (message) => {
 				try {
+					if (message.type === 'log') {
+						this.writeLog(message.data)
+						return
+					}
+
 					if (message.type === 'ready') {
 						this.init(webviewReady, webviewPanel, document)
 					}
@@ -157,6 +204,12 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 				} catch (error) {
 					console.error('Error en onDidReceiveMessage:', error)
+					this.writeLog({
+						timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+						level: 'error',
+						message: 'Error in onDidReceiveMessage',
+						meta: { error: error instanceof Error ? error.message : String(error) }
+					})
 				}
 			}
 		)
@@ -343,24 +396,6 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		return children
 	}
 
-	private listarCarpetasRecursivo = async (
-		uri: vscode.Uri,
-		acc: vscode.Uri[] = []
-	): Promise<vscode.Uri[]> => {
-		const IGNORAR = new Set(['node_modules', 'public'])
-		const entries = await vscode.workspace.fs.readDirectory(uri)
-		for (const [name, tipo] of entries) {
-			if (tipo === vscode.FileType.Directory) {
-				if (IGNORAR.has(name)) {
-					continue
-				}
-				const sub = vscode.Uri.joinPath(uri, name)
-				acc.push(sub)
-				await this.listarCarpetasRecursivo(sub, acc)
-			}
-		}
-		return acc
-	}
 	private async openSimpleBrowser(url: string = DEFAULT_URL) {
 		await vscode.commands.executeCommand('workbench.action.focusSecondEditorGroup')
 		await vscode.commands.executeCommand('simpleBrowser.show', url)

@@ -2,6 +2,7 @@ import { Button } from '@mui/material'
 import PupilDialog from '../../PupilDialog/PupilDialog.js'
 import { useState, useEffect, useRef } from 'react'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
+import logger from '../../../../utils/logger.js'
 
 type SimpleBrowserProps = {
 	isOpen: boolean
@@ -25,23 +26,33 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 		const nativeInput = e.target as HTMLInputElement
 		activeInputRef.current = nativeInput
 		setActiveInput(nativeInput)
-		console.log('Input focused in SimpleBrowser:', nativeInput)
+
+		logger.info('Input focused in SimpleBrowser', {
+			inputId: nativeInput.id,
+			inputValue: nativeInput.value,
+			timestamp: new Date().toISOString()
+		})
 	}
 
 	const handleInputBlur = () => {
 		setTimeout(() => {
 			if (activeInputRef.current && document.activeElement !== activeInputRef.current) {
 				setActiveInput(null)
+				logger.info('Input blurred in SimpleBrowser', {
+					inputId: activeInputRef.current.id
+				})
 			}
 		}, 100)
 	}
 
 	const handleClose = () => {
 		setActiveInput(null)
+		logger.info('SimpleBrowser dialog closed')
 		onClose()
 	}
 
 	const handleConfirm = () => {
+		logger.info('SimpleBrowser opening URL', { url, port })
 		onClick(url, port)
 		setActiveInput(null)
 		onClose()

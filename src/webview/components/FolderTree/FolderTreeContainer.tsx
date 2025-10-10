@@ -12,7 +12,6 @@ const FolderTreeContainer: React.FC = () => {
 	React.useEffect(() => {
 		const listener = (event: MessageEvent) => {
 			const msg = event.data
-			console.log('Mensaje recibido en webview:', msg)
 			if (msg.type === 'show-folder-tree') {
 				setTree(msg.items)
 				setSelecting(true)
@@ -24,7 +23,6 @@ const FolderTreeContainer: React.FC = () => {
 	}, [])
 
 	const handleSelect = (fullPath: string) => {
-		console.log('Carpeta seleccionada en webview:')
 		vscode.postMessage({ type: 'folder-selected', path: fullPath })
 		setSelecting(false)
 		setTree([])

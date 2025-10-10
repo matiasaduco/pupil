@@ -54,7 +54,6 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 		const nativeInput = e.target as HTMLInputElement
 		inputRef.current = nativeInput
 		setActiveInput(nativeInput)
-		console.log('Input focused, registered:', nativeInput)
 	}
 
 	return (

@@ -1,5 +1,6 @@
 import './App.css'
 import { VsCodeApiProvider } from './contexts/VsCodeApiContext.js'
+import { LoggerProvider } from '../providers/LoggerProvider.js'
 import PupilContainer from '@webview/components/PupilContainer/PupilContainer.js'
 import { StyledEngineProvider } from '@mui/material/styles'
 import { GlobalStyles } from '@mui/styled-engine'
@@ -13,10 +14,12 @@ const App = () => {
 			<GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
 			<MockPupilEditorProvider>
 				<VsCodeApiProvider>
-					<KeyboardFocusProvider>
-						<PupilContainer />
-						<FolderTreeContainer />
-					</KeyboardFocusProvider>
+					<LoggerProvider>
+						<KeyboardFocusProvider>
+							<PupilContainer />
+							<FolderTreeContainer />
+						</KeyboardFocusProvider>
+					</LoggerProvider>
 				</VsCodeApiProvider>
 			</MockPupilEditorProvider>
 		</StyledEngineProvider>
