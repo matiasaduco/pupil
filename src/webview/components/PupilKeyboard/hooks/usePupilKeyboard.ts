@@ -4,8 +4,10 @@ import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock'
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab'
 import SpaceBarIcon from '@mui/icons-material/SpaceBar'
 import { Layout } from '../types/layout.js'
+import { useState } from 'react'
 
 const usePupilKeyboard = () => {
+	const [isShifted, setIsShifted] = useState(false)
 	// const layout = {
 	// 	shift: [
 	// 		shortcuts,
@@ -17,7 +19,7 @@ const usePupilKeyboard = () => {
 	// 	]
 	// }
 
-	const layout: Layout = {
+	const defaultLayout: Layout = {
 		default: [
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
@@ -78,7 +80,79 @@ const usePupilKeyboard = () => {
 		]
 	}
 
-	return { layout }
+	const shiftedLayout: Layout = {
+		default: [
+			{ value: '~', label: '~' },
+			{ value: '!', label: '!' },
+			{ value: '@', label: '@' },
+			{ value: '#', label: '#' },
+			{ value: '$', label: '$' },
+			{ value: '%', label: '%' },
+			{ value: '^', label: '^' },
+			{ value: '&', label: '&' },
+			{ value: '*', label: '*' },
+			{ value: '(', label: '(' },
+			{ value: ')', label: ')' },
+			{ value: '_', label: '_' },
+			{ value: '+', label: '+' },
+			{ value: '{bksp}', icon: BackspaceIcon, col: 4 },
+
+			{ value: '{tab}', label: 'Tab', icon: KeyboardTabIcon, col: 3 },
+			{ value: 'Q', label: 'Q' },
+			{ value: 'W', label: 'W' },
+			{ value: 'E', label: 'E' },
+			{ value: 'R', label: 'R' },
+			{ value: 'T', label: 'T' },
+			{ value: 'Y', label: 'Y' },
+			{ value: 'U', label: 'U' },
+			{ value: 'I', label: 'I' },
+			{ value: 'O', label: 'O' },
+			{ value: 'P', label: 'P' },
+			{ value: '{', label: '{' },
+			{ value: '}', label: '}' },
+			{ value: '|', label: '|', col: 3 },
+
+			{ value: '{caps}', label: 'Caps', icon: KeyboardCapslockIcon, col: 4 },
+			{ value: 'A', label: 'A' },
+			{ value: 'S', label: 'S' },
+			{ value: 'D', label: 'D' },
+			{ value: 'F', label: 'F' },
+			{ value: 'G', label: 'G' },
+			{ value: 'H', label: 'H' },
+			{ value: 'J', label: 'J' },
+			{ value: 'K', label: 'K' },
+			{ value: 'L', label: 'L' },
+			{ value: ':', label: ':' },
+			{ value: '"', label: '"' },
+			{ value: '{enter}', label: '< enter', icon: KeyboardReturnIcon, col: 4 },
+
+			{ value: '{shift}', label: 'Shift', col: 4 },
+			{ value: 'Z', label: 'Z' },
+			{ value: 'X', label: 'X' },
+			{ value: 'C', label: 'C' },
+			{ value: 'V', label: 'V' },
+			{ value: 'B', label: 'B' },
+			{ value: 'N', label: 'N' },
+			{ value: 'M', label: 'M' },
+			{ value: '<', label: '<' },
+			{ value: '>', label: '>' },
+			{ value: '?', label: '?' },
+			{ value: '{space}', label: 'Space', icon: SpaceBarIcon, col: 6 }
+		]
+	}
+
+	const layout = isShifted ? shiftedLayout : defaultLayout
+
+	const toggleShift = () => {
+		setIsShifted(!isShifted)
+	}
+
+	return {
+		layout,
+		isShifted,
+		toggleShift
+	}
 }
+
 
 export default usePupilKeyboard

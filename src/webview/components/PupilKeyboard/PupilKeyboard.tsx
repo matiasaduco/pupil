@@ -9,10 +9,14 @@ type PupilKeyboardProps = {
 }
 
 const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
-	const { layout } = usePupilKeyboard()
+	const { layout, toggleShift, isShifted } = usePupilKeyboard()
 	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 
 	const handleKeyPress = (key: { value: string; label?: string }) => {
+		if (key.value === '{caps}' || key.value === '{shift}') {
+			toggleShift()
+			return
+		}
 		if (activeInput.current) {
 			if (key.value === '{bksp}') {
 				deleteFromActiveInput()
@@ -40,13 +44,14 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 			className="grid grid-cols-30 gap-1 bg-gray-400 rounded p-2"
 			style={{ height: 'min(30vh, 220px)' }}
 		>
-			{layout.default.map((key) => {
+			{layout.default.map((key, index) => {
 				const Icon = key.icon
+				const isActive = (key.value === '{caps}' || key.value === '{shift}') && isShifted
 				return (
 					<Button
-						key={key.value}
+						key={`${key.value}-${index}`}
 						onClick={() => handleKeyPress(key)}
-						className="pupil-keyboard-btn"
+						className={`pupil-keyboard-btn ${isActive ? 'active' : ''}`}
 						style={{ gridColumn: `span ${key.col || 2} / span ${key.col || 2}` }}
 					>
 						{Icon ? <Icon /> : key.label || key.value}
