@@ -1,5 +1,5 @@
 .transcript-box {
-    width: 320px;
+    min-width: 400px;
     max-height: 200px;
     overflow-y: auto;
     border-radius: 12px;

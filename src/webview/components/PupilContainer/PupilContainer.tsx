@@ -6,6 +6,7 @@ import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Toolbar from '../Toolbar/Toolbar.js'
 import { useEffect } from 'react'
+import RadialKeyboard from '../RadialKeyboard/RadialKeyboard.js'
 
 const PupilContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
@@ -45,7 +46,7 @@ const PupilContainer = () => {
 					)}
 				</IconButton>
 			)}
-			<div className="flex flex-col h-screen">
+			<div className="flex flex-col h-screen relative">
 				<PupilEditor
 					ref={editorRef}
 					keyboardVisible={keyboardVisible}
@@ -61,6 +62,7 @@ const PupilContainer = () => {
 					handleButtonClick={handleKeyboardInput}
 				/>
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
+				<RadialKeyboard onInput={handleKeyboardInput} />
 			</div>
 		</ThemeProvider>
 	)

@@ -88,6 +88,7 @@
 		"@mui/lab": "^7.0.0-beta.17",
 		"@mui/material": "^7.3.2",
 		"@mui/x-tree-view": "^8.11.3",
+		"@spaceymonk/react-radial-menu": "^2.1.0",
 		"@tailwindcss/vite": "^4.1.12",
 		"clsx": "^2.1.1",
 		"express": "^5.1.0",

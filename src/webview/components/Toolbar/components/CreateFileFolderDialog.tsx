@@ -18,17 +18,6 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 	const inputRef = useRef<HTMLInputElement | null>(null)
 
 	useEffect(() => {
-		const handleMiddleClick = (e: MouseEvent) => {
-			if (e.button === 1) {
-				e.preventDefault()
-				setOpen(true)
-			}
-		}
-		window.addEventListener('mouseup', handleMiddleClick, true)
-		return () => window.removeEventListener('mouseup', handleMiddleClick, true)
-	}, [])
-
-	useEffect(() => {
 		if (externalOpen) {
 			setOpen(true)
 		}
@@ -53,7 +42,10 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 	}
 
 	const handleConfirm = () => {
-		if (!name.trim()) return
+		if (!name.trim()) {
+			return
+		}
+
 		vscode.postMessage({ type: `create-${type}`, name })
 		reset()
 	}
