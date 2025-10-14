@@ -1,20 +1,22 @@
 .transcript-box {
-    min-width: 400px;
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 8px;
-    background-color: var(--transcript-bg, #f7f7fa);
-    color: var(--transcript-color, #222);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    border: 1px solid var(--transcript-border, #e0e0e0);
-    transition: background 0.2s, color 0.2s;
+	min-width: 400px;
+	max-height: 200px;
+	overflow-y: auto;
+	border-radius: 12px;
+	padding: 16px;
+	margin-bottom: 8px;
+	background-color: var(--transcript-bg, #f7f7fa);
+	color: var(--transcript-color, #222);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	border: 1px solid var(--transcript-border, #e0e0e0);
+	transition:
+		background 0.2s,
+		color 0.2s;
 }
 
 .transcript-text {
-    white-space: pre-wrap;
-    word-break: break-word;
-    font-size: 1rem;
-    font-family: inherit;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-size: 1rem;
+	font-family: inherit;
 }

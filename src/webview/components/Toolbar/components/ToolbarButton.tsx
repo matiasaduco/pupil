@@ -3,10 +3,10 @@ import { OverridableComponent } from '@mui/material/OverridableComponent'
 import { createElement } from 'react'
 
 type ToolbarButtonProps = {
-  tooltipTitle: string
-  icon?: OverridableComponent<SvgIconTypeMap>
-  label?: string
-  onButtonClick: () => void
+	tooltipTitle: string
+	icon?: OverridableComponent<SvgIconTypeMap>
+	label?: string
+	onButtonClick: () => void
 }
 
 const ToolbarButton = ({ tooltipTitle, icon, label, onButtonClick }: ToolbarButtonProps) => {
