@@ -32,46 +32,46 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		}
 	}
 
-  private initializeLogsDirectory() {
-    const logsDir = path.join(this.context.extensionPath, 'logs')
-    if (!fs.existsSync(logsDir)) {
-      fs.mkdirSync(logsDir, { recursive: true })
-    }
-  }
+	private initializeLogsDirectory() {
+		const logsDir = path.join(this.context.extensionPath, 'logs')
+		if (!fs.existsSync(logsDir)) {
+			fs.mkdirSync(logsDir, { recursive: true })
+		}
+	}
 
-  private getLogFilePath(level: string): string {
-    const logsDir = path.join(this.context.extensionPath, 'logs')
-    const date = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+	private getLogFilePath(level: string): string {
+		const logsDir = path.join(this.context.extensionPath, 'logs')
+		const date = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 
-    if (level === 'error') {
-      return path.join(logsDir, `error-${date}.log`)
-    }
-    return path.join(logsDir, `combined-${date}.log`)
-  }
+		if (level === 'error') {
+			return path.join(logsDir, `error-${date}.log`)
+		}
+		return path.join(logsDir, `combined-${date}.log`)
+	}
 
-  private writeLog(entry: {
-    timestamp: string
-    level: string
-    message: string
-    meta?: string | object
-  }) {
-    try {
-      const { timestamp, level, message, meta } = entry
+	private writeLog(entry: {
+		timestamp: string
+		level: string
+		message: string
+		meta?: string | object
+	}) {
+		try {
+			const { timestamp, level, message, meta } = entry
 
-      const metaStr = meta ? ` | Meta: ${JSON.stringify(meta)}` : ''
-      const logEntry = `[${timestamp}] ${level.toUpperCase()}: ${message}${metaStr}\n`
+			const metaStr = meta ? ` | Meta: ${JSON.stringify(meta)}` : ''
+			const logEntry = `[${timestamp}] ${level.toUpperCase()}: ${message}${metaStr}\n`
 
-      const combinedLogPath = this.getLogFilePath(level)
-      fs.appendFileSync(combinedLogPath, logEntry)
+			const combinedLogPath = this.getLogFilePath(level)
+			fs.appendFileSync(combinedLogPath, logEntry)
 
-      if (level === 'error') {
-        const errorLogPath = this.getLogFilePath('error')
-        fs.appendFileSync(errorLogPath, logEntry)
-      }
-    } catch (error) {
-      console.error('Failed to write log to file:', error)
-    }
-  }
+			if (level === 'error') {
+				const errorLogPath = this.getLogFilePath('error')
+				fs.appendFileSync(errorLogPath, logEntry)
+			}
+		} catch (error) {
+			console.error('Failed to write log to file:', error)
+		}
+	}
 
 	public updateConnectionStatus(status: ConnectionStatusType) {
 		this.connectionStatus = status

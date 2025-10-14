@@ -10,7 +10,6 @@ type PupilKeyboardProps = {
 
 const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 	const { layout, handleKeyPress, clickedKey } = usePupilKeyboard(onInput)
-  const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 
 	if (!visible) {
 		return null
