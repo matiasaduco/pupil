@@ -1,38 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Speech Recognition Demo</title>
-  <style>
-    body { font-family: sans-serif; margin: 2em; }
-    #result { margin-top: 1em; font-size: 1.2em; }
-    button { padding: 0.5em 1em; font-size: 1em; }
-  </style>
-</head>
-<body>
-  <h1>Demo SpeechRecognition</h1>
-  <button id="start">Iniciar reconocimiento</button>
-  <div id="result"></div>
-  <script>
-    const startBtn = document.getElementById('start');
-    const resultDiv = document.getElementById('result');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      resultDiv.textContent = 'Tu navegador no soporta SpeechRecognition.';
-    } else {
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'es-ES';
-      recognition.onresult = (event) => {
-        resultDiv.textContent = event.results[0][0].transcript;
-      };
-      recognition.onerror = (event) => {
-        resultDiv.textContent = 'Error: ' + event.error;
-      };
-      startBtn.onclick = () => {
-        recognition.start();
-        resultDiv.textContent = 'Escuchando...';
-      };
-    }
-  </script>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Speech Recognition Demo</title>
+		<style>
+			body {
+				font-family: sans-serif;
+				margin: 2em;
+			}
+			#result {
+				margin-top: 1em;
+				font-size: 1.2em;
+			}
+			button {
+				padding: 0.5em 1em;
+				font-size: 1em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Demo SpeechRecognition</h1>
+		<button id="start">Iniciar reconocimiento</button>
+		<div id="result" />
+		<script>
+			const startBtn = document.getElementById('start')
+			const resultDiv = document.getElementById('result')
+			const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+			const ws = new WebSocket('ws://localhost:8080')
+
+			if (!SpeechRecognition) {
+				resultDiv.textContent = 'Tu navegador no soporta SpeechRecognition.'
+			} else {
+				const recognition = new SpeechRecognition()
+				recognition.lang = 'es-ES'
+				recognition.onresult = (event) => {
+					resultDiv.textContent = event.results[0][0].transcript
+				}
+				recognition.onerror = (event) => {
+					resultDiv.textContent = 'Error: ' + event.error
+				}
+				startBtn.onclick = () => {
+					recognition.start()
+					resultDiv.textContent = 'Escuchando...'
+				}
+			}
+
+			ws.onopen = () => {
+				console.log('Conectado al WebSocket')
+				ws.send('Hola desde el cliente!')
+			}
+
+			ws.onclose = () => {
+				console.log('WebSocket closed')
+			}
+
+			ws.onerror = (error) => {
+				console.error('WebSocket error:', error)
+			}
+		</script>
+	</body>
 </html>
