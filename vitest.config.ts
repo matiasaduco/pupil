@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -11,18 +12,15 @@ export default defineConfig({
 			'@components': path.resolve(__dirname, 'src/webview/components')
 		}
 	},
-	build: {
-		outDir: path.resolve(__dirname, 'dist/webview'),
-		emptyOutDir: true,
-		rollupOptions: {
-			input: path.resolve(__dirname, 'src/webview/index.html')
-		}
-	},
 	plugins: [react(), tailwindcss()],
 	test: {
 		environment: 'jsdom',
 		globals: true,
-		setupFiles: ['src/webview/test/setup.ts'],
-		include: ['src/webview/**/*.{test,spec}.{ts,tsx}']
+		setupFiles: [path.resolve(__dirname, 'src/webview/test/setup.ts')],
+		include: [path.resolve(__dirname, 'src/webview/test/**/*.{test,spec}.{ts,tsx}')],
+		alias: {
+			'@webview': path.resolve(__dirname, 'src/webview'),
+			'@components': path.resolve(__dirname, 'src/webview/components')
+		}
 	}
 })
