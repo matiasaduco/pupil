@@ -1,6 +1,6 @@
-export type Message = {
+export type Message<T = unknown> = {
 	type: MessageType
-	content?: never
+	content?: T
 }
 
 type MessageType =
@@ -19,3 +19,4 @@ type MessageType =
 	| 'terminal-show'
 	| 'openSimpleBrowser'
 	| 'stop-process'
+	| 'transcript'

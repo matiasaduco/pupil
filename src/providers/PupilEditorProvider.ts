@@ -5,22 +5,26 @@ import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
 import { FolderNode } from '@webview/components/FolderTree/FolderTree.js'
 import { DEFAULT_URL } from '../constants.js'
+import { Message } from '@webview/types/Message.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
 	private pendingAction: { type: 'file' | 'folder'; name: string } | null = null
+	private webviewPanel: vscode.WebviewPanel | null = null
+	private sendToSpeechWebClient: (message: unknown) => void
 
-	constructor(private readonly context: vscode.ExtensionContext) {}
+	constructor(
+		private readonly context: vscode.ExtensionContext,
+		sendToSpeechWebClient: (message: unknown) => void
+	) {
+		this.sendToSpeechWebClient = sendToSpeechWebClient
+	}
 
-	public static register(context: vscode.ExtensionContext): vscode.Disposable {
-		return vscode.window.registerCustomEditorProvider(
-			PupilEditorProvider.viewType,
-			new PupilEditorProvider(context),
-			{
-				webviewOptions: { retainContextWhenHidden: true },
-				supportsMultipleEditorsPerDocument: false
-			}
-		)
+	public disposable(): vscode.Disposable {
+		return vscode.window.registerCustomEditorProvider(PupilEditorProvider.viewType, this, {
+			webviewOptions: { retainContextWhenHidden: true },
+			supportsMultipleEditorsPerDocument: false
+		})
 	}
 
 	public async resolveCustomTextEditor(
@@ -30,6 +34,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		_token: vscode.CancellationToken
 	): Promise<void> {
 		let webviewReady = false
+		this.webviewPanel = webviewPanel
 
 		webviewPanel.webview.options = {
 			enableScripts: true,
@@ -110,6 +115,21 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'save-file') {
 						document.save()
+					}
+					if (message.type === 'start-listening') {
+						this.sendToSpeechWebClient({
+							type: 'start-listening',
+							continuous: message.continuous
+						})
+					}
+					if (message.type === 'stop-listening') {
+						this.sendToSpeechWebClient({ type: 'stop-listening' })
+					}
+					if (message.type === 'transcript') {
+						webviewPanel.webview.postMessage({
+							type: 'transcript',
+							content: message.content
+						})
 					}
 				} catch (error) {
 					console.error('Error en onDidReceiveMessage:', error)
@@ -329,6 +349,12 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				type: 'set-focus',
 				focus: 'editor'
 			})
+		}
+	}
+
+	public sendMessageToWebview(message: Message) {
+		if (this.webviewPanel) {
+			this.webviewPanel.webview.postMessage(message)
 		}
 	}
 }

@@ -27,27 +27,49 @@
 			const resultDiv = document.getElementById('result')
 			const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 			const ws = new WebSocket('ws://localhost:8080')
+			let recognition
 
 			if (!SpeechRecognition) {
 				resultDiv.textContent = 'Tu navegador no soporta SpeechRecognition.'
 			} else {
-				const recognition = new SpeechRecognition()
+				recognition = new SpeechRecognition()
+				recognition.continuous = true
 				recognition.lang = 'es-ES'
+
 				recognition.onresult = (event) => {
-					resultDiv.textContent = event.results[0][0].transcript
+					const transcript = (resultDiv.textContent = event.results[0][0].transcript)
+
+					if (ws.readyState === WebSocket.OPEN) {
+						ws.send({ type: 'transcript', content: transcript })
+					}
 				}
+
 				recognition.onerror = (event) => {
 					resultDiv.textContent = 'Error: ' + event.error
 				}
+
 				startBtn.onclick = () => {
 					recognition.start()
 					resultDiv.textContent = 'Escuchando...'
 				}
 			}
 
+			ws.onmessage = (event) => {
+				const message = JSON.parse(event.data)
+
+				if (message.type === 'start-listening') {
+					recognition.start()
+					resultDiv.textContent = 'Escuchando...'
+				}
+
+				if (message.type === 'stop-listening') {
+					recognition.stop()
+					resultDiv.textContent = 'Reconocimiento detenido.'
+				}
+			}
+
 			ws.onopen = () => {
-				console.log('Conectado al WebSocket')
-				ws.send('Hola desde el cliente!')
+				console.log('Conected to WebSocket')
 			}
 
 			ws.onclose = () => {
