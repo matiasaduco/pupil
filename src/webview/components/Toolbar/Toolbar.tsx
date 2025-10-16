@@ -9,6 +9,7 @@ import ToolbarButton from './components/ToolbarButton.js'
 import CreateFileFolderDialog from './components/CreateFileFolderDialog.js'
 import SimpleBrowserDialog from './components/SimpleBrowserDialog.js'
 import TranscriptDialog from './components/TranscriptDialog/TranscriptDialog.js'
+import { ConnectionStatusType } from '../../../constants.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -19,6 +20,7 @@ type ToolbarProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
 	keyboardVisible: boolean
 	toggleKeyboard: () => void
+	connectionStatus: ConnectionStatusType
 }
 
 const Toolbar = ({
@@ -27,7 +29,8 @@ const Toolbar = ({
 	toggleKeyboard,
 	focus,
 	switchFocus,
-	handleButtonClick
+	handleButtonClick,
+	connectionStatus
 }: ToolbarProps) => {
 	const {
 		generalShortcuts,
@@ -140,6 +143,7 @@ const Toolbar = ({
 				isOpen={transcriptDialogOpen}
 				editorRef={editorRef}
 				onClose={() => setTranscriptDialogOpen(false)}
+				connectionStatus={connectionStatus}
 			/>
 		</>
 	)

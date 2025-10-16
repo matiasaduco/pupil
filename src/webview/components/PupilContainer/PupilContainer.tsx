@@ -18,7 +18,8 @@ const PupilContainer = () => {
 		colorScheme,
 		focus,
 		switchFocus,
-		switchColorScheme
+		switchColorScheme,
+		connectionStatus
 	} = usePupilEditorContainer()
 
 	const theme = createTheme({
@@ -60,6 +61,7 @@ const PupilContainer = () => {
 					focus={focus}
 					switchFocus={switchFocus}
 					handleButtonClick={handleKeyboardInput}
+					connectionStatus={connectionStatus}
 				/>
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
 				<RadialKeyboard onInput={handleKeyboardInput} />

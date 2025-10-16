@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { PupilEditorProvider } from './providers/PupilEditorProvider.js'
 import { WebSocketServer, WebSocket } from 'ws'
+import { ConnectionStatus } from './constants.js'
 
 export function activate(context: vscode.ExtensionContext) {
 	let wss: WebSocketServer | undefined = undefined
@@ -19,13 +20,16 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.env.openExternal(vscode.Uri.parse('http://localhost:3000'))
 		}, 2000)
 
+		pupilEditorProvider.updateConnectionStatus(ConnectionStatus.CONNECTING)
+
 		wss = new WebSocketServer({ port: 8080 })
 
-		wss.on('connection', (ws) => {
+		wss.on('connection', (ws: WebSocket) => {
 			console.log('Client connected')
 			client = ws
+			pupilEditorProvider.updateConnectionStatus(ConnectionStatus.CONNECTED)
 
-			ws.on('message', (message) => {
+			ws.on('message', (message: Buffer) => {
 				const transcript = JSON.parse(message.toString())
 				pupilEditorProvider.sendMessageToWebview(transcript)
 			})
@@ -33,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 			ws.on('close', () => {
 				console.log('Client disconnected')
 				client = undefined
+				pupilEditorProvider.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
 			})
 		})
 	})

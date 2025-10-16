@@ -4,20 +4,31 @@ import SnippetManager from '../managers/SnippetManager.js'
 import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
 import { FolderNode } from '@webview/components/FolderTree/FolderTree.js'
-import { DEFAULT_URL } from '../constants.js'
-import { Message } from '@webview/types/Message.js'
+import { DEFAULT_URL, ConnectionStatus, ConnectionStatusType } from '../constants.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
 	private pendingAction: { type: 'file' | 'folder'; name: string } | null = null
 	private webviewPanel: vscode.WebviewPanel | null = null
 	private sendToSpeechWebClient: (message: unknown) => void
+	private connectionStatus: ConnectionStatusType = ConnectionStatus.DISCONNECTED
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
 		sendToSpeechWebClient: (message: unknown) => void
 	) {
 		this.sendToSpeechWebClient = sendToSpeechWebClient
+	}
+
+	public sendMessageToWebview(message: unknown) {
+		if (this.webviewPanel) {
+			this.webviewPanel.webview.postMessage(message)
+		}
+	}
+
+	public updateConnectionStatus(status: ConnectionStatusType) {
+		this.connectionStatus = status
+		this.sendMessageToWebview({ type: 'connection-status', status })
 	}
 
 	public disposable(): vscode.Disposable {
@@ -349,12 +360,6 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				type: 'set-focus',
 				focus: 'editor'
 			})
-		}
-	}
-
-	public sendMessageToWebview(message: Message) {
-		if (this.webviewPanel) {
-			this.webviewPanel.webview.postMessage(message)
 		}
 	}
 }
