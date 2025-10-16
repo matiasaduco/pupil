@@ -17,6 +17,7 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 			toggleShift()
 			return
 		}
+
 		if (activeInput.current) {
 			if (key.value === '{bksp}') {
 				deleteFromActiveInput()
@@ -35,6 +36,7 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 			onInput?.(key.value)
 		}
 	}
+
 	if (!visible) {
 		return null
 	}

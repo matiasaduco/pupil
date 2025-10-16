@@ -11,13 +11,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private pendingAction: { type: 'file' | 'folder'; name: string } | null = null
 	private webviewPanel: vscode.WebviewPanel | null = null
 	private sendToSpeechWebClient: (message: unknown) => void
+	private stopSpeechServer: () => void
 	private connectionStatus: ConnectionStatusType = ConnectionStatus.DISCONNECTED
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
-		sendToSpeechWebClient: (message: unknown) => void
+		sendToSpeechWebClient: (message: unknown) => void,
+		stopSpeechServer: () => void
 	) {
 		this.sendToSpeechWebClient = sendToSpeechWebClient
+		this.stopSpeechServer = stopSpeechServer
 	}
 
 	public sendMessageToWebview(message: unknown) {
@@ -135,6 +138,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'stop-listening') {
 						this.sendToSpeechWebClient({ type: 'stop-listening' })
+					}
+					if (message.type === 'start-speech-server') {
+						if (this.connectionStatus.value !== 'connected') {
+							vscode.commands.executeCommand('pupil.openSpeechWeb')
+						}
+					}
+					if (message.type === 'stop-speech-server') {
+						if (this.connectionStatus.value === 'connected') {
+							this.stopSpeechServer()
+						}
 					}
 					if (message.type === 'transcript') {
 						webviewPanel.webview.postMessage({

@@ -7,7 +7,26 @@ export function activate(context: vscode.ExtensionContext) {
 	let wss: WebSocketServer | undefined = undefined
 	let client: WebSocket | undefined = undefined
 
-	const pupilEditorProvider = new PupilEditorProvider(context, sendToSpeechWebClient)
+	function sendToSpeechWebClient(message: unknown) {
+		const data = JSON.stringify(message)
+		client?.send(data)
+	}
+
+	const stopSpeechServer = () => {
+		if (wss) {
+			wss.close()
+			wss = undefined
+		}
+		client = undefined
+		pupilEditorProvider.updateConnectionStatus(ConnectionStatus.DISCONNECTED)
+	}
+
+	const pupilEditorProvider = new PupilEditorProvider(
+		context,
+		sendToSpeechWebClient,
+		stopSpeechServer
+	)
+
 	const editorDisposable = pupilEditorProvider.disposable()
 	context.subscriptions.push(editorDisposable)
 
@@ -41,11 +60,6 @@ export function activate(context: vscode.ExtensionContext) {
 			})
 		})
 	})
-
-	function sendToSpeechWebClient(message: unknown) {
-		const data = JSON.stringify(message)
-		client?.send(data)
-	}
 
 	context.subscriptions.push({
 		dispose: () => {
