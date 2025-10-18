@@ -2,6 +2,7 @@ import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { useEffect, useRef, useState } from 'react'
+import { ConnectionStatus, ConnectionStatusType } from '../../../../constants.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -18,6 +19,9 @@ const usePupilContainer = () => {
 	const [focus, setFocus] = useState<FocusTarget>('editor')
 	const { insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
+	const [connectionStatus, setConnectionStatus] = useState<ConnectionStatusType>(
+		ConnectionStatus.DISCONNECTED
+	)
 
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
@@ -26,6 +30,9 @@ const usePupilContainer = () => {
 			}
 			if (event.data.type === 'set-focus') {
 				setFocus(event.data.focus)
+			}
+			if (event.data.type === 'connection-status') {
+				setConnectionStatus(event.data.status)
 			}
 		}
 
@@ -115,7 +122,8 @@ const usePupilContainer = () => {
 		colorScheme,
 		focus,
 		switchFocus,
-		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs'))
+		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs')),
+		connectionStatus
 	}
 }
 

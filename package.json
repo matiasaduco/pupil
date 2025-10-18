@@ -15,7 +15,12 @@
 		"views": {
 			"explorer": []
 		},
-		"commands": [],
+		"commands": [
+			{
+				"command": "pupil.openSpeechWeb",
+				"title": "Abrir demo SpeechRecognition en navegador"
+			}
+		],
 		"menus": {
 			"view/item/context": []
 		},

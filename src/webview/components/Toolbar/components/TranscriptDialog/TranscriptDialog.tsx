@@ -6,14 +6,21 @@ import SendIcon from '@mui/icons-material/Send'
 import { IconButton, Switch } from '@mui/material'
 import useTranscriptDialog from './hooks/useTranscriptDialog.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
+import { ConnectionStatusType } from '../../../../../constants.js'
 
 type TranscriptDialogProps = {
 	isOpen: boolean
 	editorRef: React.RefObject<PupilEditorHandle | null>
 	onClose: () => void
+	connectionStatus: ConnectionStatusType
 }
 
-const TranscriptDialog = ({ isOpen, editorRef, onClose }: TranscriptDialogProps) => {
+const TranscriptDialog = ({
+	isOpen,
+	editorRef,
+	onClose,
+	connectionStatus
+}: TranscriptDialogProps) => {
 	const {
 		handleSpeechToText,
 		listening,
@@ -37,6 +44,9 @@ const TranscriptDialog = ({ isOpen, editorRef, onClose }: TranscriptDialogProps)
 				onClick={() => setCommmentTranscription((prev) => !prev)}
 				defaultChecked={commentTranscription}
 			/>
+			<span className="grow-1" />
+			<span>Server:</span>
+			<span className="ml-[5px]">{connectionStatus.icon}</span>
 		</>
 	)
 

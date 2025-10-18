@@ -3,12 +3,16 @@ import './Toolbar.css'
 import Snippets from '../Snippets/Snippets.js'
 import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { RefObject } from 'react'
+import { RefObject, useState } from 'react'
 import useToolbar from './hooks/useToolbar.js'
 import ToolbarButton from './components/ToolbarButton.js'
 import CreateFileFolderDialog from './components/CreateFileFolderDialog.js'
 import SimpleBrowserDialog from './components/SimpleBrowserDialog.js'
 import TranscriptDialog from './components/TranscriptDialog/TranscriptDialog.js'
+import SettingsDialog from './components/SettingsDialog.js'
+import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
+import SettingsIcon from '@mui/icons-material/Settings'
+import { ConnectionStatusType } from '../../../constants.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -19,6 +23,7 @@ type ToolbarProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
 	keyboardVisible: boolean
 	toggleKeyboard: () => void
+	connectionStatus: ConnectionStatusType
 }
 
 const Toolbar = ({
@@ -27,8 +32,24 @@ const Toolbar = ({
 	toggleKeyboard,
 	focus,
 	switchFocus,
-	handleButtonClick
+	handleButtonClick,
+	connectionStatus
 }: ToolbarProps) => {
+	const vscode = useVsCodeApi()
+	const [settingsDialogOpen, setSettingsDialogOpen] = useState(false)
+
+	const handleStartServer = () => {
+		vscode.postMessage({ type: 'start-speech-server' })
+	}
+
+	const handleStopServer = () => {
+		vscode.postMessage({ type: 'stop-speech-server' })
+	}
+
+	const handleSettingsClick = () => {
+		setSettingsDialogOpen(true)
+	}
+
 	const {
 		generalShortcuts,
 		editorShortcuts,
@@ -123,6 +144,16 @@ const Toolbar = ({
 							/>
 						)
 					)}
+
+				<span className="grow-1" />
+
+				<ToolbarButton
+					key="settings"
+					tooltipTitle="Settings"
+					icon={SettingsIcon}
+					label="Settings"
+					onButtonClick={handleSettingsClick}
+				/>
 			</nav>
 
 			<SimpleBrowserDialog
@@ -140,6 +171,15 @@ const Toolbar = ({
 				isOpen={transcriptDialogOpen}
 				editorRef={editorRef}
 				onClose={() => setTranscriptDialogOpen(false)}
+				connectionStatus={connectionStatus}
+			/>
+
+			<SettingsDialog
+				open={settingsDialogOpen}
+				onClose={() => setSettingsDialogOpen(false)}
+				onStartServer={handleStartServer}
+				onStopServer={handleStopServer}
+				connectionStatus={connectionStatus}
 			/>
 		</>
 	)
