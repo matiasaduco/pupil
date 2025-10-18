@@ -19,7 +19,6 @@ export const KeyboardFocusProvider: React.FC<{ children: React.ReactNode }> = ({
 	}, [])
 
 	const setActiveInput = useCallback((input: HTMLInputElement | HTMLTextAreaElement | null) => {
-		console.log('Setting active input:', input)
 		activeInputRef.current = input
 
 		if (!input && editorRef.current) {

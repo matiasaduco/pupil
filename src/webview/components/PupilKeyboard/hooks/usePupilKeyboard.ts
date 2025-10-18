@@ -5,21 +5,14 @@ import KeyboardTabIcon from '@mui/icons-material/KeyboardTab'
 import SpaceBarIcon from '@mui/icons-material/SpaceBar'
 import { Layout } from '../types/layout.js'
 import { useState } from 'react'
+import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 
-const usePupilKeyboard = () => {
-	const [isShifted, setIsShifted] = useState(false)
-	// const layout = {
-	// 	shift: [
-	// 		shortcuts,
-	// 		'~ ! @ # $ % ^ & * ( ) _ + {bksp}',
-	// 		'{tab} Q W E R T Y U I O P { } |',
-	// 		'{lock} A S D F G H J K L : " {enter}',
-	// 		'{shift} Z X C V B N M < > ? {shift}',
-	// 		'.com @ {space}'
-	// 	]
-	// }
+const usePupilKeyboard = (onInput?: (input: string) => void) => {
+	const [isShifted, setIsShifted] = useState<boolean>(false)
+	const [clickedKey, setClickedKey] = useState<string | null>(null)
+	const { activeInput, insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
 
-	const defaultLayout: Layout = {
+	const layout: Layout = {
 		default: [
 			{ value: '`', label: '`' },
 			{ value: '1', label: '1' },
@@ -77,11 +70,8 @@ const usePupilKeyboard = () => {
 			{ value: '.' },
 			{ value: '/' },
 			{ value: '{space}', label: 'Space', icon: SpaceBarIcon, col: 6 }
-		]
-	}
-
-	const shiftedLayout: Layout = {
-		default: [
+		],
+		shift: [
 			{ value: '~', label: '~' },
 			{ value: '!', label: '!' },
 			{ value: '@', label: '@' },
@@ -141,16 +131,45 @@ const usePupilKeyboard = () => {
 		]
 	}
 
-	const layout = isShifted ? shiftedLayout : defaultLayout
+	const handleKeyPress = (key: { value: string; label?: string }) => {
+		if (key.value === '{caps}' || key.value === '{shift}') {
+			if (key.value === clickedKey) {
+				setClickedKey(null)
+				setIsShifted(false)
+			} else {
+				setClickedKey(key.value)
+				setIsShifted(true)
+			}
+			return
+		}
 
-	const toggleShift = () => {
-		setIsShifted(!isShifted)
+		if (activeInput.current) {
+			if (key.value === '{bksp}') {
+				deleteFromActiveInput()
+			} else if (key.value === '{space}') {
+				insertIntoActiveInput(' ')
+			} else if (key.value === '{enter}') {
+				insertIntoActiveInput('\n')
+			} else if (key.value === '{tab}') {
+				insertIntoActiveInput('\t')
+			} else if (key.value.startsWith('{')) {
+				onInput?.(key.value)
+			} else {
+				insertIntoActiveInput(key.value)
+			}
+		} else {
+			onInput?.(key.value)
+			if (isShifted && clickedKey === '{shift}') {
+				setIsShifted(false)
+				setClickedKey(null)
+			}
+		}
 	}
 
 	return {
-		layout,
-		isShifted,
-		toggleShift
+		layout: layout[isShifted ? 'shift' : 'default'],
+		handleKeyPress,
+		clickedKey
 	}
 }
 

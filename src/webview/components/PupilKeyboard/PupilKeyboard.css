@@ -15,11 +15,9 @@
 	background: #f3f4f6;
 	color: #222;
 }
+
 .pupil-keyboard-btn:hover {
 	background: #e5e7eb;
-}
-.pupil-keyboard-btn:active {
-	background: #d1d5db;
 }
 
 .dark .pupil-keyboard-btn {
