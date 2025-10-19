@@ -197,10 +197,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						}
 					}
 					if (message.type === 'transcript') {
-						webviewPanel.webview.postMessage({
-							type: 'transcript',
-							content: message.content
-						})
+						webviewPanel.webview.postMessage(message)
 					}
 				} catch (error) {
 					console.error('Error en onDidReceiveMessage:', error)

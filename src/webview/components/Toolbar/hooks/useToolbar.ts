@@ -11,8 +11,6 @@ import TerminalIcon from '@mui/icons-material/Terminal'
 import SaveIcon from '@mui/icons-material/Save'
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder'
 import WebIcon from '@mui/icons-material/Language'
-import { useState } from 'react'
-import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import CommentIcon from '@mui/icons-material/Comment'
 
 type Shortcut = {
@@ -23,24 +21,24 @@ type Shortcut = {
 	divider?: boolean
 }
 
-const useToolbar = (handleButtonClick: (action: string) => void) => {
-	const vscode = useVsCodeApi()
-	const [openSimpleBrowserDialog, setOpenSimpleBrowserDialog] = useState<boolean>(false)
-	const [openFileFolderDialog, setOpenFileFolderDialog] = useState<boolean>(false)
-	const [transcriptDialogOpen, setTranscriptDialogOpen] = useState<boolean>(false)
-
+const useToolbar = (
+	handleButtonClick: (action: string) => void,
+	openSimpleBrowserDialog?: () => void,
+	openFileFolderDialog?: () => void,
+	openTranscriptDialog?: () => void
+) => {
 	const generalShortcuts = [
 		{
 			tooltipTitle: 'Open Simple Browser',
 			icon: WebIcon,
 			label: 'Open Browser',
-			onClick: () => setOpenSimpleBrowserDialog(true)
+			onClick: openSimpleBrowserDialog
 		},
 		{
 			tooltipTitle: 'Create New File/Folder',
 			icon: CreateNewFolderIcon,
 			label: 'Create',
-			onClick: () => setOpenFileFolderDialog(true)
+			onClick: openFileFolderDialog
 		},
 		{
 			tooltipTitle: 'Open Terminal',
@@ -58,7 +56,7 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 			tooltipTitle: 'Start Speech to Text',
 			icon: CommentIcon,
 			label: 'Speech to Text',
-			onClick: () => setTranscriptDialogOpen(true)
+			onClick: openTranscriptDialog
 		}
 	]
 
@@ -82,21 +80,10 @@ const useToolbar = (handleButtonClick: (action: string) => void) => {
 		}
 	]
 
-	const openSimpleBrowser = (url: string, port: string) => {
-		vscode.postMessage({ type: 'openSimpleBrowser', url: `${url}:${port}` })
-	}
-
 	return {
 		generalShortcuts,
 		editorShortcuts,
-		terminalShortcuts,
-		openSimpleBrowserDialog,
-		setOpenSimpleBrowserDialog,
-		openFileFolderDialog,
-		setOpenFileFolderDialog,
-		openSimpleBrowser,
-		transcriptDialogOpen,
-		setTranscriptDialogOpen
+		terminalShortcuts
 	}
 }
 

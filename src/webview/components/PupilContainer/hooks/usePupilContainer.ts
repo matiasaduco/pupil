@@ -114,6 +114,18 @@ const usePupilContainer = () => {
 		}
 	}
 
+	const openSimpleBrowser = (url: string, port: string) => {
+		vscode.postMessage({ type: 'openSimpleBrowser', url: `${url}:${port}` })
+	}
+
+	const handleStartServer = () => {
+		vscode.postMessage({ type: 'start-speech-server' })
+	}
+
+	const handleStopServer = () => {
+		vscode.postMessage({ type: 'stop-speech-server' })
+	}
+
 	return {
 		editorRef,
 		keyboardVisible,
@@ -123,7 +135,10 @@ const usePupilContainer = () => {
 		focus,
 		switchFocus,
 		switchColorScheme: () => setColorScheme((prev) => (prev === 'vs' ? 'vs-dark' : 'vs')),
-		connectionStatus
+		connectionStatus,
+		openSimpleBrowser,
+		handleStartServer,
+		handleStopServer
 	}
 }
 

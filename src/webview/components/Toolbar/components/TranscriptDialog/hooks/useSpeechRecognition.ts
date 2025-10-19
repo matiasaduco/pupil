@@ -9,6 +9,7 @@ const useSpeechRecognition = () => {
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
 			if (event.data.type === 'transcript') {
+				console.log(event.data.content)
 				setTranscript(event.data.content)
 			}
 		}

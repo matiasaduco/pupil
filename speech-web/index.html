@@ -40,7 +40,7 @@
 					const transcript = (resultDiv.textContent = event.results[0][0].transcript)
 
 					if (ws.readyState === WebSocket.OPEN) {
-						ws.send({ type: 'transcript', content: transcript })
+						ws.send(JSON.stringify({ type: 'transcript', content: transcript }))
 					}
 				}
 
