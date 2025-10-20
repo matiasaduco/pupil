@@ -21,7 +21,7 @@ describe('PupilKeyboard', () => {
 			</KeyboardFocusProvider>
 		)
 
-		expect(screen.getByRole('grid')).toBeInTheDocument()
+		expect(screen.getByText('q')).toBeInTheDocument()
 	})
 
 	it('should handle key presses correctly', () => {
@@ -32,14 +32,15 @@ describe('PupilKeyboard', () => {
 			</KeyboardFocusProvider>
 		)
 
-		// Find and click a regular key (e.g., 'a')
-		const aKey = screen.getByText('a')
+		const aKey = screen.getByRole('button', { name: 'a' })
 		fireEvent.click(aKey)
 		expect(onInput).toHaveBeenCalledWith('a')
 
-		// Test special keys (e.g., space)
-		const spaceKey = screen.getByText('space')
-		fireEvent.click(spaceKey)
+		const spaceButton = screen.getByTestId('SpaceBarIcon').closest('button')
+		if (!spaceButton) {
+			throw new Error('Space button not found')
+		}
+		fireEvent.click(spaceButton)
 		expect(onInput).toHaveBeenCalledWith('{space}')
 	})
 
@@ -50,10 +51,12 @@ describe('PupilKeyboard', () => {
 			</KeyboardFocusProvider>
 		)
 
-		const shiftKey = screen.getByText('shift')
-		fireEvent.click(shiftKey)
-
-		// After clicking shift, some keys should show uppercase
-		expect(screen.getByText('A')).toBeInTheDocument()
+		const capsKey = screen.getByTestId('KeyboardCapslockIcon')
+		const capsButton = capsKey.closest('button')
+		if (!capsButton) {
+			throw new Error('Caps button not found')
+		}
+		fireEvent.click(capsButton)
+		expect(screen.getByRole('button', { name: 'Q' })).toBeInTheDocument()
 	})
 })

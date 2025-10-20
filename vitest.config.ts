@@ -17,7 +17,7 @@ export default defineConfig({
 		environment: 'jsdom',
 		globals: true,
 		setupFiles: [path.resolve(__dirname, 'src/webview/test/setup.ts')],
-		include: [path.resolve(__dirname, 'src/webview/test/**/*.{test,spec}.{ts,tsx}')],
+		include: ['**/*.{test,spec}.{ts,tsx}'],
 		alias: {
 			'@webview': path.resolve(__dirname, 'src/webview'),
 			'@components': path.resolve(__dirname, 'src/webview/components')
