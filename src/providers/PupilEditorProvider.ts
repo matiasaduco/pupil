@@ -163,7 +163,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.getTerminals(webviewPanel)
 					}
 					if (message.type === 'terminal-show' && message.content) {
-						this.showTerminal(message.content)
+						this.showTerminal(message.content, webviewPanel)
 					}
 					if (message.type === 'openSimpleBrowser') {
 						this.openSimpleBrowser(message.url)
@@ -300,12 +300,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		})
 	}
 
-	private async showTerminal(processId: number) {
+	private async showTerminal(processId: number, webviewPanel: vscode.WebviewPanel) {
 		const terminals = vscode.window.terminals
 		for (const terminal of terminals) {
 			const terminalProcessId = await terminal.processId
 			if (terminalProcessId === processId) {
 				terminal.show()
+				webviewPanel.webview.postMessage({
+					type: 'set-focus',
+					focus: 'terminal'
+				})
 				break
 			}
 		}
