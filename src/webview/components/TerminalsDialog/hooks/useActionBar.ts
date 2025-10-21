@@ -22,9 +22,11 @@ const useActionBar = () => {
 
 	const handleOnClose = () => setOpen(false)
 
-	const openTerminal = (index: number) => {
-		vscode.postMessage({ type: 'terminal-show', content: index })
-		setOpen(false)
+	const openTerminal = (processId: number | undefined) => {
+		if (processId !== undefined) {
+			vscode.postMessage({ type: 'terminal-show', content: processId })
+			setOpen(false)
+		}
 	}
 
 	return { getTerminals, terminals, open, handleOnClose, openTerminal }

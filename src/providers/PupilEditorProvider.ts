@@ -29,8 +29,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	public sendMessageToWebview(message: unknown) {
 		if (this.webviewPanel) {
 			this.webviewPanel.webview.postMessage(message)
-		}
-	}
+		} }
 
 	private initializeLogsDirectory() {
 		const logsDir = path.join(this.context.extensionPath, 'logs')
@@ -287,16 +286,29 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		terminal.show()
 	}
 
-	private getTerminals(webviewPanel: vscode.WebviewPanel) {
+	private async getTerminals(webviewPanel: vscode.WebviewPanel) {
+		const terminals = vscode.window.terminals
+		const terminalsWithIds = await Promise.all(
+			terminals.map(async (t) => ({
+				name: t.name,
+				processId: await t.processId
+			}))
+		)
 		webviewPanel.webview.postMessage({
 			type: 'set-terminals',
-			content: vscode.window.terminals
+			content: terminalsWithIds
 		})
 	}
 
-	private showTerminal(index: number) {
-		const terminal = vscode.window.terminals[index]
-		terminal?.show()
+	private async showTerminal(processId: number) {
+		const terminals = vscode.window.terminals
+		for (const terminal of terminals) {
+			const terminalProcessId = await terminal.processId
+			if (terminalProcessId === processId) {
+				terminal.show()
+				break
+			}
+		}
 	}
 
 	private async createNewFile(fileName: string, webviewPanel: vscode.WebviewPanel) {

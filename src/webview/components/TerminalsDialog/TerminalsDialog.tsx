@@ -12,9 +12,9 @@ const TerminalsDialog = () => {
 				<div className="flex flex-col max-h-96 overflow-y-auto">
 					{terminals.map((terminal, index) => (
 						<Button
-							key={`${terminal}-${index}`}
+							key={`${terminal.name}-${terminal.processId}-${index}`}
 							className="p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-							onClick={() => openTerminal(index)}
+							onClick={() => openTerminal(terminal.processId)}
 						>
 							{terminal.name}
 						</Button>
