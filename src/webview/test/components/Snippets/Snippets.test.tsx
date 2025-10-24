@@ -1,12 +1,10 @@
-import { describe, it, expect, vi, type MockedFunction } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import * as React from 'react'
 import Snippets from '@components/Snippets/Snippets.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { VsCodeApiProvider } from '@webview/contexts/VsCodeApiContext.js'
 import '@testing-library/jest-dom'
-
-const mockUseSnippets = vi.fn()
 
 const mockEditorRef = {
 	current: {
@@ -112,7 +110,9 @@ vi.mock('@components/Snippets/components/TooltipTitle.js', () => ({
 
 describe('Snippets', () => {
 	beforeEach(async () => {
-		const mockUseSnippets = vi.mocked(await import('@components/Snippets/hooks/useSnippets.js')).default
+		const mockUseSnippets = vi.mocked(
+			await import('@components/Snippets/hooks/useSnippets.js')
+		).default
 		mockUseSnippets.mockReturnValue({
 			snippets: mockSnippets,
 			handleSnippetPress: vi.fn(),
@@ -133,7 +133,9 @@ describe('Snippets', () => {
 	})
 
 	it('should open the dialog when Snippets button is clicked', async () => {
-		const mockUseSnippets = vi.mocked(await import('@components/Snippets/hooks/useSnippets.js')).default
+		const mockUseSnippets = vi.mocked(
+			await import('@components/Snippets/hooks/useSnippets.js')
+		).default
 		const mockOpenModal = vi.fn()
 		mockUseSnippets.mockReturnValue({
 			snippets: mockSnippets,
@@ -156,7 +158,9 @@ describe('Snippets', () => {
 	})
 
 	it('should render snippets in the dialog when open', async () => {
-		const mockUseSnippets = vi.mocked(await import('@components/Snippets/hooks/useSnippets.js')).default
+		const mockUseSnippets = vi.mocked(
+			await import('@components/Snippets/hooks/useSnippets.js')
+		).default
 		mockUseSnippets.mockReturnValue({
 			snippets: mockSnippets,
 			handleSnippetPress: vi.fn(),
@@ -176,7 +180,9 @@ describe('Snippets', () => {
 	})
 
 	it('should call handleSnippetPress when a snippet button is clicked', async () => {
-		const mockUseSnippets = vi.mocked(await import('@components/Snippets/hooks/useSnippets.js')).default
+		const mockUseSnippets = vi.mocked(
+			await import('@components/Snippets/hooks/useSnippets.js')
+		).default
 		const mockHandleSnippetPress = vi.fn()
 		mockUseSnippets.mockReturnValue({
 			snippets: mockSnippets,

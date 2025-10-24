@@ -21,7 +21,7 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		let result = ''
 		let line = ''
 
-		for (let word of words) {
+		for (const word of words) {
 			if ((line + (line ? ' ' : '') + word).length > maxLen) {
 				result += (result ? '\n' : '') + line
 				line = word

@@ -29,7 +29,8 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	public sendMessageToWebview(message: unknown) {
 		if (this.webviewPanel) {
 			this.webviewPanel.webview.postMessage(message)
-		} }
+		}
+	}
 
 	private initializeLogsDirectory() {
 		const logsDir = path.join(this.context.extensionPath, 'logs')
@@ -88,7 +89,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel
 	): Promise<void> {
-		let webviewReady = false
+		const webviewReady = false
 		this.webviewPanel = webviewPanel
 
 		webviewPanel.webview.options = {
