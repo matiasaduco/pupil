@@ -27,7 +27,8 @@ export default [
 			eqeqeq: 'warn',
 			semi: ['error', 'never'],
 			'comma-dangle': ['error', 'never'],
-			'no-throw-literal': 'warn'
+			'no-throw-literal': 'warn',
+			'prefer-const': 'warn'
 		}
 	}
 ]

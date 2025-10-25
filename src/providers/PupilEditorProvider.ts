@@ -89,7 +89,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel
 	): Promise<void> {
-		let webviewReady = false
+		const webviewReady = false
 		this.webviewPanel = webviewPanel
 
 		webviewPanel.webview.options = {
@@ -164,7 +164,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.getTerminals(webviewPanel)
 					}
 					if (message.type === 'terminal-show' && message.content) {
-						this.showTerminal(message.content)
+						this.showTerminal(message.content, webviewPanel)
 					}
 					if (message.type === 'openSimpleBrowser') {
 						this.openSimpleBrowser(message.url)
@@ -287,16 +287,33 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		terminal.show()
 	}
 
-	private getTerminals(webviewPanel: vscode.WebviewPanel) {
+	private async getTerminals(webviewPanel: vscode.WebviewPanel) {
+		const terminals = vscode.window.terminals
+		const terminalsWithIds = await Promise.all(
+			terminals.map(async (t) => ({
+				name: t.name,
+				processId: await t.processId
+			}))
+		)
 		webviewPanel.webview.postMessage({
 			type: 'set-terminals',
-			content: vscode.window.terminals
+			content: terminalsWithIds
 		})
 	}
 
-	private showTerminal(index: number) {
-		const terminal = vscode.window.terminals[index]
-		terminal?.show()
+	private async showTerminal(processId: number, webviewPanel: vscode.WebviewPanel) {
+		const terminals = vscode.window.terminals
+		for (const terminal of terminals) {
+			const terminalProcessId = await terminal.processId
+			if (terminalProcessId === processId) {
+				terminal.show()
+				webviewPanel.webview.postMessage({
+					type: 'set-focus',
+					focus: 'terminal'
+				})
+				break
+			}
+		}
 	}
 
 	private async createNewFile(fileName: string, webviewPanel: vscode.WebviewPanel) {
