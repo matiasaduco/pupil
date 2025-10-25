@@ -3,55 +3,112 @@
 	<head>
 		<meta charset="UTF-8" />
 		<title>Speech Recognition Demo</title>
-		<style>
-			body {
-				font-family: sans-serif;
-				margin: 2em;
-			}
-			#result {
-				margin-top: 1em;
-				font-size: 1.2em;
-			}
-			button {
-				padding: 0.5em 1em;
-				font-size: 1em;
-			}
-		</style>
+		<link rel="stylesheet" href="styles.css" />
 	</head>
 	<body>
-		<h1>Demo SpeechRecognition</h1>
-		<button id="start">Iniciar reconocimiento</button>
-		<div id="result" />
+		<div class="header">
+			<div class="server-status">
+				<div class="status-indicator" id="status-indicator"></div>
+				<span id="status-text">Desconectado</span>
+			</div>
+			<button class="theme-toggle" id="theme-toggle">🌙 Dark Mode</button>
+		</div>
+		<div class="main-content">
+			<div class="left-panel">
+				<h2>¿Por qué necesito tener esta página abierta?</h2>
+				<p>Esta página web es necesaria para habilitar la funcionalidad de reconocimiento de voz (STT - Speech-to-Text) en la extensión Pupil. Actúa como un puente entre tu navegador y el servidor local, permitiendo la captura y transmisión de audio en tiempo real. Mantén esta pestaña abierta en segundo plano mientras usas la extensión para que el reconocimiento de voz funcione correctamente.</p>
+			</div>
+			<div class="right-panel">
+				<div class="control-section">
+					<h3>Control de Reconocimiento</h3>
+					<button class="mic-button" id="start">🎤</button>
+					<p>Haz clic en el micrófono para iniciar el reconocimiento de voz</p>
+				</div>
+				<div class="transcript-section">
+					<div class="transcript-title">Transcripción en Tiempo Real</div>
+					<div id="result">Presiona el micrófono para comenzar...</div>
+				</div>
+			</div>
+		</div>
 		<script>
-			const startBtn = document.getElementById('start')
+			const micBtn = document.getElementById('start')
 			const resultDiv = document.getElementById('result')
+			const themeToggle = document.getElementById('theme-toggle')
+			const statusIndicator = document.getElementById('status-indicator')
+			const statusText = document.getElementById('status-text')
+			const body = document.body
 			const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 			const ws = new WebSocket('ws://localhost:8080')
 			let recognition
 
+			// Theme toggle
+			themeToggle.onclick = () => {
+				body.classList.toggle('dark')
+				themeToggle.textContent = body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode'
+			}
+
+			// Update server status
+			function updateStatus(connected) {
+				if (connected) {
+					statusIndicator.classList.add('connected')
+					statusText.textContent = 'Conectado'
+				} else {
+					statusIndicator.classList.remove('connected')
+					statusText.textContent = 'Desconectado'
+				}
+			}
+
 			if (!SpeechRecognition) {
 				resultDiv.textContent = 'Tu navegador no soporta SpeechRecognition.'
+				resultDiv.classList.add('error')
 			} else {
 				recognition = new SpeechRecognition()
 				recognition.continuous = true
 				recognition.lang = 'es-ES'
 
 				recognition.onresult = (event) => {
-					const transcript = (resultDiv.textContent = event.results[0][0].transcript)
+					const transcript = event.results[0][0].transcript
+					resultDiv.textContent = transcript
 
 					if (ws.readyState === WebSocket.OPEN) {
-						ws.send({ type: 'transcript', content: transcript })
+						ws.send(JSON.stringify({ type: 'transcript', content: transcript }))
 					}
+				}
+
+				recognition.onstart = () => {
+					micBtn.classList.add('listening')
+					document.querySelector('.transcript-section').classList.add('listening')
+					resultDiv.textContent = 'Escuchando...'
+				}
+
+				recognition.onend = () => {
+					micBtn.classList.remove('listening')
+					document.querySelector('.transcript-section').classList.remove('listening')
 				}
 
 				recognition.onerror = (event) => {
 					resultDiv.textContent = 'Error: ' + event.error
+					resultDiv.classList.add('error')
 				}
 
-				startBtn.onclick = () => {
+				micBtn.onclick = () => {
 					recognition.start()
-					resultDiv.textContent = 'Escuchando...'
 				}
+			}
+
+			ws.onopen = () => {
+				console.log('Connected to WebSocket')
+				updateStatus(true)
+			}
+
+			ws.onclose = () => {
+				console.log('WebSocket closed')
+				updateStatus(false)
+			}
+
+			ws.onerror = (error) => {
+				console.error('WebSocket error:', error)
+				updateStatus(false)
 			}
 
 			ws.onmessage = (event) => {
@@ -59,25 +116,12 @@
 
 				if (message.type === 'start-listening') {
 					recognition.start()
-					resultDiv.textContent = 'Escuchando...'
 				}
 
 				if (message.type === 'stop-listening') {
 					recognition.stop()
 					resultDiv.textContent = 'Reconocimiento detenido.'
 				}
-			}
-
-			ws.onopen = () => {
-				console.log('Conected to WebSocket')
-			}
-
-			ws.onclose = () => {
-				console.log('WebSocket closed')
-			}
-
-			ws.onerror = (error) => {
-				console.error('WebSocket error:', error)
 			}
 		</script>
 	</body>

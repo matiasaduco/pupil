@@ -7,9 +7,15 @@ import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Toolbar from '../Toolbar/Toolbar.js'
 import { useEffect } from 'react'
 import RadialKeyboard from '../RadialKeyboard/RadialKeyboard.js'
+import SimpleBrowserDialog from '../Toolbar/components/SimpleBrowserDialog.js'
+import CreateFileFolderDialog from '../Toolbar/components/CreateFileFolderDialog.js'
+import TranscriptDialog from '../Toolbar/components/TranscriptDialog/TranscriptDialog.js'
+import SettingsDialog from '../Toolbar/components/SettingsDialog.js'
+import useDialog from './hooks/useDialog.js'
 
 const PupilContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
+
 	const {
 		editorRef,
 		keyboardVisible,
@@ -19,8 +25,22 @@ const PupilContainer = () => {
 		focus,
 		switchFocus,
 		switchColorScheme,
-		connectionStatus
+		connectionStatus,
+		openSimpleBrowser,
+		handleStartServer,
+		handleStopServer
 	} = usePupilEditorContainer()
+
+	const {
+		openSimpleBrowserDialog,
+		openFileFolderDialog,
+		openTranscriptDialog,
+		openSettingsDialog,
+		setOpenSimpleBrowserDialog,
+		setOpenFileFolderDialog,
+		setOpenTranscriptDialog,
+		setOpenSettingsDialog
+	} = useDialog()
 
 	const theme = createTheme({
 		palette: {
@@ -61,10 +81,41 @@ const PupilContainer = () => {
 					focus={focus}
 					switchFocus={switchFocus}
 					handleButtonClick={handleKeyboardInput}
-					connectionStatus={connectionStatus}
+					openSimpleBrowserDialog={() => setOpenSimpleBrowserDialog(true)}
+					openFileFolderDialog={() => setOpenFileFolderDialog(true)}
+					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
+					openSettingsDialog={() => setOpenSettingsDialog(true)}
 				/>
 				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
-				<RadialKeyboard onInput={handleKeyboardInput} />
+				<RadialKeyboard
+					onInput={handleKeyboardInput}
+					openSimpleBrowserDialog={() => setOpenSimpleBrowserDialog(true)}
+					openFileFolderDialog={() => setOpenFileFolderDialog(true)}
+					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
+					openSettingsDialog={() => setOpenSettingsDialog(true)}
+				/>
+				<SimpleBrowserDialog
+					isOpen={openSimpleBrowserDialog}
+					onClick={openSimpleBrowser}
+					onClose={() => setOpenSimpleBrowserDialog(false)}
+				/>
+				<CreateFileFolderDialog
+					externalOpen={openFileFolderDialog}
+					onExternalClose={() => setOpenFileFolderDialog(false)}
+				/>
+				<TranscriptDialog
+					isOpen={openTranscriptDialog}
+					editorRef={editorRef}
+					onClose={() => setOpenTranscriptDialog(false)}
+					connectionStatus={connectionStatus}
+				/>
+				<SettingsDialog
+					open={openSettingsDialog}
+					onClose={() => setOpenSettingsDialog(false)}
+					onStartServer={handleStartServer}
+					onStopServer={handleStopServer}
+					connectionStatus={connectionStatus}
+				/>
 			</div>
 		</ThemeProvider>
 	)
