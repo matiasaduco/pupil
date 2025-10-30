@@ -67,7 +67,7 @@ const PupilContainer = () => {
 					)}
 				</IconButton>
 			)}
-			<div className="flex flex-col h-screen relative">
+			<div className="flex flex-col h-screen relative" data-testid="pupil-container">
 				<PupilEditor
 					ref={editorRef}
 					keyboardVisible={keyboardVisible}
@@ -86,7 +86,11 @@ const PupilContainer = () => {
 					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
 					openSettingsDialog={() => setOpenSettingsDialog(true)}
 				/>
-				<PupilKeyboard onInput={handleKeyboardInput} visible={keyboardVisible} />
+				<PupilKeyboard
+					onInput={handleKeyboardInput}
+					visible={keyboardVisible}
+					data-testid="pupil-keyboard"
+				/>
 				<RadialKeyboard
 					onInput={handleKeyboardInput}
 					openSimpleBrowserDialog={() => setOpenSimpleBrowserDialog(true)}

@@ -6,9 +6,10 @@ import clsx from 'clsx'
 type PupilKeyboardProps = {
 	onInput?: (input: string) => void
 	visible: boolean
+	'data-testid'?: string
 }
 
-const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
+const PupilKeyboard = ({ onInput, visible, 'data-testid': testId }: PupilKeyboardProps) => {
 	const { layout, handleKeyPress, clickedKey } = usePupilKeyboard(onInput)
 
 	if (!visible) {
@@ -19,6 +20,7 @@ const PupilKeyboard = ({ onInput, visible }: PupilKeyboardProps) => {
 		<div
 			className="grid grid-cols-30 gap-1 bg-gray-400 rounded p-2"
 			style={{ height: 'min(30vh, 220px)' }}
+			data-testid={testId}
 		>
 			{layout.map((key, index) => (
 				<Button

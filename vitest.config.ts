@@ -18,6 +18,7 @@ export default defineConfig({
 		globals: true,
 		setupFiles: [path.resolve(__dirname, 'src/webview/test/setup.ts')],
 		include: ['**/*.{test,spec}.{ts,tsx}'],
+		exclude: ['**/node_modules/**', '**/e2e/**', '**/dist/**', '**/out/**'],
 		alias: {
 			'@webview': path.resolve(__dirname, 'src/webview'),
 			'@components': path.resolve(__dirname, 'src/webview/components')
