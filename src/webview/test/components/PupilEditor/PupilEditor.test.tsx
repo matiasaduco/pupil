@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import * as React from 'react'
 import PupilEditor from '@components/PupilEditor/PupilEditor.js'
 import type { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
@@ -48,15 +48,17 @@ describe('PupilEditor', () => {
 			</VsCodeApiProvider>
 		)
 
-		window.dispatchEvent(
-			new MessageEvent('message', {
-				data: {
-					type: 'init',
-					content: 'test content',
-					fileExtension: 'ts'
-				}
-			})
-		)
+		await act(async () => {
+			window.dispatchEvent(
+				new MessageEvent('message', {
+					data: {
+						type: 'init',
+						content: 'test content',
+						fileExtension: 'ts'
+					}
+				})
+			)
+		})
 
 		const editor = await screen.findByTestId('mock-editor')
 		expect(editor).toBeInTheDocument()
@@ -74,15 +76,17 @@ describe('PupilEditor', () => {
 			</VsCodeApiProvider>
 		)
 
-		window.dispatchEvent(
-			new MessageEvent('message', {
-				data: {
-					type: 'init',
-					content: 'test content',
-					fileExtension: 'ts'
-				}
-			})
-		)
+		await act(async () => {
+			window.dispatchEvent(
+				new MessageEvent('message', {
+					data: {
+						type: 'init',
+						content: 'test content',
+						fileExtension: 'ts'
+					}
+				})
+			)
+		})
 
 		const editorEl = await screen.findByTestId('mock-editor')
 		expect(editorEl.getAttribute('data-theme')).toBe('vs-dark')

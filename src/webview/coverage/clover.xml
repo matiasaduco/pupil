@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1761851833930" clover="3.2.0">
-  <project timestamp="1761851833931" name="All files">
-    <metrics statements="2163" coveredstatements="1708" conditionals="288" coveredconditionals="241" methods="147" coveredmethods="98" elements="2598" coveredelements="2047" complexity="0" loc="2163" ncloc="2163" packages="27" files="40" classes="40"/>
+<coverage generated="1761932246251" clover="3.2.0">
+  <project timestamp="1761932246252" name="All files">
+    <metrics statements="2164" coveredstatements="1709" conditionals="288" coveredconditionals="241" methods="147" coveredmethods="98" elements="2599" coveredelements="2048" complexity="0" loc="2164" ncloc="2164" packages="27" files="40" classes="40"/>
     <package name="webview">
       <metrics statements="33" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
       <file name="App.tsx" path="D:\Facultad\TIP\TP\pupil\src\webview\App.tsx">
@@ -1402,9 +1402,9 @@
       </file>
     </package>
     <package name="webview.components.Snippets">
-      <metrics statements="34" coveredstatements="34" conditionals="5" coveredconditionals="5" methods="2" coveredmethods="2"/>
+      <metrics statements="35" coveredstatements="35" conditionals="5" coveredconditionals="5" methods="2" coveredmethods="2"/>
       <file name="Snippets.tsx" path="D:\Facultad\TIP\TP\pupil\src\webview\components\Snippets\Snippets.tsx">
-        <metrics statements="34" coveredstatements="34" conditionals="5" coveredconditionals="5" methods="2" coveredmethods="2"/>
+        <metrics statements="35" coveredstatements="35" conditionals="5" coveredconditionals="5" methods="2" coveredmethods="2"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -1424,21 +1424,22 @@
         <line num="26" count="10" type="stmt"/>
         <line num="27" count="10" type="stmt"/>
         <line num="28" count="10" type="stmt"/>
-        <line num="30" count="10" type="stmt"/>
+        <line num="29" count="10" type="stmt"/>
         <line num="31" count="10" type="stmt"/>
         <line num="32" count="10" type="stmt"/>
-        <line num="33" count="10" type="cond" truecount="1" falsecount="0"/>
-        <line num="34" count="10" type="stmt"/>
-        <line num="36" count="10" type="stmt"/>
+        <line num="33" count="10" type="stmt"/>
+        <line num="34" count="10" type="cond" truecount="1" falsecount="0"/>
+        <line num="35" count="10" type="stmt"/>
         <line num="37" count="10" type="stmt"/>
         <line num="38" count="10" type="stmt"/>
-        <line num="39" count="9" type="stmt"/>
-        <line num="40" count="21" type="stmt"/>
+        <line num="39" count="10" type="stmt"/>
+        <line num="40" count="9" type="stmt"/>
         <line num="41" count="21" type="stmt"/>
         <line num="42" count="21" type="stmt"/>
         <line num="43" count="21" type="stmt"/>
-        <line num="45" count="21" type="stmt"/>
-        <line num="47" count="1" type="stmt"/>
+        <line num="44" count="21" type="stmt"/>
+        <line num="46" count="21" type="stmt"/>
+        <line num="48" count="1" type="stmt"/>
       </file>
     </package>
     <package name="webview.components.Snippets.components">

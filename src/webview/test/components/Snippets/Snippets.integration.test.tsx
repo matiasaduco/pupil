@@ -66,7 +66,6 @@ describe('Snippets Integration', () => {
 		const button = screen.getByText('Snippets')
 		fireEvent.click(button)
 
-		// Dialog should be open but no snippets yet - check for dialog title in portal
 		await waitFor(() => {
 			const portal = document.getElementById('pupil-dialog-portal')
 			const titleInPortal = portal?.querySelector('.MuiCardHeader-title')
@@ -81,11 +80,9 @@ describe('Snippets Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		// Open the dialog first
 		const button = screen.getByText('Snippets')
 		fireEvent.click(button)
 
-		// Simulate receiving snippets
 		const mockSnippets = {
 			user: [],
 			extension: [],
@@ -132,11 +129,9 @@ describe('Snippets Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		// Open the dialog
 		const button = screen.getByText('Snippets')
 		fireEvent.click(button)
 
-		// Simulate receiving snippets
 		const mockSnippets = {
 			user: [],
 			extension: [],
@@ -170,12 +165,10 @@ describe('Snippets Integration', () => {
 			expect(screen.getByText('console.log')).toBeInTheDocument()
 		})
 
-		// Click the snippet
 		const snippetButton = screen.getByText('console.log')
 		fireEvent.click(snippetButton)
 
 		expect(mockEditorRef.current.insertAtCursor).toHaveBeenCalledWith('console.log($1)')
-		// Dialog should close after selection - check that dialog title is gone
 		await waitFor(() => {
 			expect(screen.queryByRole('heading', { name: 'Snippets' })).not.toBeInTheDocument()
 		})
@@ -188,11 +181,9 @@ describe('Snippets Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		// Open the dialog
 		const button = screen.getByText('Snippets')
 		fireEvent.click(button)
 
-		// Simulate receiving snippets
 		const mockSnippets = {
 			user: [],
 			extension: [],
@@ -226,7 +217,6 @@ describe('Snippets Integration', () => {
 			expect(screen.getByText('if-else')).toBeInTheDocument()
 		})
 
-		// Click the snippet
 		const snippetButton = screen.getByText('if-else')
 		fireEvent.click(snippetButton)
 
@@ -237,7 +227,6 @@ describe('Snippets Integration', () => {
 			'\t$3',
 			'}'
 		])
-		// Dialog should close after selection - check that dialog title is gone
 		await waitFor(() => {
 			expect(screen.queryByRole('heading', { name: 'Snippets' })).not.toBeInTheDocument()
 		})
@@ -250,7 +239,6 @@ describe('Snippets Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		// Open the dialog
 		const button = screen.getByText('Snippets')
 		fireEvent.click(button)
 
@@ -260,7 +248,6 @@ describe('Snippets Integration', () => {
 			expect(titleInPortal?.textContent).toBe('Snippets')
 		})
 
-		// Click outside/backdrop to close - find the backdrop element
 		const backdrop = portalTarget.querySelector('.absolute.inset-0.z-10')
 		if (backdrop) {
 			fireEvent.click(backdrop)

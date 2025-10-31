@@ -79,19 +79,29 @@ vi.mock('@mui/material', () => ({
 		children,
 		onClick,
 		className,
-		style
+		style,
+		id
 	}: {
 		children: React.ReactNode
 		onClick?: () => void
 		className?: string
 		style?: Record<string, unknown>
+		id?: string
 	}) => (
-		<button data-testid="mui-button" onClick={onClick} className={className} style={style}>
+		<button data-testid="mui-button" id={id} onClick={onClick} className={className} style={style}>
 			{children}
 		</button>
 	),
-	Tooltip: ({ children, title }: { children: React.ReactNode; title: React.ReactNode }) => (
-		<div data-testid="tooltip">
+	Tooltip: ({
+		children,
+		title,
+		key
+	}: {
+		children: React.ReactNode
+		title: React.ReactNode
+		key?: string
+	}) => (
+		<div data-testid="tooltip" key={key}>
 			{children}
 			<div data-testid="tooltip-title">{title}</div>
 		</div>
