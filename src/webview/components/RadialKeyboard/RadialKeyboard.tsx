@@ -34,11 +34,11 @@ const RadialKeyboard = ({
 			<Menu
 				centerX={position.x}
 				centerY={position.y}
-				innerRadius={75}
-				outerRadius={150}
+				innerRadius={45}
+				outerRadius={140}
 				show={show}
 				animation={['fade', 'scale']}
-				animationTimeout={150}
+				animationTimeout={100}
 				drawBackground
 			>
 				{/* Renderiza el layout dinámicamente */}
@@ -47,7 +47,7 @@ const RadialKeyboard = ({
 						key={`${item.label} - ${idx}`}
 						itemView={item.label}
 						data={item.label}
-						displayPosition="bottom"
+						displayPosition="center"
 					>
 						{item.childrens?.map((child, cidx) =>
 							child.childrens ? (
@@ -55,7 +55,7 @@ const RadialKeyboard = ({
 									key={`${child.label || child.value} - ${cidx}`}
 									itemView={child.label || child.value}
 									data={child.value}
-									displayPosition="bottom"
+									displayPosition="center"
 								>
 									{/* Renderiza los hijos recursivamente */}
 									{child.childrens.map((subChild, scidx) => (
