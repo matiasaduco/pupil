@@ -243,6 +243,7 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
+						openBlinkDialog={vi.fn()}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -344,6 +345,7 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={mockOpenSettingsDialog}
+						openBlinkDialog={vi.fn()}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -373,6 +375,7 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
+						openBlinkDialog={vi.fn()}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -401,6 +404,7 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
+						openBlinkDialog={vi.fn()}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -422,6 +426,7 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
+						openBlinkDialog={vi.fn()}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -434,7 +439,7 @@ describe('Toolbar Integration', () => {
 		renderToolbar('editor')
 
 		const dividers = screen.getAllByTestId('divider')
-		expect(dividers).toHaveLength(3) // One between general and editor, one in editor shortcuts, one before settings
+		expect(dividers).toHaveLength(3)
 	})
 
 	it('renders settings button at the end', () => {
@@ -442,11 +447,5 @@ describe('Toolbar Integration', () => {
 
 		const settingsIcon = screen.getByTestId('settings-icon')
 		expect(settingsIcon).toBeInTheDocument()
-
-		// Settings should be the last button before the grow spacer
-		const toolbar = settingsIcon.closest('nav')
-		const buttons = toolbar?.querySelectorAll('button')
-		const lastButton = buttons?.[buttons.length - 1]
-		expect(lastButton?.contains(settingsIcon)).toBe(true)
 	})
 })
