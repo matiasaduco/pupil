@@ -23,13 +23,14 @@ const Snippets = ({ editorRef }: SnippetsProps) => {
 					{snippets?.all.flat().map((snippet) =>
 						Object.entries(snippet.snippets).map(([key, { body, description }]) => (
 							<HtmlTooltip
+								key={key}
 								title={<TooltipTitle body={body} description={description} />}
 								placement="top"
 								arrow
 							>
 								<Button
+									id={`snippet-${key}`}
 									className="w-[10em] h-[3em] truncate"
-									key={key}
 									onClick={() => handleSnippetPress?.(body)}
 									style={{ margin: '0 3px 6px 0' }}
 								>
