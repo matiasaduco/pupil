@@ -34,7 +34,7 @@ const RadialKeyboard = ({
 			<Menu
 				centerX={position.x}
 				centerY={position.y}
-				innerRadius={45}
+				innerRadius={40}
 				outerRadius={140}
 				show={show}
 				animation={['fade', 'scale']}
