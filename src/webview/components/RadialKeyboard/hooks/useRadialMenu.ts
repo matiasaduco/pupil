@@ -26,6 +26,7 @@ type Shortcut = {
 	icon?: OverridableComponent<SvgIconTypeMap>
 	divider?: boolean
 	onClick?: () => void
+	closeOnClick?: boolean
 }
 
 type Layout = {
@@ -49,37 +50,43 @@ const useRadialMenu = (
 			tooltipTitle: 'Open Simple Browser',
 			icon: WebIcon,
 			label: 'Open Browser',
-			onClick: openSimpleBrowserDialog
+			onClick: openSimpleBrowserDialog,
+			closeOnClick: true
 		},
 		{
 			tooltipTitle: 'Create New File/Folder',
 			icon: CreateNewFolderIcon,
 			label: 'Create',
-			onClick: openFileFolderDialog
+			onClick: openFileFolderDialog,
+			closeOnClick: true
 		},
 		{
 			tooltipTitle: 'Open Terminal',
 			icon: TerminalIcon,
 			label: 'Open Terminal',
-			onClick: () => handleButtonClick('{open-terminal}')
+			onClick: () => handleButtonClick('{open-terminal}'),
+			closeOnClick: true
 		},
 		{
 			tooltipTitle: 'Save current document',
 			icon: SaveIcon,
 			label: 'Save Document',
-			onClick: () => handleButtonClick('{save}')
+			onClick: () => handleButtonClick('{save}'),
+			closeOnClick: true
 		},
 		{
 			tooltipTitle: 'Start Speech to Text',
 			icon: CommentIcon,
 			label: 'Speech to Text',
-			onClick: openTranscriptDialog
+			onClick: openTranscriptDialog,
+			closeOnClick: true
 		},
 		{
 			tooltipTitle: 'Open Settings',
 			icon: SaveIcon,
 			label: 'Settings',
-			onClick: openSettingsDialog
+			onClick: openSettingsDialog,
+			closeOnClick: true
 		}
 	]
 
@@ -210,7 +217,12 @@ const useRadialMenu = (
 					childrens: generalShortcuts.map((shortcut) => ({
 						label: shortcut.label,
 						icon: shortcut.icon,
-						onClick: shortcut.onClick
+						onClick: shortcut.closeOnClick
+							? () => {
+									shortcut.onClick?.()
+									setShow(false)
+								}
+							: shortcut.onClick
 					}))
 				},
 				{
