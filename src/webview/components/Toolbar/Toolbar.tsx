@@ -7,6 +7,7 @@ import { RefObject } from 'react'
 import useToolbar from './hooks/useToolbar.js'
 import ToolbarButton from './components/ToolbarButton.js'
 import SettingsIcon from '@mui/icons-material/Settings'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -21,6 +22,7 @@ type ToolbarProps = {
 	openFileFolderDialog: () => void
 	openTranscriptDialog: () => void
 	openSettingsDialog: () => void
+	openBlinkDialog: () => void
 }
 
 const Toolbar = ({
@@ -33,7 +35,8 @@ const Toolbar = ({
 	openSimpleBrowserDialog,
 	openFileFolderDialog,
 	openTranscriptDialog,
-	openSettingsDialog
+	openSettingsDialog,
+	openBlinkDialog
 }: ToolbarProps) => {
 	const { generalShortcuts, editorShortcuts, terminalShortcuts } = useToolbar(
 		handleButtonClick,
@@ -132,6 +135,13 @@ const Toolbar = ({
 					icon={SettingsIcon}
 					label="Settings"
 					onButtonClick={openSettingsDialog}
+				/>
+				<ToolbarButton
+					key="blink"
+					tooltipTitle="Eye Tracking"
+					icon={VisibilityIcon}
+					label="Eye Tracking"
+					onButtonClick={openBlinkDialog}
 				/>
 			</nav>
 		</>
