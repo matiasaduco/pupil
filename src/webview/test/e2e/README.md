@@ -45,6 +45,7 @@ npm run test:e2e:ui
 \`\`\`
 
 This opens Playwright's UI where you can:
+
 - See tests run in real-time
 - Debug failing tests
 - View traces and screenshots
@@ -96,21 +97,22 @@ The Playwright configuration is in `playwright.config.ts` at the project root. K
 import { test, expect } from '@playwright/test'
 
 test.describe('ComponentName E2E Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await page.waitForSelector('[data-testid="pupil-container"]', { timeout: 10000 })
-  })
+test.beforeEach(async ({ page }) => {
+await page.goto('/')
+await page.waitForSelector('[data-testid="pupil-container"]', { timeout: 10000 })
+})
 
-  test('should do something', async ({ page }) => {
-    // Locate element
-    const button = page.locator('button[aria-label="Save"]')
-    
+test('should do something', async ({ page }) => {
+// Locate element
+const button = page.locator('button[aria-label="Save"]')
+
     // Interact
     await button.click()
-    
+
     // Assert
     await expect(page.locator('.success-message')).toBeVisible()
-  })
+
+})
 })
 \`\`\`
 
@@ -153,6 +155,7 @@ npx playwright show-report
 \`\`\`
 
 This opens an HTML report with:
+
 - Screenshots at each step
 - Network requests
 - Console logs
@@ -183,14 +186,16 @@ npx playwright test --headed --slow-mo=1000
 For GitHub Actions or other CI:
 
 \`\`\`yaml
+
 - name: Install Playwright Browsers
   run: npx playwright install --with-deps
 
 - name: Run E2E tests
   run: npm run test:e2e
-\`\`\`
+  \`\`\`
 
 The tests will automatically:
+
 - Retry failed tests 2 times
 - Run in headless mode
 - Generate HTML report
@@ -198,16 +203,17 @@ The tests will automatically:
 
 ## Comparison with Unit Tests
 
-| Aspect | Unit Tests (Vitest) | E2E Tests (Playwright) |
-|--------|---------------------|------------------------|
-| **Speed** | Fast (milliseconds) | Slower (seconds) |
-| **Scope** | Single component | Full application |
-| **Mocking** | Heavy mocking | Minimal mocking |
-| **Environment** | jsdom | Real browser |
-| **Dependencies** | Mocked | Real |
-| **Purpose** | Logic verification | User flow validation |
+| Aspect           | Unit Tests (Vitest) | E2E Tests (Playwright) |
+| ---------------- | ------------------- | ---------------------- |
+| **Speed**        | Fast (milliseconds) | Slower (seconds)       |
+| **Scope**        | Single component    | Full application       |
+| **Mocking**      | Heavy mocking       | Minimal mocking        |
+| **Environment**  | jsdom               | Real browser           |
+| **Dependencies** | Mocked              | Real                   |
+| **Purpose**      | Logic verification  | User flow validation   |
 
 Both types of tests are valuable:
+
 - **Unit tests**: Verify component logic, edge cases, and state management
 - **E2E tests**: Verify user experience, integration, and real-world usage
 
@@ -216,12 +222,14 @@ Both types of tests are valuable:
 ### Port Already in Use
 
 If port 5173 is busy:
+
 1. Kill the existing process
 2. Or change the port in `vite.config.ts` and `playwright.config.ts`
 
 ### Tests Timeout
 
 If tests timeout waiting for elements:
+
 1. Check that the dev server started successfully
 2. Verify the component actually renders (check console errors)
 3. Increase timeout: `{ timeout: 30000 }`
@@ -229,6 +237,7 @@ If tests timeout waiting for elements:
 ### Monaco Editor Not Loading
 
 If Monaco editor tests fail:
+
 1. Ensure Vite build is working: `npm run dev`
 2. Check browser console for errors
 3. Verify Monaco CDN is accessible
