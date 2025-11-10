@@ -6,10 +6,7 @@ type BlinkDialogProps = {
 	onClose: () => void
 }
 
-const BlinkDialog = ({
-	open,
-	onClose
-}: BlinkDialogProps) => {
+const BlinkDialog = ({ open, onClose }: BlinkDialogProps) => {
 	return (
 		<PupilDialog open={open} onClose={onClose} title="Eye Tracking">
 			<div className="blink-dialog-content" style={{ minWidth: '500px', minHeight: '600px' }}>

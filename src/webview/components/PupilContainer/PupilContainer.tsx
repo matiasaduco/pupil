@@ -5,7 +5,7 @@ import { createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Toolbar from '../Toolbar/Toolbar.js'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import RadialKeyboard from '../RadialKeyboard/RadialKeyboard.js'
 import SimpleBrowserDialog from '../Toolbar/components/SimpleBrowserDialog.js'
 import CreateFileFolderDialog from '../Toolbar/components/CreateFileFolderDialog.js'
@@ -31,6 +31,19 @@ const PupilContainer = () => {
 		handleStartServer,
 		handleStopServer
 	} = usePupilEditorContainer()
+
+	const [radialEnabled, setRadialEnabled] = useState<boolean>(() => {
+		const stored = localStorage.getItem('pupil-radial-enabled')
+		return stored !== null ? JSON.parse(stored) : true // default true
+	})
+
+	const toggleRadial = () => {
+		setRadialEnabled((prev) => {
+			const newValue = !prev
+			localStorage.setItem('pupil-radial-enabled', JSON.stringify(newValue))
+			return newValue
+		})
+	}
 
 	const {
 		openSimpleBrowserDialog,
@@ -101,6 +114,7 @@ const PupilContainer = () => {
 					openFileFolderDialog={() => setOpenFileFolderDialog(true)}
 					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
 					openSettingsDialog={() => setOpenSettingsDialog(true)}
+					enabled={radialEnabled}
 				/>
 				<SimpleBrowserDialog
 					isOpen={openSimpleBrowserDialog}
@@ -123,11 +137,10 @@ const PupilContainer = () => {
 					onStartServer={handleStartServer}
 					onStopServer={handleStopServer}
 					connectionStatus={connectionStatus}
+					radialEnabled={radialEnabled}
+					onToggleRadial={toggleRadial}
 				/>
-				<BlinkDialog
-					open={openBlinkDialog}
-					onClose={() => setOpenBlinkDialog(false)}
-				/>
+				<BlinkDialog open={openBlinkDialog} onClose={() => setOpenBlinkDialog(false)} />
 			</div>
 		</ThemeProvider>
 	)
