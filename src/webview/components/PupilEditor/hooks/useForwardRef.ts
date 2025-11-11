@@ -55,6 +55,14 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	}
 
 	const insertMultipleAtCursor = (texts: string[]) => {
+		// If the provided lines look like a snippet (contain placeholders/tabstops),
+		// insert them as a single snippet so placeholders/tabstops work across lines.
+		const joined = texts.join('\n')
+		const looksLikeSnippet = /\$(?:\d+|\{)/.test(joined)
+		if (looksLikeSnippet) {
+			insertAtCursor(joined)
+			return
+		}
 		texts.forEach((line, index) => {
 			insertAtCursor(line)
 			if (index < texts.length - 1) {
@@ -93,6 +101,26 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 		}
 
 		if (monaco && editor && position) {
+			// If the text looks like a snippet (contains $1, ${1:}, choices, etc.) try
+			// to use Monaco's snippet controller so placeholders/tabstops work like in VS Code.
+			const looksLikeSnippet = /\$(?:\d+|\{)/.test(text)
+			if (looksLikeSnippet) {
+				// snippetController2 is the Monaco contribution that handles snippets
+				try {
+					const contribHost = editor as unknown as { getContribution: (id: string) => unknown }
+					const snippetController = contribHost.getContribution('snippetController2')
+					if (
+						snippetController &&
+						typeof (snippetController as { insert?: unknown }).insert === 'function'
+					) {
+						;(snippetController as { insert: (s: string) => void }).insert(text)
+						editor.focus()
+						return
+					}
+				} catch {
+					// ignore and fall back to plain insert
+				}
+			}
 			const range = new monaco.Range(
 				position.lineNumber,
 				position.column,

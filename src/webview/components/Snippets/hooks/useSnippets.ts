@@ -35,10 +35,18 @@ const useSnippets = (editorRef: RefObject<PupilEditorHandle | null>) => {
 	}, [])
 
 	const handleSnippetPress = (snippet: string | string[]) => {
-		if (Array.isArray(snippet)) {
-			editorRef.current?.insertMultipleAtCursor(snippet)
-		} else {
-			editorRef.current?.insertAtCursor(snippet)
+		// Prefer inserting directly into the in-webview editor when available so we
+		// don't steal focus or open another editor. Only ask the extension to insert
+		// a SnippetString when the editorRef is not available (for environments
+		// where the webview doesn't host an editor, e.g. tests without a real editor).
+		if (editorRef.current) {
+			if (Array.isArray(snippet)) {
+				editorRef.current.insertMultipleAtCursor(snippet)
+			} else {
+				editorRef.current.insertAtCursor(snippet)
+			}
+		} else if (vscode) {
+			vscode.postMessage({ type: 'insert-snippet', body: snippet })
 		}
 		setOpen(false)
 	}

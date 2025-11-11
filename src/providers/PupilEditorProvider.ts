@@ -130,6 +130,36 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					if (message.type === 'get-snippets') {
 						this.getSnippets(webviewPanel)
 					}
+					if (message.type === 'insert-snippet' && message.body) {
+						// Insert snippet using VS Code API so placeholders/tabstops work.
+						// First ensure the editor that corresponds to the current custom document has focus.
+						try {
+							let targetEditor = vscode.window.visibleTextEditors.find(
+								(e) => e.document.uri.toString() === document.uri.toString()
+							)
+							if (!targetEditor) {
+								// Try to open the document in an editor to ensure focus
+								const doc = await vscode.workspace.openTextDocument(document.uri)
+								targetEditor = await vscode.window.showTextDocument(doc)
+							} else {
+								// Reveal/focus the existing editor
+								await vscode.window.showTextDocument(targetEditor.document, targetEditor.viewColumn)
+							}
+							if (!targetEditor) {
+								return
+							}
+							let body: string
+							if (Array.isArray(message.body)) {
+								body = message.body.join('\n')
+							} else {
+								body = String(message.body)
+							}
+							const snippet = new vscode.SnippetString(body)
+							await targetEditor.insertSnippet(snippet, targetEditor.selection)
+						} catch (err) {
+							console.error('Failed to insert snippet:', err)
+						}
+					}
 					if (message.type === 'edit' && message.content) {
 						this.updateTextDocument(document, message.content)
 					}
