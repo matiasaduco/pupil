@@ -1,5 +1,5 @@
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { RefObject, useState } from 'react'
+import { RefObject, useState, useEffect } from 'react'
 import useSpeechRecognition from './useSpeechRecognition.js'
 
 type TranscriptDialogProps = {
@@ -11,6 +11,7 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 	const { transcript, listening, resetTranscript, startListening, stopListening } =
 		useSpeechRecognition()
 	const [commentTranscription, setCommmentTranscription] = useState<boolean>(true)
+	const [editableTranscript, setEditableTranscript] = useState<string>('')
 
 	const insertLineBreaks = (text: string, maxLen: number = 50) => {
 		if (!text) {
@@ -37,7 +38,11 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		return result
 	}
 
-	let transcriptWithBreaks = insertLineBreaks(transcript, 50)
+	const transcriptWithBreaks = insertLineBreaks(transcript, 50)
+
+	useEffect(() => {
+		setEditableTranscript(transcriptWithBreaks)
+	}, [transcriptWithBreaks])
 
 	const handleSpeechToText = () => {
 		if (listening) {
@@ -51,9 +56,9 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		if (listening) {
 			stopListening()
 		}
-		onSubmit(transcriptWithBreaks)
+		onSubmit(editableTranscript)
 		resetTranscript()
-		transcriptWithBreaks = ''
+		setEditableTranscript('')
 		onClose()
 	}
 
@@ -72,7 +77,7 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 			stopListening()
 		}
 		resetTranscript()
-		transcriptWithBreaks = ''
+		setEditableTranscript('')
 		onClose()
 	}
 
@@ -84,7 +89,9 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		handleOnSubmit,
 		handleOnClose,
 		commentTranscription,
-		setCommmentTranscription
+		setCommmentTranscription,
+		editableTranscript,
+		setEditableTranscript
 	}
 }
 
