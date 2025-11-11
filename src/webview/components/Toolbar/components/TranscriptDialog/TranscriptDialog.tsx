@@ -3,7 +3,7 @@ import PupilDialog from '@webview/components/PupilDialog/PupilDialog.js'
 import MicrophoneIcon from '@mui/icons-material/Mic'
 import StopCircleIcon from '@mui/icons-material/StopCircle'
 import SendIcon from '@mui/icons-material/Send'
-import { IconButton, Switch } from '@mui/material'
+import { IconButton, Switch, TextField } from '@mui/material'
 import useTranscriptDialog from './hooks/useTranscriptDialog.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { ConnectionStatusType } from '../../../../../constants.js'
@@ -26,9 +26,10 @@ const TranscriptDialog = ({
 		listening,
 		handleOnClose,
 		handleOnSubmit,
-		transcriptWithBreaks,
 		commentTranscription,
-		setCommmentTranscription
+		setCommmentTranscription,
+		editableTranscript,
+		setEditableTranscript
 	} = useTranscriptDialog({ editorRef, onClose })
 
 	const ActionButton = () => (
@@ -59,9 +60,25 @@ const TranscriptDialog = ({
 			extraAction={<ActionButton />}
 		>
 			<div className="transcript-box">
-				<span className="transcript-text">
-					{transcriptWithBreaks || 'No transcript available.'}
-				</span>
+				<TextField
+					multiline
+					fullWidth
+					value={editableTranscript}
+					onChange={(e) => setEditableTranscript(e.target.value)}
+					placeholder="No transcript available."
+					variant="outlined"
+					sx={{
+						'& .MuiOutlinedInput-root': {
+							backgroundColor: 'transparent',
+							'& fieldset': {
+								border: 'none'
+							},
+							'&.Mui-focused fieldset': {
+								border: 'none'
+							}
+						}
+					}}
+				/>
 			</div>
 		</PupilDialog>
 	)
