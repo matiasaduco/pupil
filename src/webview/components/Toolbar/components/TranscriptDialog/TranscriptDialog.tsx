@@ -29,7 +29,8 @@ const TranscriptDialog = ({
 		commentTranscription,
 		setCommmentTranscription,
 		editableTranscript,
-		setEditableTranscript
+		setEditableTranscript,
+		textareaRef
 	} = useTranscriptDialog({ editorRef, onClose })
 
 	const ActionButton = () => (
@@ -61,6 +62,7 @@ const TranscriptDialog = ({
 		>
 			<div className="transcript-box">
 				<TextField
+					inputRef={textareaRef}
 					multiline
 					fullWidth
 					value={editableTranscript}
