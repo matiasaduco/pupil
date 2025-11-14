@@ -27,17 +27,12 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(({ visible, 
 					onMount={handleOnMount}
 					options={{
 						automaticLayout: true,
-						quickSuggestions: false,
-						suggestOnTriggerCharacters: true,
-						suggest: {
-							preview: true,
-							showInlineDetails: true,
-							snippetsPreventQuickSuggestions: false,
-							showSnippets: true
-						},
-						snippetSuggestions: 'top',
-						tabCompletion: 'on',
-						wordBasedSuggestions: 'off'
+						acceptSuggestionOnEnter: 'smart',
+						quickSuggestions: {
+							other: 'inline',
+							comments: true,
+							strings: true
+						}
 					}}
 					height="100%"
 				/>

@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import PupilDialog from '../../PupilDialog/PupilDialog.js'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import logger from '../../../../utils/logger.js'
 
@@ -15,6 +15,15 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 	const [port, setPort] = useState<string>('3000')
 	const { setActiveInput } = useKeyboardFocus()
 	const activeInputRef = useRef<HTMLInputElement | null>(null)
+	const shouldMaintainFocusRef = useRef(false)
+
+	useLayoutEffect(() => {
+		// Maintain focus after state updates from physical keyboard
+		if (shouldMaintainFocusRef.current && activeInputRef.current) {
+			activeInputRef.current.focus()
+			shouldMaintainFocusRef.current = false
+		}
+	}, [url, port])
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -34,15 +43,12 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 		})
 	}
 
-	const handleInputBlur = () => {
-		setTimeout(() => {
-			if (activeInputRef.current && document.activeElement !== activeInputRef.current) {
-				setActiveInput(null)
-				logger.info('Input blurred in SimpleBrowser', {
-					inputId: activeInputRef.current.id
-				})
-			}
-		}, 100)
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const input = e.target as HTMLInputElement
+		// Keep focus active when typing with physical keyboard
+		activeInputRef.current = input
+		setActiveInput(input)
+		shouldMaintainFocusRef.current = true
 	}
 
 	const handleClose = () => {
@@ -70,9 +76,11 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 						type="text"
 						placeholder="http://localhost"
 						value={url}
-						onChange={(e) => setUrl(e.target.value)}
+						onChange={(e) => {
+							setUrl(e.target.value)
+							handleInputChange(e)
+						}}
 						onFocus={handleInputFocus}
-						onBlur={handleInputBlur}
 						className="border border-gray-300 rounded p-2"
 					/>
 				</div>
@@ -85,9 +93,11 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 						type="text"
 						placeholder="3000"
 						value={port}
-						onChange={(e) => setPort(e.target.value)}
+						onChange={(e) => {
+							setPort(e.target.value)
+							handleInputChange(e)
+						}}
 						onFocus={handleInputFocus}
-						onBlur={handleInputBlur}
 						className="border border-gray-300 rounded p-2"
 					/>
 				</div>
