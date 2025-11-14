@@ -113,7 +113,7 @@
 		"@tailwindcss/vite": "^4.1.12",
 		"clsx": "^2.1.1",
 		"express": "^5.1.0",
-		"monaco-editor": "^0.52.2",
+		"monaco-editor": "^0.55.0-dev-20251107",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
 		"react-simple-keyboard": "^3.8.116",
