@@ -19,7 +19,6 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 	const shouldMaintainFocusRef = useRef(false)
 
 	useLayoutEffect(() => {
-		// Maintain focus after state updates from physical keyboard
 		if (shouldMaintainFocusRef.current && inputRef.current) {
 			inputRef.current.focus()
 			shouldMaintainFocusRef.current = false
@@ -67,7 +66,6 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const input = e.target as HTMLInputElement
-		// Keep focus active when typing with physical keyboard
 		inputRef.current = input
 		setActiveInput(input)
 		setName(e.target.value)

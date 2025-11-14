@@ -11,19 +11,17 @@ type SimpleBrowserProps = {
 }
 
 const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) => {
-	const [url, setUrl] = useState<string>('http://localhost')
-	const [port, setPort] = useState<string>('3000')
+	const [formState, setFormState] = useState({ url: 'http://localhost', port: '3000' })
 	const { setActiveInput } = useKeyboardFocus()
-	const activeInputRef = useRef<HTMLInputElement | null>(null)
+	const inputRef = useRef<HTMLInputElement | null>(null)
 	const shouldMaintainFocusRef = useRef(false)
 
 	useLayoutEffect(() => {
-		// Maintain focus after state updates from physical keyboard
-		if (shouldMaintainFocusRef.current && activeInputRef.current) {
-			activeInputRef.current.focus()
+		if (shouldMaintainFocusRef.current && inputRef.current) {
+			inputRef.current.focus()
 			shouldMaintainFocusRef.current = false
 		}
-	}, [url, port])
+	}, [formState])
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -33,7 +31,7 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 
 	const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
 		const nativeInput = e.target as HTMLInputElement
-		activeInputRef.current = nativeInput
+		inputRef.current = nativeInput
 		setActiveInput(nativeInput)
 
 		logger.info('Input focused in SimpleBrowser', {
@@ -43,23 +41,22 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 		})
 	}
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'url' | 'port') => {
 		const input = e.target as HTMLInputElement
-		// Keep focus active when typing with physical keyboard
-		activeInputRef.current = input
+		inputRef.current = input
 		setActiveInput(input)
+		setFormState((prev) => ({ ...prev, [field]: e.target.value }))
 		shouldMaintainFocusRef.current = true
 	}
 
 	const handleClose = () => {
 		setActiveInput(null)
-		logger.info('SimpleBrowser dialog closed')
 		onClose()
 	}
 
 	const handleConfirm = () => {
-		logger.info('SimpleBrowser opening URL', { url, port })
-		onClick(url, port)
+		logger.info('SimpleBrowser opening URL', { url: formState.url, port: formState.port })
+		onClick(formState.url, formState.port)
 		setActiveInput(null)
 		onClose()
 	}
@@ -72,14 +69,12 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 						URL
 					</label>
 					<input
+						ref={inputRef}
 						id="url"
 						type="text"
 						placeholder="http://localhost"
-						value={url}
-						onChange={(e) => {
-							setUrl(e.target.value)
-							handleInputChange(e)
-						}}
+						value={formState.url}
+						onChange={(e) => handleInputChange(e, 'url')}
 						onFocus={handleInputFocus}
 						className="border border-gray-300 rounded p-2"
 					/>
@@ -92,11 +87,8 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 						id="port"
 						type="text"
 						placeholder="3000"
-						value={port}
-						onChange={(e) => {
-							setPort(e.target.value)
-							handleInputChange(e)
-						}}
+						value={formState.port}
+						onChange={(e) => handleInputChange(e, 'port')}
 						onFocus={handleInputFocus}
 						className="border border-gray-300 rounded p-2"
 					/>
