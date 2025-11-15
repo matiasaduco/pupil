@@ -1,4 +1,4 @@
-import { Button, Divider } from '@mui/material'
+import { Divider, IconButton } from '@mui/material'
 import './Toolbar.css'
 import Snippets from '../Snippets/Snippets.js'
 import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
@@ -8,6 +8,10 @@ import useToolbar from './hooks/useToolbar.js'
 import ToolbarButton from './components/ToolbarButton.js'
 import SettingsIcon from '@mui/icons-material/Settings'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import StopIcon from '@mui/icons-material/Stop'
+import HighlightableButton from './components/HighlightableButton.js'
+import useTypeWithBlink from '../../../hooks/useTypeWithBlink.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -23,6 +27,8 @@ type ToolbarProps = {
 	openTranscriptDialog: () => void
 	openSettingsDialog: () => void
 	openBlinkDialog: () => void
+	highlightDelayMs?: number
+	highlightGapMs?: number
 }
 
 const Toolbar = ({
@@ -36,7 +42,9 @@ const Toolbar = ({
 	openFileFolderDialog,
 	openTranscriptDialog,
 	openSettingsDialog,
-	openBlinkDialog
+	openBlinkDialog,
+	highlightDelayMs,
+	highlightGapMs
 }: ToolbarProps) => {
 	const { generalShortcuts, editorShortcuts, terminalShortcuts } = useToolbar(
 		handleButtonClick,
@@ -45,14 +53,29 @@ const Toolbar = ({
 		openTranscriptDialog
 	)
 
+	const { highlightedButtonId, isHighlighting, nextButtonId, toggleHighlightSequence, registerButton } =
+		useTypeWithBlink(highlightDelayMs, highlightGapMs)
+
 	return (
 		<>
 			<nav className={'toolbar-nav flex items-center gap-2'}>
-				<Button onClick={() => switchFocus(focus)} className="w-35">
-					{focus}
-				</Button>
-				<Button onClick={toggleKeyboard}>{`${keyboardVisible ? 'Hide' : 'Show'}`} Keyboard</Button>
-				<TerminalsDialog />
+				<HighlightableButton
+					id={nextButtonId()}
+					registerButton={registerButton}
+					highlightedButtonId={highlightedButtonId}
+					onClick={() => switchFocus(focus)}
+					label={focus}
+				/>
+
+				<HighlightableButton
+					id={nextButtonId()}
+					registerButton={registerButton}
+					highlightedButtonId={highlightedButtonId}
+					onClick={toggleKeyboard}
+					label={`${keyboardVisible ? 'Hide' : 'Show'} Keyboard`}
+				/>
+
+				<TerminalsDialog id={nextButtonId()} highlightedButtonId={highlightedButtonId} registerButton={registerButton} />
 
 				<Divider
 					orientation="vertical"
@@ -62,15 +85,20 @@ const Toolbar = ({
 				/>
 
 				{/* GENERAL SHORTCUTS */}
-				{generalShortcuts.map((shortcut) => (
-					<ToolbarButton
-						key={shortcut.label}
-						tooltipTitle={shortcut.tooltipTitle!}
-						icon={shortcut.icon}
-						label={shortcut.label}
-						onButtonClick={shortcut.onClick || (() => {})}
-					/>
-				))}
+				{generalShortcuts.map((shortcut) => {
+					const id = nextButtonId(shortcut.label)
+					return (
+						<ToolbarButton
+							key={shortcut.label}
+							tooltipTitle={shortcut.tooltipTitle!}
+							icon={shortcut.icon}
+							label={shortcut.label}
+							onButtonClick={shortcut.onClick || (() => {})}
+							id={id}
+							active={highlightedButtonId === id}
+						/>
+					)
+				})}
 
 				<Divider
 					orientation="vertical"
@@ -82,7 +110,12 @@ const Toolbar = ({
 				{/* EDITOR SHORTCUTS */}
 				{focus === 'editor' && (
 					<>
-						<Snippets editorRef={editorRef} />
+						<Snippets
+							id={nextButtonId()}
+							highlightedButtonId={highlightedButtonId}
+							editorRef={editorRef}
+							registerButton={registerButton}
+						/>
 						{editorShortcuts.map((shortcut) =>
 							shortcut.divider ? (
 								<Divider
@@ -93,13 +126,21 @@ const Toolbar = ({
 									sx={{ bgcolor: 'grey.700', borderRightWidth: 1 }}
 								/>
 							) : (
-								<ToolbarButton
-									key={shortcut.value}
-									tooltipTitle={shortcut.tooltipTitle!}
-									icon={shortcut.icon}
-									label={shortcut.label}
-									onButtonClick={() => handleButtonClick(shortcut.value!)}
-								/>
+								(() => {
+									const id = nextButtonId(shortcut.value ?? shortcut.label)
+									return (
+										<ToolbarButton
+											key={shortcut.value}
+											tooltipTitle={shortcut.tooltipTitle!}
+											icon={shortcut.icon}
+											label={shortcut.label}
+											onButtonClick={() => handleButtonClick(shortcut.value!)}
+											id={id}
+											active={highlightedButtonId === id}
+											registerButton={registerButton}
+										/>
+									)
+								})()
 							)
 						)}
 					</>
@@ -117,32 +158,60 @@ const Toolbar = ({
 								sx={{ bgcolor: 'grey.700', borderRightWidth: 1 }}
 							/>
 						) : (
-							<ToolbarButton
-								key={shortcut.value}
-								tooltipTitle={shortcut.tooltipTitle!}
-								icon={shortcut.icon}
-								label={shortcut.label}
-								onButtonClick={() => handleButtonClick(shortcut.value!)}
-							/>
+							(() => {
+								const id = nextButtonId(shortcut.value ?? shortcut.label)
+								return (
+										<ToolbarButton
+										key={shortcut.value}
+										tooltipTitle={shortcut.tooltipTitle!}
+										icon={shortcut.icon}
+										label={shortcut.label}
+										onButtonClick={() => handleButtonClick(shortcut.value!)}
+										id={id}
+										active={highlightedButtonId === id}
+											registerButton={registerButton}
+									/>
+								)
+							})()
 						)
 					)}
 
 				<span className="grow-1" />
 
-				<ToolbarButton
-					key="settings"
-					tooltipTitle="Settings"
-					icon={SettingsIcon}
-					label="Settings"
-					onButtonClick={openSettingsDialog}
-				/>
-				<ToolbarButton
-					key="blink"
-					tooltipTitle="Eye Tracking"
-					icon={VisibilityIcon}
-					label="Eye Tracking"
-					onButtonClick={openBlinkDialog}
-				/>
+				{(() => {
+					const id = nextButtonId('settings')
+					return (
+						<ToolbarButton
+							key="settings"
+							tooltipTitle="Settings"
+							icon={SettingsIcon}
+							label="Settings"
+							onButtonClick={openSettingsDialog}
+							id={id}
+							active={highlightedButtonId === id}
+							registerButton={registerButton}
+						/>
+					)
+				})()}
+				{(() => {
+					const id = nextButtonId('eye-tracking')
+					return (
+						<ToolbarButton
+							key="blink"
+							tooltipTitle="Eye Tracking"
+							icon={VisibilityIcon}
+							label="Eye Tracking"
+							onButtonClick={openBlinkDialog}
+							id={id}
+							active={highlightedButtonId === id}
+							registerButton={registerButton}
+						/>
+					)
+				})()}
+
+				<IconButton data-testid="start-highlight-sequence" onClick={toggleHighlightSequence}>
+					{isHighlighting ? <StopIcon /> : <PlayArrowIcon />}
+				</IconButton>
 			</nav>
 		</>
 	)

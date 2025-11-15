@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
 import { KeyboardFocusProvider } from '@webview/contexts/KeyboardFocusContext.js'
 
@@ -59,4 +59,28 @@ describe('PupilKeyboard', () => {
 		fireEvent.click(capsButton)
 		expect(screen.getByRole('button', { name: 'Q' })).toBeInTheDocument()
 	})
+
+	it('should trigger highlighted button on Space key when highlight sequence is active', async () => {
+ 		const onInput = vi.fn()
+ 		render(
+ 			<KeyboardFocusProvider>
+ 				<PupilKeyboard visible={true} onInput={onInput} highlightDelayMs={10} highlightGapMs={10} />
+ 			</KeyboardFocusProvider>
+ 		)
+
+ 		const startBtn = screen.getByTestId('start-highlight-sequence')
+ 		fireEvent.click(startBtn)
+
+ 		// wait for a button to be highlighted via data-highlighted attribute
+ 		await waitFor(() => {
+ 			const highlighted = document.querySelector('button[data-highlighted="true"]')
+ 			if (!highlighted) {
+ 				throw new Error('no highlighted button yet')
+ 			}
+ 		})
+
+ 		fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+
+ 		expect(onInput).toHaveBeenCalled()
+ 	})
 })

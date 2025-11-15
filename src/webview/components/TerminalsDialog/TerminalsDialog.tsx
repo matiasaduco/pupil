@@ -1,13 +1,26 @@
 import Button from '@mui/material/Button'
 import PupilDialog from '../PupilDialog/PupilDialog.js'
 import useActionBar from './hooks/useActionBar.js'
+import HighlightableButton from '../Toolbar/components/HighlightableButton.js'
 
-const TerminalsDialog = () => {
+type TerminalsDialogProps = {
+	id: string
+	highlightedButtonId: string | null
+	registerButton?: (id: string, handler: () => void) => () => void
+}
+
+const TerminalsDialog = ({ id, highlightedButtonId, registerButton }: TerminalsDialogProps) => {
 	const { getTerminals, terminals, open, handleOnClose, openTerminal } = useActionBar()
 
 	return (
 		<>
-			<Button onClick={getTerminals}>Terminales</Button>
+			<HighlightableButton
+				id={id}
+				registerButton={registerButton}
+				highlightedButtonId={highlightedButtonId}
+				onClick={getTerminals}
+				label="Terminales"
+			/>
 			<PupilDialog open={open} onClose={handleOnClose} title="Terminales abiertas">
 				<div className="flex flex-col max-h-96 overflow-y-auto">
 					{terminals.map((terminal, index) => (

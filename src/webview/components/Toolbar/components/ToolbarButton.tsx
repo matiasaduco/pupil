@@ -1,26 +1,49 @@
 import { IconButton, SvgIconTypeMap, Tooltip, Typography, useTheme } from '@mui/material'
 import { OverridableComponent } from '@mui/material/OverridableComponent'
-import { createElement } from 'react'
+import { createElement, useEffect } from 'react'
 
 type ToolbarButtonProps = {
 	tooltipTitle: string
 	icon?: OverridableComponent<SvgIconTypeMap>
 	label?: string
 	onButtonClick: () => void
+	id?: string
+	active?: boolean
+	registerButton?: (id: string, handler: () => void) => () => void
 }
 
-const ToolbarButton = ({ tooltipTitle, icon, label, onButtonClick }: ToolbarButtonProps) => {
+const ToolbarButton = ({
+	tooltipTitle,
+	icon,
+	label,
+	onButtonClick,
+	id,
+	active
+	,registerButton
+}: ToolbarButtonProps) => {
 	const theme = useTheme()
+	const highlightColor = theme.palette.primary?.main ?? '#1976d2'
+
+	useEffect(() => {
+		if (!registerButton || !id) return
+		const unregister = registerButton(id, onButtonClick)
+		return () => unregister()
+	}, [id, onButtonClick, registerButton])
 
 	return (
 		<Tooltip title={tooltipTitle}>
 			<IconButton
+				id={id}
 				onClick={onButtonClick}
 				sx={{
 					width: 35,
 					height: 35,
 					fontSize: 14,
-					color: theme.palette.text.primary
+					color: theme.palette.text.primary,
+					borderWidth: active ? 2 : 2,
+					borderStyle: 'solid',
+					borderColor: active ? highlightColor : 'transparent',
+					transition: 'border-color 200ms ease'
 				}}
 			>
 				{icon ? (

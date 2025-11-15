@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Toolbar from '../../../components/Toolbar/Toolbar.js'
 import { VsCodeApiProvider } from '../../../contexts/VsCodeApiContext.js'
@@ -228,12 +228,17 @@ describe('Toolbar Integration', () => {
 	const mockHandleButtonClick = vi.fn()
 	const mockEditorRef = { current: null }
 
-	const renderToolbar = (focus: 'editor' | 'terminal' = 'editor') => {
+	const renderToolbar = (
+		focus: 'editor' | 'terminal' = 'editor',
+		opts?: { highlightDelayMs?: number; highlightGapMs?: number }
+	) => {
 		return render(
 			<VsCodeApiProvider>
 				<KeyboardFocusProvider>
 					<Toolbar
 						focus={focus}
+						highlightDelayMs={opts?.highlightDelayMs}
+						highlightGapMs={opts?.highlightGapMs}
 						switchFocus={vi.fn()}
 						handleButtonClick={mockHandleButtonClick}
 						editorRef={mockEditorRef}
@@ -256,7 +261,7 @@ describe('Toolbar Integration', () => {
 	})
 
 	it('renders toolbar with general shortcuts', () => {
-		renderToolbar()
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
 
 		expect(screen.getByTestId('terminals-dialog')).toBeInTheDocument()
 		expect(screen.getByTestId('web-icon')).toBeInTheDocument()
@@ -286,7 +291,7 @@ describe('Toolbar Integration', () => {
 	})
 
 	it('calls handleButtonClick for terminal shortcut', async () => {
-		renderToolbar()
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
 
 		const terminalButton = screen.getByTestId('terminal-icon').closest('button')
 		fireEvent.click(terminalButton!)
@@ -447,5 +452,120 @@ describe('Toolbar Integration', () => {
 
 		const settingsIcon = screen.getByTestId('settings-icon')
 		expect(settingsIcon).toBeInTheDocument()
+	})
+
+	it('assigns ordered id attributes to toolbar buttons', () => {
+		renderToolbar()
+
+		const iconButtons = screen.getAllByTestId('icon-button')
+		expect(iconButtons.length).toBeGreaterThan(0)
+
+		const seenIds = new Set<string>()
+		iconButtons.forEach((btn) => {
+			expect(btn).toHaveAttribute('id')
+			const id = btn.getAttribute('id')!
+			expect(id).toMatch(/^toolbar-button-/)
+			expect(seenIds.has(id)).toBe(false)
+			seenIds.add(id)
+		})
+	})
+
+	it('assigns ordered id attributes to toolbar buttons when focus is terminal', () => {
+		renderToolbar('terminal')
+
+		const iconButtons = screen.getAllByTestId('icon-button')
+		expect(iconButtons.length).toBeGreaterThan(0)
+
+		const seenIdsTerminal = new Set<string>()
+		iconButtons.forEach((btn) => {
+			expect(btn).toHaveAttribute('id')
+			const id = btn.getAttribute('id')!
+			expect(id).toMatch(/^toolbar-button-/)
+			expect(seenIdsTerminal.has(id)).toBe(false)
+			seenIdsTerminal.add(id)
+		})
+	})
+
+	it('starts highlighting when Guide is clicked and stops when toggled', async () => {
+		// Use real timers; the highlightDelayMs is small for test speed
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
+
+		const iconButtons = screen.getAllByTestId('icon-button')
+		const guideButton = screen.getByTestId('start-highlight-sequence')
+		const btn1 = document.getElementById(iconButtons[0].id)
+		const btn2 = document.getElementById(iconButtons[1].id)
+		expect(btn1).not.toBeNull()
+		expect(btn2).not.toBeNull()
+
+		// Start the highlight sequence
+		act(() => {
+			fireEvent.click(guideButton)
+		})
+
+		// First button should be highlighted immediately when sequence starts
+		await waitFor(() =>
+			expect(
+				iconButtons.find((b) => !b.getAttribute('style')?.includes('border-color: transparent'))
+			).toHaveAttribute('id', iconButtons[0].id)
+		)
+
+		// Stop the sequence
+		const stopButton = screen.getByText('Stop')
+		fireEvent.click(stopButton)
+		await waitFor(() => expect(btn1!.getAttribute('style')).toContain('border-color: transparent'))
+		vi.useRealTimers()
+	})
+
+	it('toggles highlight on and off via the Guide/Stop button', async () => {
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
+
+		const iconButtons = screen.getAllByTestId('icon-button')
+		const guideButton = screen.getByTestId('start-highlight-sequence')
+		const btn1 = document.getElementById(iconButtons[0].id)
+
+		// Start highlighting
+		act(() => {
+			fireEvent.click(guideButton)
+		})
+
+		// Assert it's highlighted
+		await waitFor(() => {
+			const highlighted = iconButtons.find(
+				(b) => !b.getAttribute('style')?.includes('border-color: transparent')
+			)
+			expect(highlighted).toHaveAttribute('id', iconButtons[0].id)
+		})
+
+		// Stop highlighting
+		const stopButton = screen.getByText('Stop')
+		fireEvent.click(stopButton)
+		await waitFor(() => expect(btn1!.getAttribute('style')).toContain('border-color: transparent'))
+	})
+
+	it('executes highlighted button on Space keypress while highlighting', async () => {
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
+
+		const guideButton = screen.getByTestId('start-highlight-sequence')
+		const terminalButton = screen.getByTestId('terminal-icon').closest('button')
+		expect(terminalButton).not.toBeNull()
+
+		// Start the highlight sequence
+		act(() => {
+			fireEvent.click(guideButton)
+		})
+
+		// Wait until the terminal button is the one highlighted
+		await waitFor(() => {
+			const btn = document.getElementById(terminalButton!.id)
+			expect(btn).not.toBeNull()
+			expect(btn!.getAttribute('style')).not.toContain('border-color: transparent')
+		})
+
+		// Press Space to execute the highlighted button
+		fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+
+		await waitFor(() => {
+			expect(mockHandleButtonClick).toHaveBeenCalledWith('{open-terminal}')
+		})
 	})
 })

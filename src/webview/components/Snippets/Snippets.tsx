@@ -6,18 +6,28 @@ import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { RefObject } from 'react'
 import PupilDialog from '../PupilDialog/PupilDialog.js'
 import TooltipTitle from './components/TooltipTitle.js'
+import HighlightableButton from '../Toolbar/components/HighlightableButton.js'
 
 type SnippetsProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
 	onSnippetPress?: (input: string | string[]) => void
+	id: string
+	highlightedButtonId: string | null
+	registerButton?: (id: string, handler: () => void) => () => void
 }
 
-const Snippets = ({ editorRef }: SnippetsProps) => {
+const Snippets = ({ editorRef, id, highlightedButtonId, registerButton }: SnippetsProps) => {
 	const { snippets, handleSnippetPress, open, openModal, onClose } = useSnippets(editorRef)
 
 	return (
 		<>
-			<Button onClick={openModal}>Snippets</Button>
+			<HighlightableButton
+				id={id}
+				highlightedButtonId={highlightedButtonId}
+				registerButton={registerButton}
+				onClick={openModal}
+				label="Snippets"
+			/>
 			<PupilDialog open={open} onClose={onClose} title="Snippets">
 				<div className="flex flex-wrap gap-3 justify-center overflow-auto max-h-[30em]">
 					{snippets?.all.flat().map((snippet) =>
