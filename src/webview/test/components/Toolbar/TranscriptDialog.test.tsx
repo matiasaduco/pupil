@@ -43,6 +43,25 @@ vi.mock('@mui/material', () => ({
 	),
 	Switch: ({ onClick, defaultChecked }: { onClick?: () => void; defaultChecked?: boolean }) => (
 		<input type="checkbox" data-testid="switch" defaultChecked={defaultChecked} onClick={onClick} />
+	),
+	TextField: ({ inputRef, multiline, rows, value, placeholder, variant, fullWidth, InputProps }: {
+		inputRef?: React.Ref<HTMLTextAreaElement>;
+		multiline?: boolean;
+		rows?: number;
+		value?: string;
+		placeholder?: string;
+		variant?: string;
+		fullWidth?: boolean;
+		InputProps?: { readOnly?: boolean };
+	}) => (
+		<textarea
+			data-testid="text-field"
+			ref={inputRef}
+			rows={rows}
+			value={value}
+			placeholder={placeholder}
+			readOnly={InputProps?.readOnly}
+		/>
 	)
 }))
 
@@ -153,7 +172,7 @@ describe('TranscriptDialog', () => {
 		})
 
 		expect(screen.getByTestId('pupil-dialog')).toBeInTheDocument()
-		expect(screen.getByText('No transcript available.')).toBeInTheDocument()
+		expect(screen.getByPlaceholderText('No transcript available.')).toBeInTheDocument()
 	})
 
 	it('does not render dialog when isOpen is false', () => {
@@ -384,7 +403,7 @@ describe('TranscriptDialog', () => {
 			connectionStatus
 		})
 
-		const transcriptBox = screen.getByText('No transcript available.').closest('.transcript-box')
+		const transcriptBox = screen.getByPlaceholderText('No transcript available.').closest('.transcript-box')
 		expect(transcriptBox).toBeInTheDocument()
 		expect(transcriptBox).toHaveClass('transcript-box')
 	})

@@ -60,6 +60,21 @@ vi.mock('@mui/material', () => ({
 		<div data-testid="mui-box" style={sx}>
 			{children}
 		</div>
+	),
+	Switch: ({ checked, onChange, color }: { checked?: boolean; onChange?: () => void; color?: string }) => (
+		<input
+			type="checkbox"
+			data-testid="mui-switch"
+			checked={checked}
+			onChange={onChange}
+			data-color={color}
+		/>
+	),
+	FormControlLabel: ({ control, label }: { control: React.ReactNode; label: string }) => (
+		<label data-testid="form-control-label">
+			{control}
+			<span>{label}</span>
+		</label>
 	)
 }))
 
