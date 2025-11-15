@@ -6,6 +6,7 @@ import PupilDialog from '../PupilDialog/PupilDialog.js'
 import SnippetCard from './components/SnippetCard.js'
 import SnippetFolderIcon from '@mui/icons-material/SnippetFolder'
 import ToolbarButton from '../Toolbar/components/ToolbarButton.js'
+import HighlightableButton from '../Toolbar/components/HighlightableButton.js'
 
 type SnippetsProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
