@@ -55,6 +55,8 @@ describe('ToolbarButton', () => {
 		icon?: OverridableComponent<SvgIconTypeMap>
 		label?: string
 		onButtonClick: () => void
+		id?: string
+		active?: boolean
 	}) => {
 		return render(<ToolbarButton {...props} />)
 	}
@@ -130,11 +132,25 @@ describe('ToolbarButton', () => {
 		renderToolbarButton({
 			tooltipTitle: 'Test tooltip',
 			label: 'Test',
-			onButtonClick: mockOnButtonClick
+			onButtonClick: mockOnButtonClick,
+			id: 'test-id'
 		})
 
 		const button = screen.getByTestId('icon-button')
 		expect(button).toBeInTheDocument()
+		expect(button).toHaveAttribute('id', 'test-id')
+	})
+
+	it('applies id prop to IconButton when provided', () => {
+		renderToolbarButton({
+			tooltipTitle: 'Test tooltip',
+			label: 'Test',
+			onButtonClick: mockOnButtonClick,
+			id: 'another-id'
+		})
+
+		const button = screen.getByTestId('icon-button')
+		expect(button).toHaveAttribute('id', 'another-id')
 	})
 
 	it('renders icon with correct props when provided', () => {
@@ -170,5 +186,19 @@ describe('ToolbarButton', () => {
 		expect(typography).toHaveAttribute('data-variant', 'body2')
 		const styles = typography.style
 		expect(styles.fontSize).toBe('0.75rem')
+	})
+
+	it('applies active border when active prop is true', () => {
+		renderToolbarButton({
+			tooltipTitle: 'Test tooltip',
+			label: 'Test',
+			onButtonClick: mockOnButtonClick,
+			id: 'active-id',
+			active: true
+		})
+
+		const button = screen.getByTestId('icon-button')
+		const styleAttr = button.getAttribute('style') || ''
+		expect(styleAttr).not.toContain('border-color: transparent')
 	})
 })

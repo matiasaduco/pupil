@@ -31,3 +31,22 @@
 .dark .pupil-keyboard-btn:active {
 	background: #181a20;
 }
+
+.pupil-keyboard--section-highlighted {
+	box-shadow: 0 0 0 3px #fbbf24;
+}
+
+.dark .pupil-keyboard--section-highlighted {
+	box-shadow: 0 0 0 3px #fbbf24;
+}
+
+.pupil-keyboard-btn--highlighted {
+	border-color: #f59e0b !important;
+	box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+	background: #fff7ed;
+}
+
+.dark .pupil-keyboard-btn--highlighted {
+	background: #3b2a13;
+	box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.45);
+}

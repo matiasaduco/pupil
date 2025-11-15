@@ -1,8 +1,9 @@
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ConnectionStatus, ConnectionStatusType } from '../../../../constants.js'
+import { HighlightMode } from '@webview/types/HighlightSettings.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -21,6 +22,15 @@ const usePupilContainer = () => {
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 	const [connectionStatus, setConnectionStatus] = useState<ConnectionStatusType>(
 		ConnectionStatus.DISCONNECTED
+	)
+	const [isKeyboardHighlighting, setIsKeyboardHighlighting] = useState(false)
+	const [isKeyboardSectionHighlighted, setKeyboardSectionHighlighted] = useState(false)
+	const [sectionGuideMode, setSectionGuideMode] = useState<HighlightMode>('both')
+	const [highlightDelayMs, setHighlightDelay] = useState(700)
+
+	const highlightGapMs = useMemo(
+		() => Math.max(80, Math.round(highlightDelayMs * 0.25)),
+		[highlightDelayMs]
 	)
 
 	useEffect(() => {
@@ -118,12 +128,28 @@ const usePupilContainer = () => {
 		vscode.postMessage({ type: 'openSimpleBrowser', url: `${url}:${port}` })
 	}
 
+	useEffect(() => {
+		if (!keyboardVisible) {
+			setIsKeyboardHighlighting(false)
+			setKeyboardSectionHighlighted(false)
+		}
+	}, [keyboardVisible])
+
 	const handleStartServer = () => {
 		vscode.postMessage({ type: 'start-speech-server' })
 	}
 
 	const handleStopServer = () => {
 		vscode.postMessage({ type: 'stop-speech-server' })
+	}
+
+	const setKeyboardHighlighting = (next: boolean) => {
+		setIsKeyboardHighlighting(next)
+	}
+
+	const setHighlightDelayMs = (next: number) => {
+		const clampedValue = Math.min(1500, Math.max(200, Math.round(next)))
+		setHighlightDelay(clampedValue)
 	}
 
 	return {
@@ -138,7 +164,16 @@ const usePupilContainer = () => {
 		connectionStatus,
 		openSimpleBrowser,
 		handleStartServer,
-		handleStopServer
+		handleStopServer,
+		isKeyboardHighlighting,
+		setKeyboardHighlighting,
+		isKeyboardSectionHighlighted,
+		setKeyboardSectionHighlighted,
+		highlightDelayMs,
+		highlightGapMs,
+		setHighlightDelayMs,
+		sectionGuideMode,
+		setSectionGuideMode
 	}
 }
 

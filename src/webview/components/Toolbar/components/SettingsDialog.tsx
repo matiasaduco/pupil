@@ -1,8 +1,20 @@
 import PupilDialog from '@webview/components/PupilDialog/PupilDialog.js'
-import { Button, Box, Switch, FormControlLabel } from '@mui/material'
+import {
+	Button,
+	Box,
+	Switch,
+	FormControlLabel,
+	Slider,
+	Typography,
+	FormControl,
+	FormLabel,
+	RadioGroup,
+	Radio
+} from '@mui/material'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import StopIcon from '@mui/icons-material/Stop'
 import { ConnectionStatusType } from '../../../../constants.js'
+import { HighlightMode } from '@webview/types/HighlightSettings.js'
 
 type SettingsDialogProps = {
 	open: boolean
@@ -12,6 +24,10 @@ type SettingsDialogProps = {
 	connectionStatus: ConnectionStatusType
 	radialEnabled: boolean
 	onToggleRadial: () => void
+	highlightDelayMs: number
+	onHighlightDelayChange: (value: number) => void
+	sectionGuideMode: HighlightMode
+	onSectionGuideModeChange: (mode: HighlightMode) => void
 }
 
 const SettingsDialog = ({
@@ -21,7 +37,11 @@ const SettingsDialog = ({
 	onStopServer,
 	connectionStatus,
 	radialEnabled,
-	onToggleRadial
+	onToggleRadial,
+	highlightDelayMs,
+	onHighlightDelayChange,
+	sectionGuideMode,
+	onSectionGuideModeChange
 }: SettingsDialogProps) => {
 	const isConnected = connectionStatus.value === 'connected'
 	const isConnecting = connectionStatus.value === 'connecting'
@@ -39,6 +59,36 @@ const SettingsDialog = ({
 						control={<Switch checked={radialEnabled} onChange={onToggleRadial} color="primary" />}
 						label="Activar Teclado Radial"
 					/>
+					<FormControl component="fieldset">
+						<FormLabel component="legend">Velocidad de iluminación</FormLabel>
+						<Slider
+							data-testid="highlight-speed-slider"
+							min={200}
+							max={1500}
+							step={50}
+							value={highlightDelayMs}
+							valueLabelDisplay="auto"
+							onChange={(_, value) =>
+								onHighlightDelayChange(Array.isArray(value) ? value[0] : value)
+							}
+						/>
+						<Typography variant="caption" color="text.secondary">
+							Intervalo actual: {highlightDelayMs} ms (pausa {Math.round(highlightDelayMs * 0.25)}{' '}
+							ms)
+						</Typography>
+					</FormControl>
+					<FormControl component="fieldset">
+						<FormLabel component="legend">Secciones que se iluminan</FormLabel>
+						<RadioGroup
+							row
+							value={sectionGuideMode}
+							onChange={(event) => onSectionGuideModeChange(event.target.value as HighlightMode)}
+						>
+							<FormControlLabel value="toolbar" control={<Radio />} label="Toolbar" />
+							<FormControlLabel value="keyboard" control={<Radio />} label="Teclado" />
+							<FormControlLabel value="both" control={<Radio />} label="Ambas" />
+						</RadioGroup>
+					</FormControl>
 					<Button
 						variant="contained"
 						color="success"

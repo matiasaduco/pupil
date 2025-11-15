@@ -80,15 +80,23 @@ vi.mock('@mui/material', () => ({
 		onClick,
 		className,
 		style,
+		sx,
 		id
 	}: {
 		children: React.ReactNode
 		onClick?: () => void
 		className?: string
 		style?: Record<string, unknown>
+		sx?: Record<string, unknown>
 		id?: string
 	}) => (
-		<button data-testid="mui-button" id={id} onClick={onClick} className={className} style={style}>
+		<button
+			data-testid="mui-button"
+			id={id}
+			onClick={onClick}
+			className={className}
+			style={{ ...style, ...(sx as Record<string, unknown>) }}
+		>
 			{children}
 		</button>
 	),
@@ -105,7 +113,12 @@ vi.mock('@mui/material', () => ({
 			{children}
 			<div data-testid="tooltip-title">{title}</div>
 		</div>
-	)
+	),
+	useTheme: () => ({
+		palette: {
+			primary: { main: '#1976d2' }
+		}
+	})
 }))
 
 vi.mock('@components/Snippets/components/TooltipTitle.js', () => ({

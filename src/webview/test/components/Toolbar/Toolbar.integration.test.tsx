@@ -150,6 +150,9 @@ vi.mock('@mui/icons-material/PlayArrow', () => ({
 vi.mock('@mui/icons-material/Stop', () => ({
 	default: () => <div data-testid="stop-icon">Stop</div>
 }))
+vi.mock('@mui/icons-material/Keyboard', () => ({
+	default: () => <div data-testid="keyboard-icon">Keyboard</div>
+}))
 
 // Mock Snippets component
 vi.mock('../../../components/Snippets/Snippets.js', () => ({
@@ -228,12 +231,26 @@ describe('Toolbar Integration', () => {
 	const mockHandleButtonClick = vi.fn()
 	const mockEditorRef = { current: null }
 
-	const renderToolbar = (focus: 'editor' | 'terminal' = 'editor') => {
+	const renderToolbar = (
+		focus: 'editor' | 'terminal' = 'editor',
+		opts?: {
+			highlightDelayMs?: number
+			highlightGapMs?: number
+			keyboardHighlighting?: boolean
+			setKeyboardHighlighting?: (value: boolean) => void
+			setKeyboardSectionHighlighted?: (value: boolean) => void
+		}
+	) => {
 		return render(
 			<VsCodeApiProvider>
 				<KeyboardFocusProvider>
 					<Toolbar
 						focus={focus}
+						highlightDelayMs={opts?.highlightDelayMs}
+						highlightGapMs={opts?.highlightGapMs}
+						keyboardHighlighting={opts?.keyboardHighlighting ?? false}
+						setKeyboardHighlighting={opts?.setKeyboardHighlighting ?? vi.fn()}
+						setKeyboardSectionHighlighted={opts?.setKeyboardSectionHighlighted ?? vi.fn()}
 						switchFocus={vi.fn()}
 						handleButtonClick={mockHandleButtonClick}
 						editorRef={mockEditorRef}
@@ -256,7 +273,7 @@ describe('Toolbar Integration', () => {
 	})
 
 	it('renders toolbar with general shortcuts', () => {
-		renderToolbar()
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
 
 		expect(screen.getByTestId('terminals-dialog')).toBeInTheDocument()
 		expect(screen.getByTestId('web-icon')).toBeInTheDocument()
@@ -286,7 +303,7 @@ describe('Toolbar Integration', () => {
 	})
 
 	it('calls handleButtonClick for terminal shortcut', async () => {
-		renderToolbar()
+		renderToolbar(undefined, { highlightDelayMs: 10, highlightGapMs: 5 })
 
 		const terminalButton = screen.getByTestId('terminal-icon').closest('button')
 		fireEvent.click(terminalButton!)
@@ -341,6 +358,9 @@ describe('Toolbar Integration', () => {
 						editorRef={mockEditorRef}
 						keyboardVisible={true}
 						toggleKeyboard={vi.fn()}
+						keyboardHighlighting={false}
+						setKeyboardHighlighting={vi.fn()}
+						setKeyboardSectionHighlighted={vi.fn()}
 						openSimpleBrowserDialog={vi.fn()}
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
@@ -371,6 +391,9 @@ describe('Toolbar Integration', () => {
 						editorRef={mockEditorRef}
 						keyboardVisible={true}
 						toggleKeyboard={mockToggleKeyboard}
+						keyboardHighlighting={false}
+						setKeyboardHighlighting={vi.fn()}
+						setKeyboardSectionHighlighted={vi.fn()}
 						openSimpleBrowserDialog={vi.fn()}
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
@@ -400,6 +423,9 @@ describe('Toolbar Integration', () => {
 						editorRef={mockEditorRef}
 						keyboardVisible={true}
 						toggleKeyboard={vi.fn()}
+						keyboardHighlighting={false}
+						setKeyboardHighlighting={vi.fn()}
+						setKeyboardSectionHighlighted={vi.fn()}
 						openSimpleBrowserDialog={vi.fn()}
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
@@ -422,6 +448,9 @@ describe('Toolbar Integration', () => {
 						editorRef={mockEditorRef}
 						keyboardVisible={false}
 						toggleKeyboard={vi.fn()}
+						keyboardHighlighting={false}
+						setKeyboardHighlighting={vi.fn()}
+						setKeyboardSectionHighlighted={vi.fn()}
 						openSimpleBrowserDialog={vi.fn()}
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
@@ -447,5 +476,175 @@ describe('Toolbar Integration', () => {
 
 		const settingsIcon = screen.getByTestId('settings-icon')
 		expect(settingsIcon).toBeInTheDocument()
+	})
+
+	it('assigns ordered id attributes to toolbar buttons', () => {
+		renderToolbar()
+
+		const iconButtons = screen.getAllByTestId('icon-button')
+		expect(iconButtons.length).toBeGreaterThan(0)
+
+		const seenIds = new Set<string>()
+		iconButtons.forEach((btn) => {
+			expect(btn).toHaveAttribute('id')
+			const id = btn.getAttribute('id')!
+			expect(id).toMatch(/^toolbar-button-/)
+			expect(seenIds.has(id)).toBe(false)
+			seenIds.add(id)
+		})
+	})
+
+	it('assigns ordered id attributes to toolbar buttons when focus is terminal', () => {
+		renderToolbar('terminal')
+
+		const iconButtons = screen.getAllByTestId('icon-button')
+		expect(iconButtons.length).toBeGreaterThan(0)
+
+		const seenIdsTerminal = new Set<string>()
+		iconButtons.forEach((btn) => {
+			expect(btn).toHaveAttribute('id')
+			const id = btn.getAttribute('id')!
+			expect(id).toMatch(/^toolbar-button-/)
+			expect(seenIdsTerminal.has(id)).toBe(false)
+			seenIdsTerminal.add(id)
+		})
+	})
+
+	it('renders only the section guide highlight control', () => {
+		renderToolbar()
+
+		expect(screen.getByTestId('start-section-highlight-sequence')).toBeInTheDocument()
+		expect(screen.queryByTestId('start-keyboard-highlight-sequence')).toBeNull()
+		expect(screen.queryByTestId('start-highlight-sequence')).toBeNull()
+	})
+
+	it('cycles section guide between toolbar and keyboard', async () => {
+		const setKeyboardSectionHighlighted = vi.fn()
+		renderToolbar('editor', {
+			highlightDelayMs: 1,
+			highlightGapMs: 1,
+			setKeyboardSectionHighlighted
+		})
+
+		const sectionGuideButton = screen.getByTestId('start-section-highlight-sequence')
+		fireEvent.click(sectionGuideButton)
+
+		await waitFor(() => {
+			expect(setKeyboardSectionHighlighted).toHaveBeenCalledWith(true)
+		})
+	})
+
+	it('starts keyboard highlight when section guide selects keyboard and space is pressed', async () => {
+		const setKeyboardHighlighting = vi.fn()
+		const setKeyboardSectionHighlighted = vi.fn()
+		let spaceTriggered = false
+		renderToolbar('editor', {
+			highlightDelayMs: 50,
+			highlightGapMs: 20,
+			setKeyboardHighlighting,
+			setKeyboardSectionHighlighted: setKeyboardSectionHighlighted as (value: boolean) => void
+		})
+
+		const sectionGuideButton = screen.getByTestId('start-section-highlight-sequence')
+		fireEvent.click(sectionGuideButton)
+
+		await waitFor(() => {
+			expect(setKeyboardSectionHighlighted).toHaveBeenCalledWith(true)
+			if (!spaceTriggered) {
+				fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+				spaceTriggered = true
+			}
+		})
+
+		await waitFor(() => {
+			expect(setKeyboardHighlighting).toHaveBeenCalledWith(true)
+		})
+	})
+
+	it('starts toolbar highlight when section guide selects toolbar and space is pressed', async () => {
+		renderToolbar('editor', { highlightDelayMs: 5, highlightGapMs: 5 })
+
+		const sectionGuideButton = screen.getByTestId('start-section-highlight-sequence')
+		fireEvent.click(sectionGuideButton)
+
+		const toolbarNav = screen.getByRole('navigation')
+		let spaceTriggered = false
+
+		await waitFor(() => {
+			expect(toolbarNav.className).toContain('toolbar-nav--section-highlighted')
+			if (!spaceTriggered) {
+				fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+				spaceTriggered = true
+			}
+		})
+
+		await waitFor(() => {
+			const iconButtons = screen.getAllByTestId('icon-button')
+			const highlighted = iconButtons.find(
+				(button) => !button.getAttribute('style')?.includes('border-color: transparent')
+			)
+			expect(highlighted).toBeDefined()
+		})
+
+		const terminalButton = screen.getByTestId('terminal-icon').closest('button')
+		expect(terminalButton).not.toBeNull()
+
+		await waitFor(() => {
+			expect(terminalButton!.getAttribute('style')).not.toContain('border-color: transparent')
+		})
+
+		fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+
+		await waitFor(() => {
+			expect(mockHandleButtonClick).toHaveBeenCalledWith('{open-terminal}')
+		})
+	})
+
+	it('stops toolbar highlight when the button is clicked during the sequence', async () => {
+		renderToolbar('editor', { highlightDelayMs: 5, highlightGapMs: 5 })
+
+		const sectionGuideButton = screen.getByTestId('start-section-highlight-sequence')
+		fireEvent.click(sectionGuideButton)
+
+		let spaceTriggered = false
+		await waitFor(() => {
+			const toolbarNav = screen.getByRole('navigation')
+			expect(toolbarNav.className).toContain('toolbar-nav--section-highlighted')
+			if (!spaceTriggered) {
+				fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+				spaceTriggered = true
+			}
+		})
+
+		await waitFor(() => {
+			const iconButtons = screen.getAllByTestId('icon-button')
+			const highlighted = iconButtons.find(
+				(button) => !button.getAttribute('style')?.includes('border-color: transparent')
+			)
+			expect(highlighted).toBeDefined()
+		})
+
+		fireEvent.click(sectionGuideButton)
+
+		await waitFor(() => {
+			expect(sectionGuideButton).toHaveAttribute('aria-pressed', 'false')
+			const iconButtons = screen.getAllByTestId('icon-button')
+			iconButtons.forEach((button) =>
+				expect(button.getAttribute('style')).toContain('border-color: transparent')
+			)
+		})
+	})
+
+	it('stops keyboard highlight when the button is clicked during keyboard sequence', () => {
+		const setKeyboardHighlighting = vi.fn()
+		renderToolbar('editor', {
+			keyboardHighlighting: true,
+			setKeyboardHighlighting
+		})
+
+		const sectionGuideButton = screen.getByTestId('start-section-highlight-sequence')
+		fireEvent.click(sectionGuideButton)
+
+		expect(setKeyboardHighlighting).toHaveBeenCalledWith(false)
 	})
 })
