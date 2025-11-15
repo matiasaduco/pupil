@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
@@ -16,6 +16,14 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 	const [name, setName] = useState('')
 	const [type, setType] = useState<'file' | 'folder'>('file')
 	const inputRef = useRef<HTMLInputElement | null>(null)
+	const shouldMaintainFocusRef = useRef(false)
+
+	useLayoutEffect(() => {
+		if (shouldMaintainFocusRef.current && inputRef.current) {
+			inputRef.current.focus()
+			shouldMaintainFocusRef.current = false
+		}
+	}, [name])
 
 	useEffect(() => {
 		if (externalOpen) {
@@ -56,6 +64,14 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 		setActiveInput(nativeInput)
 	}
 
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const input = e.target as HTMLInputElement
+		inputRef.current = input
+		setActiveInput(input)
+		setName(e.target.value)
+		shouldMaintainFocusRef.current = true
+	}
+
 	return (
 		<PupilDialog
 			open={open}
@@ -79,7 +95,7 @@ const CreateFileFolderDialog = ({ externalOpen, onExternalClose }: CreateFileFol
 					type="text"
 					placeholder={`Enter ${type} name`}
 					value={name}
-					onChange={(e) => setName(e.target.value)}
+					onChange={handleInputChange}
 					onFocus={handleInputFocus}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter') {

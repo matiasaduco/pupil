@@ -25,7 +25,15 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(({ visible, 
 					defaultValue={initialValue}
 					onChange={handleOnChange}
 					onMount={handleOnMount}
-					options={{ automaticLayout: true }}
+					options={{
+						automaticLayout: true,
+						acceptSuggestionOnEnter: 'smart',
+						quickSuggestions: {
+							other: 'inline',
+							comments: true,
+							strings: true
+						}
+					}}
 					height="100%"
 				/>
 			) : (

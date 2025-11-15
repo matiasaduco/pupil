@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import PupilDialog from '../../PupilDialog/PupilDialog.js'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import logger from '../../../../utils/logger.js'
 
@@ -11,10 +11,17 @@ type SimpleBrowserProps = {
 }
 
 const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) => {
-	const [url, setUrl] = useState<string>('http://localhost')
-	const [port, setPort] = useState<string>('3000')
+	const [formState, setFormState] = useState({ url: 'http://localhost', port: '3000' })
 	const { setActiveInput } = useKeyboardFocus()
-	const activeInputRef = useRef<HTMLInputElement | null>(null)
+	const inputRef = useRef<HTMLInputElement | null>(null)
+	const shouldMaintainFocusRef = useRef(false)
+
+	useLayoutEffect(() => {
+		if (shouldMaintainFocusRef.current && inputRef.current) {
+			inputRef.current.focus()
+			shouldMaintainFocusRef.current = false
+		}
+	}, [formState])
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -24,7 +31,7 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 
 	const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
 		const nativeInput = e.target as HTMLInputElement
-		activeInputRef.current = nativeInput
+		inputRef.current = nativeInput
 		setActiveInput(nativeInput)
 
 		logger.info('Input focused in SimpleBrowser', {
@@ -34,26 +41,22 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 		})
 	}
 
-	const handleInputBlur = () => {
-		setTimeout(() => {
-			if (activeInputRef.current && document.activeElement !== activeInputRef.current) {
-				setActiveInput(null)
-				logger.info('Input blurred in SimpleBrowser', {
-					inputId: activeInputRef.current.id
-				})
-			}
-		}, 100)
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'url' | 'port') => {
+		const input = e.target as HTMLInputElement
+		inputRef.current = input
+		setActiveInput(input)
+		setFormState((prev) => ({ ...prev, [field]: e.target.value }))
+		shouldMaintainFocusRef.current = true
 	}
 
 	const handleClose = () => {
 		setActiveInput(null)
-		logger.info('SimpleBrowser dialog closed')
 		onClose()
 	}
 
 	const handleConfirm = () => {
-		logger.info('SimpleBrowser opening URL', { url, port })
-		onClick(url, port)
+		logger.info('SimpleBrowser opening URL', { url: formState.url, port: formState.port })
+		onClick(formState.url, formState.port)
 		setActiveInput(null)
 		onClose()
 	}
@@ -66,13 +69,13 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 						URL
 					</label>
 					<input
+						ref={inputRef}
 						id="url"
 						type="text"
 						placeholder="http://localhost"
-						value={url}
-						onChange={(e) => setUrl(e.target.value)}
+						value={formState.url}
+						onChange={(e) => handleInputChange(e, 'url')}
 						onFocus={handleInputFocus}
-						onBlur={handleInputBlur}
 						className="border border-gray-300 rounded p-2"
 					/>
 				</div>
@@ -84,10 +87,9 @@ const SimpleBrowserDialog = ({ isOpen, onClose, onClick }: SimpleBrowserProps) =
 						id="port"
 						type="text"
 						placeholder="3000"
-						value={port}
-						onChange={(e) => setPort(e.target.value)}
+						value={formState.port}
+						onChange={(e) => handleInputChange(e, 'port')}
 						onFocus={handleInputFocus}
-						onBlur={handleInputBlur}
 						className="border border-gray-300 rounded p-2"
 					/>
 				</div>
