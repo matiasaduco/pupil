@@ -28,11 +28,13 @@ const PupilEditor = forwardRef<PupilEditorHandle, PupilEditorProps>(({ visible, 
 					options={{
 						automaticLayout: true,
 						acceptSuggestionOnEnter: 'smart',
-						quickSuggestions: {
-							other: 'inline',
-							comments: true,
-							strings: true
-						}
+						inlineSuggest: {
+							enabled: true,
+							mode: 'prefix'
+						},
+						quickSuggestions: false,
+						wordBasedSuggestions: 'off',
+						suggestOnTriggerCharacters: false
 					}}
 					height="100%"
 				/>

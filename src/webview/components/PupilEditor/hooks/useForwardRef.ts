@@ -2,6 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { Ref, useImperativeHandle, useRef } from 'react'
 import type { editor } from 'monaco-editor'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
+import { MonacoInlineCompletionProvider } from '@webview/utils/monacoInlineCompletionProvider.js'
 
 const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
@@ -44,6 +45,33 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 
 	const handleOnMount = (editor: editor.IStandaloneCodeEditor) => {
 		editorRef.current = editor
+
+		// Register inline completion provider
+		if (monaco) {
+			try {
+				const provider = new MonacoInlineCompletionProvider()
+				// Register for common programming languages
+				const languages = [
+					'javascript',
+					'typescript',
+					'python',
+					'java',
+					'csharp',
+					'cpp',
+					'c',
+					'go',
+					'rust',
+					'php',
+					'ruby'
+				]
+				languages.forEach((lang) => {
+					monaco.languages.registerInlineCompletionsProvider(lang, provider)
+				})
+				console.log('Inline completion provider registered successfully')
+			} catch (error) {
+				console.error('Failed to register inline completion provider:', error)
+			}
+		}
 	}
 
 	const getCursorPosition = () => {
