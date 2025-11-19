@@ -7,6 +7,7 @@ import ThemeManager from '../managers/ThemeManager.js'
 import DocumentManager from '../managers/DocumentManager.js'
 import { FolderNode } from '@webview/components/FolderTree/FolderTree.js'
 import { DEFAULT_URL, ConnectionStatus, ConnectionStatusType } from '../constants.js'
+import { VSCodeLanguageModelService } from '../services/VSCodeLanguageModelService.js'
 
 export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private static readonly viewType = 'pupil.editor'
@@ -15,6 +16,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private sendToSpeechWebClient: (message: unknown) => void
 	private stopSpeechServer: () => void
 	private connectionStatus: ConnectionStatusType = ConnectionStatus.DISCONNECTED
+	private languageModelService: VSCodeLanguageModelService
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
@@ -23,7 +25,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	) {
 		this.sendToSpeechWebClient = sendToSpeechWebClient
 		this.stopSpeechServer = stopSpeechServer
+		this.languageModelService = new VSCodeLanguageModelService()
 		this.initializeLogsDirectory()
+		this.initializeLanguageModel()
 	}
 
 	public sendMessageToWebview(message: unknown) {
@@ -228,6 +232,19 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'transcript') {
 						webviewPanel.webview.postMessage(message)
+					}
+					if (message.type === 'ai-completion-request') {
+						// Proxy AI completion requests to avoid CORS in webview
+						this.handleAICompletionRequest(message, webviewPanel)
+					}
+					if (message.type === 'request-language-model-status') {
+						// Send current language model status
+						if (this.languageModelService.isAvailable()) {
+							webviewPanel.webview.postMessage({
+								type: 'language-model-available',
+								modelName: this.languageModelService.getModelName()
+							})
+						}
 					}
 				} catch (error) {
 					console.error('Error en onDidReceiveMessage:', error)
@@ -453,5 +470,128 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 				focus: 'editor'
 			})
 		}
+	}
+
+	private async handleAICompletionRequest(
+		message: { requestId: string; service: string; payload: any },
+		webviewPanel: vscode.WebviewPanel
+	) {
+		try {
+			let response: any = null
+
+			if (message.service === 'vscode-lm') {
+				response = await this.fetchVSCodeLanguageModel(message.payload)
+			} else if (message.service === 'huggingface') {
+				response = await this.fetchHuggingFace(message.payload)
+			} else if (message.service === 'ollama') {
+				response = await this.fetchOllama(message.payload)
+			} else if (message.service === 'openai') {
+				response = await this.fetchOpenAI(message.payload)
+			}
+
+			webviewPanel.webview.postMessage({
+				type: 'ai-completion-response',
+				requestId: message.requestId,
+				response
+			})
+		} catch (error) {
+			console.error('AI completion request error:', error)
+			webviewPanel.webview.postMessage({
+				type: 'ai-completion-response',
+				requestId: message.requestId,
+				error: error instanceof Error ? error.message : String(error)
+			})
+		}
+	}
+
+	private async fetchHuggingFace(payload: {
+		inputs: string
+		parameters: any
+	}): Promise<any> {
+		const response = await fetch('https://api-inference.huggingface.co/models/Salesforce/codegen-350M-mono', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		})
+
+		if (!response.ok) {
+			throw new Error(`HuggingFace API error: ${response.status}`)
+		}
+
+		return await response.json()
+	}
+
+	private async fetchOllama(payload: { model: string; prompt: string; stream: boolean; options: any }): Promise<any> {
+		const response = await fetch('http://localhost:11434/api/generate', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload)
+		})
+
+		if (!response.ok) {
+			throw new Error(`Ollama API error: ${response.status}`)
+		}
+
+		return await response.json()
+	}
+
+	private async fetchOpenAI(payload: { model: string; messages: any[]; temperature: number; max_tokens: number }): Promise<any> {
+		const apiKey = vscode.workspace.getConfiguration('pupil').get<string>('openaiApiKey')
+		if (!apiKey) {
+			throw new Error('OpenAI API key not configured')
+		}
+
+		const response = await fetch('https://api.openai.com/v1/chat/completions', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${apiKey}`
+			},
+			body: JSON.stringify(payload)
+		})
+
+		if (!response.ok) {
+			throw new Error(`OpenAI API error: ${response.status}`)
+		}
+
+		return await response.json()
+	}
+
+	private async initializeLanguageModel() {
+		const available = await this.languageModelService.initialize()
+		if (available) {
+			console.log('✓ VS Code Language Model available:', this.languageModelService.getModelName())
+			// Notify webview that Copilot is available
+			if (this.webviewPanel) {
+				this.webviewPanel.webview.postMessage({
+					type: 'language-model-available',
+					modelName: this.languageModelService.getModelName()
+				})
+			}
+		} else {
+			console.log('ℹ No language models available (Copilot not enabled)')
+		}
+	}
+
+	private async fetchVSCodeLanguageModel(payload: {
+		prompt: string
+		context: string
+		language: string
+	}): Promise<{ completion: string } | null> {
+		if (!this.languageModelService.isAvailable()) {
+			return null
+		}
+
+		const completion = await this.languageModelService.getCompletion(
+			payload.prompt,
+			payload.context,
+			payload.language
+		)
+
+		if (!completion) {
+			return null
+		}
+
+		return { completion }
 	}
 }
