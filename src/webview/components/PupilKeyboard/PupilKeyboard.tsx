@@ -1,4 +1,4 @@
-import { Button, IconButton, Tooltip } from '@mui/material'
+import { Button, Tooltip } from '@mui/material'
 import './PupilKeyboard.css'
 import usePupilKeyboard from './hooks/usePupilKeyboard.js'
 import clsx from 'clsx'
@@ -150,37 +150,45 @@ const PupilKeyboard = ({
 	return (
 		<div style={{ position: 'relative' }}>
 			<div
-				style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: '8px' }}
+				style={{
+					position: 'absolute',
+					top: 12,
+					right: 20,
+					zIndex: 100,
+					display: 'flex',
+					gap: '4px'
+				}}
 			>
 				<Tooltip title={editMode ? 'Disable Edit Mode' : 'Enable Edit Mode'}>
-					<IconButton
+					<Button
 						onClick={() => setEditMode(!editMode)}
-						size="small"
+						className={clsx('pupil-keyboard-btn border-2', {
+							'border-amber-500!': editMode,
+							'border-transparent': !editMode
+						})}
 						sx={{
-							backgroundColor: editMode ? 'primary.main' : 'grey.700',
-							color: 'white',
-							'&:hover': {
-								backgroundColor: editMode ? 'primary.dark' : 'grey.600'
-							}
+							minWidth: 'auto',
+							padding: '6px',
+							width: '32px',
+							height: '32px'
 						}}
 					>
-						{editMode ? <EditOffIcon fontSize="small" /> : <EditIcon fontSize="small" />}
-					</IconButton>
+						{editMode ? <EditOffIcon sx={{ fontSize: 16 }} /> : <EditIcon sx={{ fontSize: 16 }} />}
+					</Button>
 				</Tooltip>
 				<Tooltip title="Reset to Default Layout">
-					<IconButton
+					<Button
 						onClick={handleResetLayout}
-						size="small"
+						className="pupil-keyboard-btn border-2 border-transparent"
 						sx={{
-							backgroundColor: 'grey.700',
-							color: 'white',
-							'&:hover': {
-								backgroundColor: 'grey.600'
-							}
+							minWidth: 'auto',
+							padding: '6px',
+							width: '32px',
+							height: '32px'
 						}}
 					>
-						<RestartAltIcon fontSize="small" />
-					</IconButton>
+						<RestartAltIcon sx={{ fontSize: 16 }} />
+					</Button>
 				</Tooltip>
 			</div>
 			<div
