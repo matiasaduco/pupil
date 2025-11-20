@@ -40,7 +40,7 @@ const ToolbarButton = ({
 	}
 
 	const isIconOnly = !!icon && !label
-	const ariaLabel = isIconOnly ? tooltipTitle ?? label : undefined
+	const ariaLabel = isIconOnly ? (tooltipTitle ?? label) : undefined
 
 	return (
 		<Tooltip title={tooltipTitle}>
