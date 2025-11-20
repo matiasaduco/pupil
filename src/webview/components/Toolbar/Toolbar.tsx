@@ -15,6 +15,9 @@ import HighlightableButton from './components/HighlightableButton.js'
 import SyncAltIcon from '@mui/icons-material/SyncAlt'
 import clsx from 'clsx'
 import { HighlightMode } from '@webview/types/HighlightSettings.js'
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong'
+import KeyboardAltIcon from '@mui/icons-material/KeyboardAlt'
+import CodeIcon from '@mui/icons-material/Code'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -362,21 +365,43 @@ const Toolbar = ({
 					'toolbar-nav--section-highlighted': isToolbarSectionHighlighted
 				})}
 			>
-				<HighlightableButton
-					id={nextButtonId()}
-					highlightedButtonId={highlightedButtonId}
-					onClick={() => switchFocus(focus)}
-					label={focus}
-				/>
+				<div className="toolbar-primary-actions">
+					{(() => {
+						const id = nextButtonId('focus')
+						const focusLabel = `${focus.charAt(0).toUpperCase()}${focus.slice(1)}`
+						return (
+							<HighlightableButton
+								id={id}
+								highlightedButtonId={highlightedButtonId}
+								onClick={() => switchFocus(focus)}
+								label={focusLabel}
+								icon={<CenterFocusStrongIcon fontSize="small" />}
+								tooltipTitle="Cambiar foco"
+							/>
+						)
+					})()}
 
-				<HighlightableButton
-					id={nextButtonId()}
-					highlightedButtonId={highlightedButtonId}
-					onClick={toggleKeyboard}
-					label={`${keyboardVisible ? 'Hide' : 'Show'} Keyboard`}
-				/>
+					{(() => {
+						const id = nextButtonId('keyboard')
+						return (
+							<HighlightableButton
+								id={id}
+								highlightedButtonId={highlightedButtonId}
+								onClick={toggleKeyboard}
+								label={`${keyboardVisible ? 'Ocultar' : 'Mostrar'} teclado`}
+								icon={<KeyboardAltIcon fontSize="small" />}
+								tooltipTitle="Alternar teclado"
+							/>
+						)
+					})()}
 
-				<TerminalsDialog id={nextButtonId()} highlightedButtonId={highlightedButtonId} />
+					<TerminalsDialog
+						id={nextButtonId('terminales')}
+						highlightedButtonId={highlightedButtonId}
+						triggerIcon={<CodeIcon fontSize="small" />}
+						triggerTooltip="Terminales abiertas"
+					/>
+				</div>
 
 				<Divider
 					orientation="vertical"

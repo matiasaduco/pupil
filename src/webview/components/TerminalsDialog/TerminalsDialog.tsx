@@ -1,4 +1,5 @@
 import Button from '@mui/material/Button'
+import { ReactNode } from 'react'
 import PupilDialog from '../PupilDialog/PupilDialog.js'
 import useActionBar from './hooks/useActionBar.js'
 import HighlightableButton from '../Toolbar/components/HighlightableButton.js'
@@ -6,9 +7,18 @@ import HighlightableButton from '../Toolbar/components/HighlightableButton.js'
 type TerminalsDialogProps = {
 	id: string
 	highlightedButtonId: string | null
+	triggerIcon?: ReactNode
+	triggerTooltip?: string
+	triggerLabel?: string
 }
 
-const TerminalsDialog = ({ id, highlightedButtonId }: TerminalsDialogProps) => {
+const TerminalsDialog = ({
+	id,
+	highlightedButtonId,
+	triggerIcon,
+	triggerTooltip,
+	triggerLabel = 'Terminales'
+}: TerminalsDialogProps) => {
 	const { getTerminals, terminals, open, handleOnClose, openTerminal } = useActionBar()
 
 	return (
@@ -17,7 +27,9 @@ const TerminalsDialog = ({ id, highlightedButtonId }: TerminalsDialogProps) => {
 				id={id}
 				highlightedButtonId={highlightedButtonId}
 				onClick={getTerminals}
-				label="Terminales"
+				label={triggerLabel}
+				icon={triggerIcon}
+				tooltipTitle={triggerTooltip ?? triggerLabel}
 			/>
 			<PupilDialog open={open} onClose={handleOnClose} title="Terminales abiertas">
 				<div className="flex flex-col max-h-96 overflow-y-auto">

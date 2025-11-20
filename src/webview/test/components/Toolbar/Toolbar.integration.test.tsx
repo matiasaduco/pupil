@@ -404,7 +404,7 @@ describe('Toolbar Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		const keyboardButton = screen.getByText('Hide Keyboard')
+		const keyboardButton = screen.getByRole('button', { name: /teclado/i })
 		fireEvent.click(keyboardButton)
 
 		await waitFor(() => {
@@ -436,7 +436,7 @@ describe('Toolbar Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		expect(screen.getByText('Hide Keyboard')).toBeInTheDocument()
+		expect(screen.getByRole('button', { name: 'Ocultar teclado' })).toBeInTheDocument()
 
 		rerender(
 			<VsCodeApiProvider>
@@ -461,7 +461,7 @@ describe('Toolbar Integration', () => {
 			</VsCodeApiProvider>
 		)
 
-		expect(screen.getByText('Show Keyboard')).toBeInTheDocument()
+		expect(screen.getByRole('button', { name: 'Mostrar teclado' })).toBeInTheDocument()
 	})
 
 	it('renders dividers between shortcut groups', () => {
