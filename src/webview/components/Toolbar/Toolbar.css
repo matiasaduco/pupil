@@ -15,6 +15,18 @@
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
 }
 
+.toolbar-nav--section-highlighted {
+	box-shadow:
+		0 0 0 3px #fbbf24,
+		0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.dark .toolbar-nav--section-highlighted {
+	box-shadow:
+		0 0 0 3px #fbbf24,
+		0 2px 12px rgba(0, 0, 0, 0.32);
+}
+
 .toolbar-nav .MuiButton-root,
 .toolbar-nav .MuiIconButton-root {
 	border-radius: 0.375rem;

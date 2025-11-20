@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import PupilKeyboard from '@components/PupilKeyboard/PupilKeyboard.js'
 import { KeyboardFocusProvider } from '@webview/contexts/KeyboardFocusContext.js'
 
@@ -58,5 +58,48 @@ describe('PupilKeyboard', () => {
 		}
 		fireEvent.click(capsButton)
 		expect(screen.getByRole('button', { name: 'Q' })).toBeInTheDocument()
+	})
+
+	it('highlights keys when highlighting is enabled', async () => {
+		render(
+			<KeyboardFocusProvider>
+				<PupilKeyboard visible={true} highlightingEnabled highlightDelayMs={5} />
+			</KeyboardFocusProvider>
+		)
+
+		const keyButton = screen.getByRole('button', { name: '`' })
+		await waitFor(() => expect(keyButton).toHaveClass('pupil-keyboard-btn--highlighted'))
+	})
+
+	it('executes highlighted key on space press', async () => {
+		const onInput = vi.fn()
+		render(
+			<KeyboardFocusProvider>
+				<PupilKeyboard
+					visible={true}
+					onInput={onInput}
+					highlightingEnabled
+					highlightDelayMs={5}
+					highlightGapMs={5}
+				/>
+			</KeyboardFocusProvider>
+		)
+
+		const keyButton = screen.getByRole('button', { name: '`' })
+		await waitFor(() => expect(keyButton).toHaveClass('pupil-keyboard-btn--highlighted'))
+
+		fireEvent.keyDown(document, { key: ' ', code: 'Space' })
+		await waitFor(() => expect(onInput).toHaveBeenCalled())
+	})
+
+	it('applies section highlight class when sectionHighlighting is true', () => {
+		render(
+			<KeyboardFocusProvider>
+				<PupilKeyboard visible={true} sectionHighlighting data-testid="pupil-keyboard" />
+			</KeyboardFocusProvider>
+		)
+
+		const keyboard = screen.getByTestId('pupil-keyboard')
+		expect(keyboard).toHaveClass('pupil-keyboard--section-highlighted')
 	})
 })

@@ -2,28 +2,27 @@ name: CI
 
 on:
   push:
-    branches: [ main, actions ]
+    branches: [main, actions]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version-file: '.nvmrc'
-    
-    - name: Install dependencies
-      run: npm install
+      - uses: actions/checkout@v3
 
-    - name: Build
-      run: npm run build  
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
 
-    - name: Run tests
-      run: npm run test:unit
+      - name: Install dependencies
+        run: npm install
 
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test:unit

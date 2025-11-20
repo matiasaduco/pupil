@@ -29,7 +29,16 @@ const PupilContainer = () => {
 		connectionStatus,
 		openSimpleBrowser,
 		handleStartServer,
-		handleStopServer
+		handleStopServer,
+		isKeyboardHighlighting,
+		setKeyboardHighlighting,
+		isKeyboardSectionHighlighted,
+		setKeyboardSectionHighlighted,
+		highlightDelayMs,
+		highlightGapMs,
+		setHighlightDelayMs,
+		sectionGuideMode,
+		setSectionGuideMode
 	} = usePupilEditorContainer()
 
 	const [radialEnabled, setRadialEnabled] = useState<boolean>(() => {
@@ -97,6 +106,12 @@ const PupilContainer = () => {
 					focus={focus}
 					switchFocus={switchFocus}
 					handleButtonClick={handleKeyboardInput}
+					keyboardHighlighting={isKeyboardHighlighting}
+					setKeyboardHighlighting={setKeyboardHighlighting}
+					setKeyboardSectionHighlighted={setKeyboardSectionHighlighted}
+					highlightDelayMs={highlightDelayMs}
+					highlightGapMs={highlightGapMs}
+					sectionGuideMode={sectionGuideMode}
 					openSimpleBrowserDialog={() => setOpenSimpleBrowserDialog(true)}
 					openFileFolderDialog={() => setOpenFileFolderDialog(true)}
 					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
@@ -106,6 +121,10 @@ const PupilContainer = () => {
 				<PupilKeyboard
 					onInput={handleKeyboardInput}
 					visible={keyboardVisible}
+					highlightingEnabled={isKeyboardHighlighting}
+					sectionHighlighting={isKeyboardSectionHighlighted}
+					highlightDelayMs={highlightDelayMs}
+					highlightGapMs={highlightGapMs}
 					data-testid="pupil-keyboard"
 				/>
 				<RadialKeyboard
@@ -139,6 +158,10 @@ const PupilContainer = () => {
 					connectionStatus={connectionStatus}
 					radialEnabled={radialEnabled}
 					onToggleRadial={toggleRadial}
+					highlightDelayMs={highlightDelayMs}
+					onHighlightDelayChange={setHighlightDelayMs}
+					sectionGuideMode={sectionGuideMode}
+					onSectionGuideModeChange={setSectionGuideMode}
 				/>
 				<BlinkDialog open={openBlinkDialog} onClose={() => setOpenBlinkDialog(false)} />
 			</div>
