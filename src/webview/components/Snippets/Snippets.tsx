@@ -1,12 +1,11 @@
 import './Snippets.css'
 import useSnippets from './hooks/useSnippets.js'
-import HtmlTooltip from '@mui/material/Tooltip'
-import { Button } from '@mui/material'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { RefObject } from 'react'
+import { RefObject, useMemo, useState } from 'react'
 import PupilDialog from '../PupilDialog/PupilDialog.js'
-import TooltipTitle from './components/TooltipTitle.js'
-import HighlightableButton from '../Toolbar/components/HighlightableButton.js'
+import SnippetCard from './components/SnippetCard.js'
+import SnippetFolderIcon from '@mui/icons-material/SnippetFolder'
+import ToolbarButton from '../Toolbar/components/ToolbarButton.js'
 
 type SnippetsProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
@@ -15,38 +14,87 @@ type SnippetsProps = {
 	highlightedButtonId: string | null
 }
 
-const Snippets = ({ editorRef, id, highlightedButtonId }: SnippetsProps) => {
+const FILTERS = [
+	{ id: 'all', label: 'Todos' },
+	{ id: 'user', label: 'Usuario' },
+	{ id: 'extension', label: 'Extensión' },
+	{ id: 'builtin', label: 'Builtin' }
+] as const
+
+type SnippetFilter = (typeof FILTERS)[number]['id']
+
+const Snippets = ({ editorRef, id, highlightedButtonId, onSnippetPress }: SnippetsProps) => {
 	const { snippets, handleSnippetPress, open, openModal, onClose } = useSnippets(editorRef)
+	const [filter, setFilter] = useState<SnippetFilter>('all')
+	const insertSnippet = onSnippetPress ?? handleSnippetPress
+
+	const snippetGroups = useMemo(() => {
+		if (!snippets) {
+			return []
+		}
+
+		if (filter === 'all') {
+			return snippets.all ?? []
+		}
+
+		return snippets[filter] ?? []
+	}, [snippets, filter])
+
+	const flattenedSnippets = useMemo(
+		() =>
+			snippetGroups.flatMap((snippetGroup) =>
+				Object.entries(snippetGroup.snippets).map(([key, value]) => ({
+					id: key,
+					body: value.body,
+					description: value.description,
+					file: snippetGroup.file,
+					source: snippetGroup.extension
+				}))
+			),
+		[snippetGroups]
+	)
 
 	return (
 		<>
-			<HighlightableButton
+			<ToolbarButton
 				id={id}
-				highlightedButtonId={highlightedButtonId}
-				onClick={openModal}
-				label="Snippets"
+				tooltipTitle="Snippets"
+				icon={<SnippetFolderIcon fontSize="small" />}
+				onButtonClick={openModal}
+				active={highlightedButtonId === id}
 			/>
 			<PupilDialog open={open} onClose={onClose} title="Snippets">
-				<div className="flex flex-wrap gap-3 justify-center overflow-auto max-h-[30em]">
-					{snippets?.all.flat().map((snippet) =>
-						Object.entries(snippet.snippets).map(([key, { body, description }]) => (
-							<HtmlTooltip
-								key={key}
-								title={<TooltipTitle body={body} description={description} />}
-								placement="top"
-								arrow
+				<div className="snippets-dialog">
+					<div className="snippets-filter" role="group" aria-label="Filtrar snippets">
+						{FILTERS.map((option) => (
+							<button
+								key={option.id}
+								type="button"
+								className={`snippets-filterButton${filter === option.id ? ' is-active' : ''}`}
+								onClick={() => setFilter(option.id)}
 							>
-								<Button
-									id={`snippet-${key}`}
-									className="w-[10em] h-[3em] truncate"
-									onClick={() => handleSnippetPress?.(body)}
-									style={{ margin: '0 3px 6px 0' }}
-								>
-									{key}
-								</Button>
-							</HtmlTooltip>
-						))
-					)}
+								{option.label}
+							</button>
+						))}
+					</div>
+					<div className="snippets-grid">
+						{flattenedSnippets.length === 0 ? (
+							<p className="snippets-empty">No hay snippets para este filtro.</p>
+						) : (
+							flattenedSnippets.map((snippet) => (
+								<SnippetCard
+									key={`${snippet.id}-${snippet.file}`}
+									id={`snippet-${snippet.id}`}
+									title={snippet.id}
+									description={snippet.description}
+									body={snippet.body}
+									meta={snippet.file}
+									badge={filter === 'all' ? snippet.source : undefined}
+									onSelect={() => insertSnippet(snippet.body)}
+								/>
+							))
+						)}
+					</div>
 				</div>
 			</PupilDialog>
 		</>

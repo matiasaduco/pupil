@@ -48,22 +48,22 @@ describe('Snippets Integration', () => {
 	it('should render the Snippets button and request snippets on mount', () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		expect(screen.getByText('Snippets')).toBeInTheDocument()
+		expect(screen.getByLabelText('Snippets')).toBeInTheDocument()
 		expect(mockPostMessage).toHaveBeenCalledWith({ type: 'get-snippets' })
 	})
 
 	it('should open dialog when Snippets button is clicked', async () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		const button = screen.getByText('Snippets')
+		const button = screen.getByLabelText('Snippets')
 		fireEvent.click(button)
 
 		await waitFor(() => {
@@ -76,11 +76,11 @@ describe('Snippets Integration', () => {
 	it('should render snippets when received via message', async () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		const button = screen.getByText('Snippets')
+		const button = screen.getByLabelText('Snippets')
 		fireEvent.click(button)
 
 		const mockSnippets = {
@@ -125,11 +125,11 @@ describe('Snippets Integration', () => {
 	it('should call insertAtCursor for single-line snippet when clicked', async () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		const button = screen.getByText('Snippets')
+		const button = screen.getByLabelText('Snippets')
 		fireEvent.click(button)
 
 		const mockSnippets = {
@@ -177,11 +177,11 @@ describe('Snippets Integration', () => {
 	it('should call insertMultipleAtCursor for multi-line snippet when clicked', async () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		const button = screen.getByText('Snippets')
+		const button = screen.getByLabelText('Snippets')
 		fireEvent.click(button)
 
 		const mockSnippets = {
@@ -235,11 +235,11 @@ describe('Snippets Integration', () => {
 	it('should close dialog when clicking outside', async () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		const button = screen.getByText('Snippets')
+		const button = screen.getByLabelText('Snippets')
 		fireEvent.click(button)
 
 		await waitFor(() => {

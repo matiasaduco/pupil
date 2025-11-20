@@ -74,6 +74,7 @@ vi.mock('@components/PupilDialog/PupilDialog.js', () => ({
 		) : null
 }))
 
+
 vi.mock('@mui/material', () => ({
 	Button: ({
 		children,
@@ -100,6 +101,21 @@ vi.mock('@mui/material', () => ({
 			{children}
 		</button>
 	),
+	IconButton: ({
+		children,
+		onClick,
+		id,
+		'aria-label': ariaLabel
+	}: {
+		children: React.ReactNode
+		onClick?: () => void
+		id?: string
+		'aria-label'?: string
+	}) => (
+		<button data-testid="mui-icon-button" id={id} onClick={onClick} aria-label={ariaLabel}>
+			{children}
+		</button>
+	),
 	Tooltip: ({
 		children,
 		title,
@@ -116,7 +132,8 @@ vi.mock('@mui/material', () => ({
 	),
 	useTheme: () => ({
 		palette: {
-			primary: { main: '#1976d2' }
+			primary: { main: '#1976d2' },
+			text: { primary: '#111827' }
 		}
 	})
 }))
@@ -148,11 +165,11 @@ describe('Snippets', () => {
 	it('should render the Snippets button', () => {
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+					<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		expect(screen.getByText('Snippets')).toBeInTheDocument()
+			expect(screen.getByLabelText('Snippets')).toBeInTheDocument()
 	})
 
 	it('should open the dialog when Snippets button is clicked', async () => {
@@ -170,11 +187,11 @@ describe('Snippets', () => {
 
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-		const button = screen.getByText('Snippets')
+		const button = screen.getByLabelText('Snippets')
 		fireEvent.click(button)
 
 		expect(mockOpenModal).toHaveBeenCalled()
@@ -194,7 +211,7 @@ describe('Snippets', () => {
 
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
@@ -217,7 +234,7 @@ describe('Snippets', () => {
 
 		render(
 			<VsCodeApiProvider>
-				<Snippets editorRef={mockEditorRef} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 

@@ -1,35 +1,51 @@
-import { Button, useTheme } from '@mui/material'
+import { Button, Tooltip, useTheme } from '@mui/material'
+import { ReactNode } from 'react'
 
 interface HighlightableButtonProps {
 	id: string
 	onClick: () => void
 	highlightedButtonId: string | null
-	label: string
+	label?: string
+	icon?: ReactNode
+	tooltipTitle?: string
+	hideLabel?: boolean
 }
 
 const HighlightableButton = ({
 	id,
 	onClick,
 	highlightedButtonId,
-	label
+	label,
+	icon,
+	tooltipTitle,
+	hideLabel
 }: HighlightableButtonProps) => {
 	const theme = useTheme()
 	const highlightColor = theme.palette.primary?.main ?? '#1976d2'
 
-	return (
+	const button = (
 		<Button
 			id={id}
 			onClick={onClick}
 			className="w-35"
+			startIcon={icon}
+			aria-label={hideLabel ? label : undefined}
 			sx={{
 				borderWidth: 2,
 				borderStyle: 'solid',
-				borderColor: highlightedButtonId === id ? highlightColor : 'transparent'
+				borderColor: highlightedButtonId === id ? highlightColor : 'transparent',
+				minWidth: hideLabel ? 40 : undefined
 			}}
 		>
-			{label}
+			{hideLabel ? null : label}
 		</Button>
 	)
+
+	if (tooltipTitle || hideLabel) {
+		return <Tooltip title={tooltipTitle ?? label}>{button}</Tooltip>
+	}
+
+	return button
 }
 
 export default HighlightableButton
