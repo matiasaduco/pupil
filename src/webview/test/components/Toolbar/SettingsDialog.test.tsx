@@ -190,7 +190,8 @@ vi.mock('@mui/material', () => {
 					return child
 				}
 				const tabElement = child as React.ReactElement<Record<string, unknown>>
-				const tabValue = (tabElement.props?.value as string | undefined) ??
+				const tabValue =
+					(tabElement.props?.value as string | undefined) ??
 					(tabElement.props?.label as string | undefined)
 				return React.cloneElement(tabElement, {
 					isActive: tabValue === value,
