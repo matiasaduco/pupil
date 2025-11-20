@@ -72,10 +72,17 @@ export class VSCodeLMService implements AIService {
 				return null
 			}
 
-			const completion = (response as { completion: string }).completion
+			let completion = (response as { completion: string }).completion.trim()
+
+			// Remove the prompt from the beginning if the AI repeated it
+			const promptTrimmed = request.prompt.trim()
+			if (completion.startsWith(promptTrimmed)) {
+				completion = completion.substring(promptTrimmed.length).trim()
+			}
+
 			console.log('✅ VS Code Language Model completion:', completion.substring(0, 50))
 			return {
-				completion: completion.trim(),
+				completion,
 				confidence: 0.95
 			}
 		} catch (error) {
@@ -160,18 +167,26 @@ export class HuggingFaceService implements AIService {
 			}
 
 			console.log('📦 HuggingFace raw response:', response)
-			const completion = Array.isArray(response)
+			const rawCompletion = Array.isArray(response)
 				? response[0]?.generated_text
 				: (response as { generated_text?: string }).generated_text
 
-			if (!completion) {
+			if (!rawCompletion) {
 				console.warn('⚠ HuggingFace returned no completion')
 				return null
 			}
 
+			let completion = rawCompletion.trim()
+
+			// Remove the prompt from the beginning if repeated
+			const promptTrimmed = request.prompt.trim()
+			if (completion.startsWith(promptTrimmed)) {
+				completion = completion.substring(promptTrimmed.length).trim()
+			}
+
 			console.log('✅ HuggingFace completion:', completion.substring(0, 50))
 			return {
-				completion: completion.trim(),
+				completion,
 				confidence: 0.7
 			}
 		} catch (error) {

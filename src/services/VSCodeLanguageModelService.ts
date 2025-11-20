@@ -38,13 +38,11 @@ export class VSCodeLanguageModelService {
 		try {
 			const model = this.models[0] // Use first available model
 
-			const messages = [
-				vscode.LanguageModelChatMessage.User(
-					`You are a code completion assistant. Complete the following ${language} code. Provide ONLY the completion, no explanations or markdown.\n\nContext:\n${context}\n\nCode to complete:\n${prompt}\n\nCompletion:`
-				)
-			]
-
-			const response = await model.sendRequest(
+		const messages = [
+			vscode.LanguageModelChatMessage.User(
+				`You are a code completion assistant. Complete the following ${language} code. Provide ONLY the missing part that comes after the given code. Do not repeat the code that is already there. No explanations, no markdown, no code blocks.\n\nContext:\n${context}\n\nCode to complete:\n${prompt}\n\nComplete with only the missing part:`
+			)
+		]			const response = await model.sendRequest(
 				messages,
 				{},
 				new vscode.CancellationTokenSource().token
