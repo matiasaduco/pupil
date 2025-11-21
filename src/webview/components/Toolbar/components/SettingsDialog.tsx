@@ -9,19 +9,49 @@ import {
 	FormControl,
 	FormLabel,
 	RadioGroup,
-	Radio
+	Radio,
+	Tabs,
+	Tab,
+	Divider
 } from '@mui/material'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import StopIcon from '@mui/icons-material/Stop'
 import { ConnectionStatusType } from '../../../../constants.js'
 import { HighlightMode } from '@webview/types/HighlightSettings.js'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
 	KeyMappings,
 	KeyMappingId,
 	KeyMappingValue,
 	RadialMouseBinding
 } from '@webview/types/KeyMapping.js'
+
+type TabValue = 'general' | 'shortcuts' | 'server'
+
+type TabPanelProps = {
+	value: TabValue
+	activeTab: TabValue
+	labelledBy: string
+	children: ReactNode
+}
+
+const TabPanel = ({ value, activeTab, labelledBy, children }: TabPanelProps) => {
+	if (value !== activeTab) {
+		return null
+	}
+
+	return (
+		<Box
+			role="tabpanel"
+			tabIndex={0}
+			id={`settings-tabpanel-${value}`}
+			aria-labelledby={labelledBy}
+			sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, overflowY: 'auto' }}
+		>
+			{children}
+		</Box>
+	)
+}
 
 const KEY_MAPPING_META: Array<{
 	id: KeyMappingId
@@ -78,6 +108,7 @@ const SettingsDialog = ({
 	const isConnected = connectionStatus.value === 'connected'
 	const isConnecting = connectionStatus.value === 'connecting'
 	const [listeningFor, setListeningFor] = useState<KeyMappingId | null>(null)
+	const [activeTab, setActiveTab] = useState<TabValue>('general')
 
 	const listeningLabel = useMemo(() => {
 		if (!listeningFor) {
@@ -164,13 +195,42 @@ const SettingsDialog = ({
 
 	return (
 		<PupilDialog open={open} onClose={onClose} title="Configuración">
-			<div className="settings-content">
-				<p>Aquí puedes configurar las opciones de Pupil.</p>
-				<p>
-					Por ahora está disponible la opción de iniciar y detener el servidor de reconocimiento de
-					voz.
-				</p>
-				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+			<Box
+				className="settings-content"
+				sx={{ width: 520, height: 420, display: 'flex', flexDirection: 'column' }}
+			>
+				<Tabs
+					value={activeTab}
+					onChange={(_, value: TabValue) => setActiveTab(value)}
+					variant="fullWidth"
+					aria-label="Secciones de configuración"
+				>
+					<Tab
+						label="General"
+						value="general"
+						id="settings-tab-general"
+						aria-controls="settings-tabpanel-general"
+					/>
+					<Tab
+						label="Atajos"
+						value="shortcuts"
+						id="settings-tab-shortcuts"
+						aria-controls="settings-tabpanel-shortcuts"
+					/>
+					<Tab
+						label="Servidor"
+						value="server"
+						id="settings-tab-server"
+						aria-controls="settings-tabpanel-server"
+					/>
+				</Tabs>
+				<Divider sx={{ my: 2 }} />
+				<TabPanel value="general" activeTab={activeTab} labelledBy="settings-tab-general">
+					<p>Aquí puedes configurar las opciones de Pupil.</p>
+					<p>
+						Por ahora está disponible la opción de iniciar y detener el servidor de reconocimiento de
+						voz.
+					</p>
 					<FormControlLabel
 						control={<Switch checked={radialEnabled} onChange={onToggleRadial} color="primary" />}
 						label="Activar Teclado Radial"
@@ -189,8 +249,7 @@ const SettingsDialog = ({
 							}
 						/>
 						<Typography variant="caption" color="text.secondary">
-							Intervalo actual: {highlightDelayMs} ms (pausa {Math.round(highlightDelayMs * 0.25)}{' '}
-							ms)
+							Intervalo actual: {highlightDelayMs} ms (pausa {Math.round(highlightDelayMs * 0.25)} ms)
 						</Typography>
 					</FormControl>
 					<FormControl component="fieldset">
@@ -205,6 +264,8 @@ const SettingsDialog = ({
 							<FormControlLabel value="both" control={<Radio />} label="Ambas" />
 						</RadioGroup>
 					</FormControl>
+				</TabPanel>
+				<TabPanel value="shortcuts" activeTab={activeTab} labelledBy="settings-tab-shortcuts">
 					<Box
 						component="section"
 						aria-label="Mapeo de teclas"
@@ -220,8 +281,7 @@ const SettingsDialog = ({
 					>
 						<Typography variant="subtitle1">Mapeo de teclas</Typography>
 						<Typography variant="body2" color="text.secondary">
-							Personaliza los atajos principales para usar Pupil de la forma que te resulte más
-							cómoda.
+							Personaliza los atajos principales para usar Pupil de la forma que te resulte más cómoda.
 						</Typography>
 						{listeningLabel && (
 							<Typography variant="caption" color="primary" role="status">
@@ -278,26 +338,33 @@ const SettingsDialog = ({
 							})}
 						</Box>
 					</Box>
-					<Button
-						variant="contained"
-						color="success"
-						startIcon={<PlayArrowIcon />}
-						onClick={onStartServer}
-						disabled={isConnected || isConnecting}
-					>
-						Iniciar Servidor
-					</Button>
-					<Button
-						variant="contained"
-						color="error"
-						startIcon={<StopIcon />}
-						onClick={onStopServer}
-						disabled={!isConnected}
-					>
-						Detener Servidor
-					</Button>
-				</Box>
-			</div>
+				</TabPanel>
+				<TabPanel value="server" activeTab={activeTab} labelledBy="settings-tab-server">
+					<Typography variant="body2" color="text.secondary">
+						Estado actual: {isConnected ? 'Conectado' : isConnecting ? 'Conectando…' : 'Detenido'}
+					</Typography>
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+						<Button
+							variant="contained"
+							color="success"
+							startIcon={<PlayArrowIcon />}
+							onClick={onStartServer}
+							disabled={isConnected || isConnecting}
+						>
+							Iniciar Servidor
+						</Button>
+						<Button
+							variant="contained"
+							color="error"
+							startIcon={<StopIcon />}
+							onClick={onStopServer}
+							disabled={!isConnected}
+						>
+							Detener Servidor
+						</Button>
+					</Box>
+				</TabPanel>
+			</Box>
 		</PupilDialog>
 	)
 }
