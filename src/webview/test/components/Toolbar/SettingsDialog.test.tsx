@@ -175,7 +175,61 @@ vi.mock('@mui/material', () => {
 			onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 		}) => (
 			<input type="radio" value={value} checked={checked} onChange={onChange} aria-label={value} />
-		)
+		),
+		Tabs: ({
+			children,
+			value,
+			onChange
+		}: {
+			children?: React.ReactNode
+			value: string
+			onChange?: (event: unknown, value: string) => void
+		}) => {
+			const enhancedChildren = React.Children.map(children, (child) => {
+				if (!React.isValidElement(child)) {
+					return child
+				}
+				const tabElement = child as React.ReactElement<Record<string, unknown>>
+				const tabValue = (tabElement.props?.value as string | undefined) ??
+					(tabElement.props?.label as string | undefined)
+				return React.cloneElement(tabElement, {
+					isActive: tabValue === value,
+					onSelect: (selectedValue: string) => onChange?.(null, selectedValue)
+				})
+			})
+			return (
+				<div data-testid="mui-tabs" role="tablist">
+					{enhancedChildren}
+				</div>
+			)
+		},
+		Tab: ({
+			label,
+			value,
+			isActive,
+			onSelect,
+			id,
+			...rest
+		}: {
+			label: string
+			value?: string
+			isActive?: boolean
+			onSelect?: (value: string) => void
+			id?: string
+			[key: string]: unknown
+		}) => (
+			<button
+				role="tab"
+				id={id}
+				aria-selected={isActive ? 'true' : 'false'}
+				data-value={value ?? label}
+				onClick={() => onSelect?.(value ?? label)}
+				{...rest}
+			>
+				{label}
+			</button>
+		),
+		Divider: () => <hr data-testid="mui-divider" />
 	}
 })
 
@@ -247,6 +301,13 @@ describe('SettingsDialog', () => {
 		return render(<SettingsDialog {...defaultProps} {...props} />)
 	}
 
+	const openTab = (label: 'General' | 'Atajos' | 'Servidor') => {
+		fireEvent.click(screen.getByRole('tab', { name: label }))
+	}
+
+	const openServerTab = () => openTab('Servidor')
+	const openShortcutsTab = () => openTab('Atajos')
+
 	beforeEach(() => {
 		mockOnStartServer.mockClear()
 		mockOnStopServer.mockClear()
@@ -283,6 +344,7 @@ describe('SettingsDialog', () => {
 
 	it('renders start server button when disconnected', () => {
 		renderSettingsDialog()
+		openServerTab()
 
 		const startButton = screen.getByText('Iniciar Servidor')
 		expect(startButton).toBeInTheDocument()
@@ -291,6 +353,7 @@ describe('SettingsDialog', () => {
 
 	it('renders start server button when connecting', () => {
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTING })
+		openServerTab()
 
 		const startButton = screen.getByText('Iniciar Servidor')
 		expect(startButton).toBeInTheDocument()
@@ -299,6 +362,7 @@ describe('SettingsDialog', () => {
 
 	it('renders stop server button when connected', () => {
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTED })
+		openServerTab()
 
 		const stopButton = screen.getByText('Detener Servidor')
 		expect(stopButton).toBeInTheDocument()
@@ -307,6 +371,7 @@ describe('SettingsDialog', () => {
 
 	it('does not render start server button when connected', () => {
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTED })
+		openServerTab()
 
 		const startButton = screen.getByText('Iniciar Servidor')
 		expect(startButton).toBeDisabled()
@@ -314,6 +379,7 @@ describe('SettingsDialog', () => {
 
 	it('does not render stop server button when not connected', () => {
 		renderSettingsDialog()
+		openServerTab()
 
 		const stopButton = screen.getByText('Detener Servidor')
 		expect(stopButton).toBeDisabled()
@@ -348,6 +414,7 @@ describe('SettingsDialog', () => {
 
 	it('calls onStartServer when start button is clicked', () => {
 		renderSettingsDialog()
+		openServerTab()
 
 		const startButton = screen.getByText('Iniciar Servidor')
 		fireEvent.click(startButton)
@@ -357,6 +424,7 @@ describe('SettingsDialog', () => {
 
 	it('calls onStopServer when stop button is clicked', () => {
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTED })
+		openServerTab()
 
 		const stopButton = screen.getByText('Detener Servidor')
 		fireEvent.click(stopButton)
@@ -366,6 +434,7 @@ describe('SettingsDialog', () => {
 
 	it('renders start button with success color', () => {
 		renderSettingsDialog()
+		openServerTab()
 
 		const buttons = screen.getAllByTestId('mui-button')
 		const startButton = buttons.find((button) => button.textContent?.includes('Iniciar Servidor'))
@@ -374,6 +443,7 @@ describe('SettingsDialog', () => {
 
 	it('renders stop button with error color', () => {
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTED })
+		openServerTab()
 
 		const buttons = screen.getAllByTestId('mui-button')
 		const stopButton = buttons.find((button) => button.textContent?.includes('Detener Servidor'))
@@ -382,6 +452,7 @@ describe('SettingsDialog', () => {
 
 	it('renders buttons with correct icons', () => {
 		const { unmount } = renderSettingsDialog({ connectionStatus: ConnectionStatus.DISCONNECTED })
+		openServerTab()
 
 		expect(screen.getByTestId('play-arrow-icon')).toBeInTheDocument()
 
@@ -390,12 +461,14 @@ describe('SettingsDialog', () => {
 
 		// Re-render with connected status to check stop icon
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTED })
+		openServerTab()
 
 		expect(screen.getByTestId('stop-icon')).toBeInTheDocument()
 	})
 
 	it('shows key mapping section with default shortcuts', () => {
 		renderSettingsDialog()
+		openShortcutsTab()
 
 		expect(screen.getByText('Mapeo de teclas')).toBeInTheDocument()
 		expect(screen.getByText('Barra espaciadora')).toBeInTheDocument()
@@ -404,6 +477,7 @@ describe('SettingsDialog', () => {
 
 	it('updates highlight key when user presses a new key', () => {
 		renderSettingsDialog()
+		openShortcutsTab()
 
 		const highlightButton = screen.getByRole('button', { name: 'Barra espaciadora' })
 		fireEvent.click(highlightButton)
@@ -417,6 +491,7 @@ describe('SettingsDialog', () => {
 
 	it('updates radial mouse button when user clicks', () => {
 		renderSettingsDialog()
+		openShortcutsTab()
 
 		const mouseButton = screen.getByRole('button', { name: 'Botón central del mouse' })
 		fireEvent.click(mouseButton)
