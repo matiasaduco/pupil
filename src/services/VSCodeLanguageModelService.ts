@@ -1,17 +1,13 @@
 import * as vscode from 'vscode'
 
-/**
- * Service to use VS Code's built-in Language Model API (Copilot, etc.)
- */
 export class VSCodeLanguageModelService {
 	private models: vscode.LanguageModelChat[] = []
 
 	async initialize(): Promise<boolean> {
 		try {
-			// Get all available language models (Copilot, etc.)
 			this.models = await vscode.lm.selectChatModels({
-				vendor: undefined, // Accept any vendor
-				family: undefined // Accept any family
+				vendor: undefined,
+				family: undefined
 			})
 
 			if (this.models.length > 0) {
@@ -36,13 +32,14 @@ export class VSCodeLanguageModelService {
 		}
 
 		try {
-			const model = this.models[0] // Use first available model
+			const model = this.models[0]
 
-		const messages = [
-			vscode.LanguageModelChatMessage.User(
-				`You are a code completion assistant. Complete the following ${language} code. Provide ONLY the missing part that comes after the given code. Do not repeat the code that is already there. No explanations, no markdown, no code blocks.\n\nContext:\n${context}\n\nCode to complete:\n${prompt}\n\nComplete with only the missing part:`
-			)
-		]			const response = await model.sendRequest(
+			const messages = [
+				vscode.LanguageModelChatMessage.User(
+					`You are a code completion assistant. Complete the following ${language} code. Provide ONLY the missing part that comes after the given code. Do not repeat the code that is already there. No explanations, no markdown, no code blocks.\n\nContext:\n${context}\n\nCode to complete:\n${prompt}\n\nComplete with only the missing part:`
+				)
+			]
+			const response = await model.sendRequest(
 				messages,
 				{},
 				new vscode.CancellationTokenSource().token

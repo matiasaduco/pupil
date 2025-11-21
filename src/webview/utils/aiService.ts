@@ -1,7 +1,3 @@
-/**
- * AI Service for code completion using various backends
- */
-
 export interface AICompletionRequest {
 	prompt: string
 	language: string
@@ -19,9 +15,6 @@ export interface AIService {
 	getName(): string
 }
 
-/**
- * VS Code Language Model API service (Copilot, etc.)
- */
 export class VSCodeLMService implements AIService {
 	private vscodeApi: { postMessage: (message: unknown) => void }
 	private available = false
@@ -30,7 +23,6 @@ export class VSCodeLMService implements AIService {
 	constructor(vscodeApi: { postMessage: (message: unknown) => void }) {
 		this.vscodeApi = vscodeApi
 
-		// Listen for language model availability
 		window.addEventListener('message', (event) => {
 			const message = event.data
 			if (message.type === 'language-model-available') {
@@ -40,7 +32,6 @@ export class VSCodeLMService implements AIService {
 			}
 		})
 
-		// Request language model status from extension
 		this.vscodeApi.postMessage({ type: 'request-language-model-status' })
 	}
 
@@ -49,7 +40,6 @@ export class VSCodeLMService implements AIService {
 	}
 
 	async isAvailable(): Promise<boolean> {
-		// Wait for initial check to complete (up to 2 seconds)
 		for (let i = 0; i < 40 && this.checkPending; i++) {
 			await new Promise((resolve) => setTimeout(resolve, 50))
 		}
@@ -59,7 +49,7 @@ export class VSCodeLMService implements AIService {
 
 	async getCompletion(request: AICompletionRequest): Promise<AICompletionResponse | null> {
 		try {
-			console.log('🤖 VS Code Language Model: Sending request...')
+			console.log('VS Code Language Model: Sending request...')
 
 			const response = await this.sendToExtension('vscode-lm', {
 				prompt: request.prompt,
@@ -68,25 +58,24 @@ export class VSCodeLMService implements AIService {
 			})
 
 			if (!response || !(response as { completion?: string }).completion) {
-				console.warn('⚠ VS Code Language Model returned no completion')
+				console.warn('VS Code Language Model returned no completion')
 				return null
 			}
 
 			let completion = (response as { completion: string }).completion.trim()
 
-			// Remove the prompt from the beginning if the AI repeated it
 			const promptTrimmed = request.prompt.trim()
 			if (completion.startsWith(promptTrimmed)) {
 				completion = completion.substring(promptTrimmed.length).trim()
 			}
 
-			console.log('✅ VS Code Language Model completion:', completion.substring(0, 50))
+			console.log('VS Code Language Model completion:', completion.substring(0, 50))
 			return {
 				completion,
 				confidence: 0.95
 			}
 		} catch (error) {
-			console.error('❌ VS Code Language Model error:', error)
+			console.error('VS Code Language Model error:', error)
 			return null
 		}
 	}
@@ -109,7 +98,6 @@ export class VSCodeLMService implements AIService {
 
 			window.addEventListener('message', handler)
 
-			// Timeout after 30 seconds
 			setTimeout(() => {
 				window.removeEventListener('message', handler)
 				reject(new Error('Request timeout'))
@@ -125,10 +113,6 @@ export class VSCodeLMService implements AIService {
 	}
 }
 
-/**
- * Free Hugging Face Inference API service
- * Uses StarCoder model - no API key required for basic usage
- */
 export class HuggingFaceService implements AIService {
 	private vscodeApi: { postMessage: (message: unknown) => void }
 
@@ -141,16 +125,13 @@ export class HuggingFaceService implements AIService {
 	}
 
 	async isAvailable(): Promise<boolean> {
-		// HuggingFace free tier is unreliable (models get deprecated)
-		// Disable by default, user should install Ollama instead
 		return false
 	}
 
 	async getCompletion(request: AICompletionRequest): Promise<AICompletionResponse | null> {
 		try {
-			console.log('🌐 HuggingFace: Sending request via extension proxy...')
+			console.log('HuggingFace: Sending request via extension proxy...')
 			const prompt = `${request.context}\n${request.prompt}`
-			// Send request to extension backend to avoid CORS
 			const response = await this.sendToExtension('huggingface', {
 				inputs: prompt,
 				parameters: {
@@ -162,35 +143,34 @@ export class HuggingFaceService implements AIService {
 			})
 
 			if (!response) {
-				console.warn('⚠ HuggingFace returned no response')
+				console.warn('HuggingFace returned no response')
 				return null
 			}
 
-			console.log('📦 HuggingFace raw response:', response)
+			console.log('HuggingFace raw response:', response)
 			const rawCompletion = Array.isArray(response)
 				? response[0]?.generated_text
 				: (response as { generated_text?: string }).generated_text
 
 			if (!rawCompletion) {
-				console.warn('⚠ HuggingFace returned no completion')
+				console.warn('HuggingFace returned no completion')
 				return null
 			}
 
 			let completion = rawCompletion.trim()
 
-			// Remove the prompt from the beginning if repeated
 			const promptTrimmed = request.prompt.trim()
 			if (completion.startsWith(promptTrimmed)) {
 				completion = completion.substring(promptTrimmed.length).trim()
 			}
 
-			console.log('✅ HuggingFace completion:', completion.substring(0, 50))
+			console.log('HuggingFace completion:', completion.substring(0, 50))
 			return {
 				completion,
 				confidence: 0.7
 			}
 		} catch (error) {
-			console.error('❌ HuggingFace API error:', error)
+			console.error('HuggingFace API error:', error)
 			return null
 		}
 	}
@@ -211,7 +191,6 @@ export class HuggingFaceService implements AIService {
 			}
 
 			window.addEventListener('message', handler)
-			// Timeout after 30 seconds
 			setTimeout(() => {
 				window.removeEventListener('message', handler)
 				reject(new Error('Request timeout'))
@@ -227,9 +206,6 @@ export class HuggingFaceService implements AIService {
 	}
 }
 
-/**
- * Ollama service for local LLM inference (CodeLlama, etc.)
- */
 export class OllamaService implements AIService {
 	private baseUrl: string
 	private model: string
@@ -246,7 +222,7 @@ export class OllamaService implements AIService {
 	async isAvailable(): Promise<boolean> {
 		try {
 			const controller = new AbortController()
-			const timeoutId = setTimeout(() => controller.abort(), 1000) // 1 second timeout
+			const timeoutId = setTimeout(() => controller.abort(), 1000)
 			const response = await fetch(`${this.baseUrl}/api/tags`, {
 				method: 'GET',
 				signal: controller.signal
@@ -309,13 +285,10 @@ Completion:`
 	}
 
 	private extractCompletion(response: string): string {
-		// Clean up the response
 		let completion = response.trim()
 
-		// Remove markdown code blocks if present
 		completion = completion.replace(/```[\w]*\n?/g, '')
 
-		// Take only the first logical block
 		const lines = completion.split('\n')
 		const result: string[] = []
 		let braceCount = 0
@@ -323,7 +296,6 @@ Completion:`
 		for (const line of lines) {
 			result.push(line)
 
-			// Count braces to know when block is complete
 			for (const char of line) {
 				if (char === '{') {
 					braceCount++
@@ -333,7 +305,6 @@ Completion:`
 				}
 			}
 
-			// If we've closed all braces and have content, we're done
 			if (braceCount === 0 && result.length > 1) {
 				break
 			}
@@ -343,9 +314,6 @@ Completion:`
 	}
 }
 
-/**
- * OpenAI service for cloud-based completions
- */
 export class OpenAIService implements AIService {
 	private apiKey: string
 	private model: string
@@ -409,9 +377,6 @@ export class OpenAIService implements AIService {
 	}
 }
 
-/**
- * Manager to handle multiple AI services with fallback
- */
 export class AIServiceManager {
 	private services: AIService[] = []
 	private currentService: AIService | null = null
@@ -426,7 +391,6 @@ export class AIServiceManager {
 		this.services.push(new OllamaService())
 		this.services.push(new HuggingFaceService(vscodeApi))
 
-		// Check for OpenAI API key from environment/config
 		const openAIKey = this.getOpenAIKey()
 		if (openAIKey) {
 			this.services.push(new OpenAIService(openAIKey))
@@ -434,7 +398,6 @@ export class AIServiceManager {
 	}
 
 	async initialize(): Promise<void> {
-		// Try services in priority order
 		for (const service of this.services) {
 			const available = await service.isAvailable()
 			if (available) {
@@ -445,9 +408,8 @@ export class AIServiceManager {
 			}
 		}
 
-		console.warn('⚠ No AI services available.')
-		console.log('💡 Install Ollama for intelligent completions: https://ollama.ai')
-		console.log('   For now, using pattern-based completions (still pretty smart!)')
+		console.warn('No AI services available.')
+		console.log('Install Ollama for intelligent completions: https://ollama.ai')
 	}
 
 	async getCompletion(request: AICompletionRequest): Promise<AICompletionResponse | null> {
@@ -468,7 +430,6 @@ export class AIServiceManager {
 
 	private getOpenAIKey(): string | null {
 		// In a real implementation, this would read from VS Code settings
-		// For now, return null (user would need to configure)
 		return null
 	}
 }
