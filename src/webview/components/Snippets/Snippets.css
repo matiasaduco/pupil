@@ -23,7 +23,9 @@
 	cursor: pointer;
 	font-size: 0.85rem;
 	padding: 0.35rem 0.9rem;
-	transition: background 0.2s ease, color 0.2s ease;
+	transition:
+		background 0.2s ease,
+		color 0.2s ease;
 }
 
 .snippets-filterButton.is-active {
@@ -64,7 +66,9 @@
 	gap: 0.4rem;
 	padding: 0.75rem;
 	text-align: left;
-	transition: border-color 0.2s ease, transform 0.15s ease;
+	transition:
+		border-color 0.2s ease,
+		transform 0.15s ease;
 	width: 100%;
 }
 
