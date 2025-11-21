@@ -5,7 +5,7 @@ import { createTheme, IconButton, ThemeProvider } from '@mui/material'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import Toolbar from '../Toolbar/Toolbar.js'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import RadialKeyboard from '../RadialKeyboard/RadialKeyboard.js'
 import SimpleBrowserDialog from '../Toolbar/components/SimpleBrowserDialog.js'
 import CreateFileFolderDialog from '../Toolbar/components/CreateFileFolderDialog.js'
@@ -13,6 +13,18 @@ import TranscriptDialog from '../Toolbar/components/TranscriptDialog/TranscriptD
 import SettingsDialog from '../Toolbar/components/SettingsDialog.js'
 import BlinkDialog from '../Toolbar/components/BlinkDialog.js'
 import useDialog from './hooks/useDialog.js'
+import useRadialPreference from './hooks/useRadialPreference.js'
+import useKeyMappings from './hooks/useKeyMappings.js'
+
+const useColorSchemeSync = (colorScheme: string) => {
+	useEffect(() => {
+		if (colorScheme === 'vs') {
+			document.documentElement.classList.remove('dark')
+		} else {
+			document.documentElement.classList.add('dark')
+		}
+	}, [colorScheme])
+}
 
 const PupilContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
@@ -41,18 +53,8 @@ const PupilContainer = () => {
 		setSectionGuideMode
 	} = usePupilEditorContainer()
 
-	const [radialEnabled, setRadialEnabled] = useState<boolean>(() => {
-		const stored = localStorage.getItem('pupil-radial-enabled')
-		return stored !== null ? JSON.parse(stored) : true // default true
-	})
-
-	const toggleRadial = () => {
-		setRadialEnabled((prev) => {
-			const newValue = !prev
-			localStorage.setItem('pupil-radial-enabled', JSON.stringify(newValue))
-			return newValue
-		})
-	}
+	const { radialEnabled, toggleRadial } = useRadialPreference()
+	const { keyMappings, handleKeyMappingChange } = useKeyMappings()
 
 	const {
 		openSimpleBrowserDialog,
@@ -67,19 +69,17 @@ const PupilContainer = () => {
 		setOpenBlinkDialog
 	} = useDialog()
 
-	const theme = createTheme({
-		palette: {
-			mode: colorScheme === 'vs' ? 'light' : 'dark'
-		}
-	})
+	const theme = useMemo(
+		() =>
+			createTheme({
+				palette: {
+					mode: colorScheme === 'vs' ? 'light' : 'dark'
+				}
+			}),
+		[colorScheme]
+	)
 
-	useEffect(() => {
-		if (colorScheme === 'vs') {
-			document.documentElement.classList.remove('dark')
-		} else {
-			document.documentElement.classList.add('dark')
-		}
-	}, [colorScheme])
+	useColorSchemeSync(colorScheme)
 
 	return (
 		<ThemeProvider theme={theme}>
@@ -100,6 +100,7 @@ const PupilContainer = () => {
 					theme={colorScheme}
 				/>
 				<Toolbar
+					highlightConfirmKey={keyMappings.highlightSequence}
 					editorRef={editorRef}
 					keyboardVisible={keyboardVisible}
 					toggleKeyboard={toggleKeyboard}
@@ -134,6 +135,7 @@ const PupilContainer = () => {
 					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
 					openSettingsDialog={() => setOpenSettingsDialog(true)}
 					enabled={radialEnabled}
+					activationButton={keyMappings.radialToggle.button}
 				/>
 				<SimpleBrowserDialog
 					isOpen={openSimpleBrowserDialog}
@@ -162,6 +164,8 @@ const PupilContainer = () => {
 					onHighlightDelayChange={setHighlightDelayMs}
 					sectionGuideMode={sectionGuideMode}
 					onSectionGuideModeChange={setSectionGuideMode}
+					keyMappings={keyMappings}
+					onKeyMappingChange={handleKeyMappingChange}
 				/>
 				<BlinkDialog open={openBlinkDialog} onClose={() => setOpenBlinkDialog(false)} />
 			</div>

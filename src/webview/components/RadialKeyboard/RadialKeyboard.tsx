@@ -8,6 +8,7 @@ type RadialKeyboardProps = {
 	openTranscriptDialog: () => void
 	openSettingsDialog: () => void
 	enabled?: boolean
+	activationButton?: number
 }
 
 const RadialKeyboard = ({
@@ -16,7 +17,8 @@ const RadialKeyboard = ({
 	openFileFolderDialog,
 	openTranscriptDialog,
 	openSettingsDialog,
-	enabled = true
+	enabled = true,
+	activationButton = 1
 }: RadialKeyboardProps) => {
 	const { layout, show, setShow, position, handleItemClick } = useRadialMenu(
 		onInput,
@@ -24,7 +26,8 @@ const RadialKeyboard = ({
 		openFileFolderDialog,
 		openTranscriptDialog,
 		openSettingsDialog,
-		enabled
+		enabled,
+		activationButton
 	)
 
 	return (

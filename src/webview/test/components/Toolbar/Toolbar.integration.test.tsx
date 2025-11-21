@@ -4,6 +4,7 @@ import Toolbar from '../../../components/Toolbar/Toolbar.js'
 import { VsCodeApiProvider } from '../../../contexts/VsCodeApiContext.js'
 import { KeyboardFocusProvider } from '../../../contexts/KeyboardFocusContext.js'
 import React from 'react'
+import { DEFAULT_KEY_MAPPINGS } from '@webview/types/KeyMapping.js'
 
 const mockPostMessage = vi.fn()
 const mockVsCodeApi = {
@@ -261,6 +262,7 @@ describe('Toolbar Integration', () => {
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
 						openBlinkDialog={vi.fn()}
+						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>

@@ -74,7 +74,6 @@ vi.mock('@components/PupilDialog/PupilDialog.js', () => ({
 		) : null
 }))
 
-
 vi.mock('@mui/material', () => ({
 	Button: ({
 		children,
@@ -165,11 +164,11 @@ describe('Snippets', () => {
 	it('should render the Snippets button', () => {
 		render(
 			<VsCodeApiProvider>
-					<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
+				<Snippets editorRef={mockEditorRef} id="snippets-button" highlightedButtonId={null} />
 			</VsCodeApiProvider>
 		)
 
-			expect(screen.getByLabelText('Snippets')).toBeInTheDocument()
+		expect(screen.getByLabelText('Snippets')).toBeInTheDocument()
 	})
 
 	it('should open the dialog when Snippets button is clicked', async () => {

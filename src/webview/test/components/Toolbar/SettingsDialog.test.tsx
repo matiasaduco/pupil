@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import SettingsDialog from '../../../components/Toolbar/components/SettingsDialog.js'
 import { ConnectionStatus } from '../../../../constants.js'
+import { KeyMappings } from '@webview/types/KeyMapping.js'
 
 // Mock PupilDialog
 vi.mock('../../../components/PupilDialog/PupilDialog.js', () => ({
@@ -193,6 +194,7 @@ describe('SettingsDialog', () => {
 	const mockOnToggleRadial = vi.fn()
 	const mockOnHighlightDelayChange = vi.fn()
 	const mockOnSectionGuideModeChange = vi.fn()
+	const mockOnKeyMappingChange = vi.fn()
 
 	type TestSettingsDialogProps = {
 		open: boolean
@@ -209,6 +211,20 @@ describe('SettingsDialog', () => {
 		onHighlightDelayChange: (value: number) => void
 		sectionGuideMode: 'toolbar' | 'keyboard' | 'both'
 		onSectionGuideModeChange: (mode: 'toolbar' | 'keyboard' | 'both') => void
+		keyMappings: KeyMappings
+		onKeyMappingChange: typeof mockOnKeyMappingChange
+	}
+
+	const defaultKeyMappings: KeyMappings = {
+		highlightSequence: {
+			key: ' ',
+			code: 'Space',
+			label: 'Barra espaciadora'
+		},
+		radialToggle: {
+			button: 1,
+			label: 'Botón central del mouse'
+		}
 	}
 
 	const defaultProps: TestSettingsDialogProps = {
@@ -222,7 +238,9 @@ describe('SettingsDialog', () => {
 		highlightDelayMs: 600,
 		onHighlightDelayChange: mockOnHighlightDelayChange,
 		sectionGuideMode: 'both',
-		onSectionGuideModeChange: mockOnSectionGuideModeChange
+		onSectionGuideModeChange: mockOnSectionGuideModeChange,
+		keyMappings: defaultKeyMappings,
+		onKeyMappingChange: mockOnKeyMappingChange
 	}
 
 	const renderSettingsDialog = (props: Partial<TestSettingsDialogProps> = {}) => {
@@ -236,6 +254,7 @@ describe('SettingsDialog', () => {
 		mockOnToggleRadial.mockClear()
 		mockOnHighlightDelayChange.mockClear()
 		mockOnSectionGuideModeChange.mockClear()
+		mockOnKeyMappingChange.mockClear()
 	})
 
 	it('renders dialog when open is true', () => {
@@ -373,5 +392,39 @@ describe('SettingsDialog', () => {
 		renderSettingsDialog({ connectionStatus: ConnectionStatus.CONNECTED })
 
 		expect(screen.getByTestId('stop-icon')).toBeInTheDocument()
+	})
+
+	it('shows key mapping section with default shortcuts', () => {
+		renderSettingsDialog()
+
+		expect(screen.getByText('Mapeo de teclas')).toBeInTheDocument()
+		expect(screen.getByText('Barra espaciadora')).toBeInTheDocument()
+		expect(screen.getByText('Botón central del mouse')).toBeInTheDocument()
+	})
+
+	it('updates highlight key when user presses a new key', () => {
+		renderSettingsDialog()
+
+		const highlightButton = screen.getByRole('button', { name: 'Barra espaciadora' })
+		fireEvent.click(highlightButton)
+		fireEvent.keyDown(window, { key: 'Enter', code: 'Enter' })
+
+		expect(mockOnKeyMappingChange).toHaveBeenCalledWith(
+			'highlightSequence',
+			expect.objectContaining({ key: 'Enter', code: 'Enter' })
+		)
+	})
+
+	it('updates radial mouse button when user clicks', () => {
+		renderSettingsDialog()
+
+		const mouseButton = screen.getByRole('button', { name: 'Botón central del mouse' })
+		fireEvent.click(mouseButton)
+		fireEvent.mouseUp(window, { button: 2 })
+
+		expect(mockOnKeyMappingChange).toHaveBeenCalledWith('radialToggle', {
+			button: 2,
+			label: 'Botón derecho del mouse'
+		})
 	})
 })

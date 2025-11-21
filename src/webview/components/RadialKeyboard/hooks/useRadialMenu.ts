@@ -44,7 +44,8 @@ const useRadialMenu = (
 	openFileFolderDialog: () => void,
 	openTranscriptDialog: () => void,
 	openSettingsDialog: () => void,
-	enabled: boolean = true
+	enabled: boolean = true,
+	activationButton: number = 1
 ) => {
 	const generalShortcuts: Shortcut[] = [
 		{
@@ -256,17 +257,17 @@ const useRadialMenu = (
 			return
 		}
 
-		const handleMiddleClick = (e: MouseEvent) => {
-			if (e.button === 1) {
+		const handleActivationClick = (e: MouseEvent) => {
+			if (e.button === activationButton) {
 				e.preventDefault()
 				setShow(true)
 				setPosition({ x: e.clientX, y: e.clientY })
 			}
 		}
 
-		window.addEventListener('mouseup', handleMiddleClick, true)
-		return () => window.removeEventListener('mouseup', handleMiddleClick, true)
-	}, [enabled])
+		window.addEventListener('mouseup', handleActivationClick, true)
+		return () => window.removeEventListener('mouseup', handleActivationClick, true)
+	}, [enabled, activationButton])
 
 	const handleItemClick = (
 		event: React.MouseEvent<SVGGElement, MouseEvent>,

@@ -44,11 +44,12 @@ const HighlightableButton = ({
 				minWidth: hideLabel ? 40 : 112,
 				paddingInline: hideLabel ? 0.75 : 1.25,
 				color: theme.palette.text.primary,
-				backgroundColor: highlightedButtonId === id
-					? alpha(highlightColor, 0.1)
-					: theme.palette.mode === 'dark'
-						? alpha('#ffffff', 0.04)
-						: alpha('#000000', 0.02)
+				backgroundColor:
+					highlightedButtonId === id
+						? alpha(highlightColor, 0.1)
+						: theme.palette.mode === 'dark'
+							? alpha('#ffffff', 0.04)
+							: alpha('#000000', 0.02)
 			}}
 		>
 			{hideLabel ? null : label}
