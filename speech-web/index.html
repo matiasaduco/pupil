@@ -4,6 +4,10 @@
 		<meta charset="UTF-8" />
 		<title>Speech Recognition Demo</title>
 		<link rel="stylesheet" href="styles.css" />
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@3.11.0/dist/tf-core.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@3.11.0/dist/tf-converter.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@3.11.0/dist/tf-backend-webgl.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@0.0.3/dist/face-landmarks-detection.js"></script>
 	</head>
 	<body>
 		<div class="header">
@@ -40,6 +44,26 @@
 					<button class="mic-button" id="start">🎤</button>
 					<p>Haz clic en el micrófono para iniciar el reconocimiento de voz</p>
 				</div>
+				<div class="blink-section">
+					<h3>Detección de Parpadeo</h3>
+					<button class="blink-button" id="start-blink">👁️ Iniciar Detección</button>
+					<div class="video-container">
+						<video id="video" autoplay playsinline></video>
+						<canvas id="canvas"></canvas>
+					</div>
+					<div class="blink-status">
+						<div class="blink-info">
+							<span>Estado: <span id="blink-state">Inactivo</span></span>
+							<span>Parpadeos/min: <span id="blink-rate">0</span></span>
+						</div>
+						<div class="blink-events">
+							<div class="event-indicator" id="left-eye">Ojo izquierdo</div>
+							<div class="event-indicator" id="right-eye">Ojo derecho</div>
+							<div class="event-indicator" id="blink">Parpadeo</div>
+							<div class="event-indicator" id="long-blink">Parpadeo largo</div>
+						</div>
+					</div>
+				</div>
 				<div class="transcript-section">
 					<div class="transcript-title">Transcripción en Tiempo Real</div>
 					<div id="result">Presiona el micrófono para comenzar...</div>
@@ -52,16 +76,306 @@
 			const themeToggle = document.getElementById('theme-toggle')
 			const statusIndicator = document.getElementById('status-indicator')
 			const statusText = document.getElementById('status-text')
+			const blinkBtn = document.getElementById('start-blink')
+			const videoElement = document.getElementById('video')
+			const canvasElement = document.getElementById('canvas')
+			const canvasCtx = canvasElement.getContext('2d')
+			const blinkStateSpan = document.getElementById('blink-state')
+			const blinkRateSpan = document.getElementById('blink-rate')
+			const leftEyeIndicator = document.getElementById('left-eye')
+			const rightEyeIndicator = document.getElementById('right-eye')
+			const blinkIndicator = document.getElementById('blink')
+			const longBlinkIndicator = document.getElementById('long-blink')
 			const body = document.body
 			const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 			const ws = new WebSocket('ws://localhost:8080')
 			let recognition
+			let model, blinkRate
+			let blinkCount = 0
+			let tempBlinkRate = 0
+			let rendering = false
+			let rateInterval
+			let previousBlinkState = false
+			const VIDEO_SIZE = 500
+			const EAR_THRESHOLD = 0.27
 
 			// Theme toggle
 			themeToggle.onclick = () => {
 				body.classList.toggle('dark')
 				themeToggle.textContent = body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode'
 			}
+
+			// Blink detection functions
+			function initBlinkRateCalculator() {
+				rateInterval = setInterval(() => {
+					blinkRate = tempBlinkRate * 6
+					tempBlinkRate = 0
+					blinkRateSpan.textContent = blinkRate || 0
+				}, 10000)
+			}
+
+			async function loadModel() {
+				try {
+					blinkStateSpan.textContent = 'Cargando modelo...'
+					await tf.setBackend('webgl')
+					model = await faceLandmarksDetection.load(
+						faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+						{ maxFaces: 1 }
+					)
+					blinkStateSpan.textContent = 'Modelo cargado'
+					console.log('Modelo cargado exitosamente')
+				} catch (error) {
+					console.error('Error al cargar modelo:', error)
+					blinkStateSpan.textContent = 'Error al cargar modelo'
+				}
+			}
+
+			async function setUpCamera() {
+				const mediaDevices = await navigator.mediaDevices.enumerateDevices()
+				const defaultWebcam = mediaDevices.find(
+					(device) => device.kind === 'videoinput' && device.label.includes('Built-in')
+				)
+				const cameraId = defaultWebcam ? defaultWebcam.deviceId : undefined
+
+				const stream = await navigator.mediaDevices.getUserMedia({
+					audio: false,
+					video: {
+						facingMode: 'user',
+						deviceId: cameraId,
+						width: VIDEO_SIZE,
+						height: VIDEO_SIZE
+					}
+				})
+
+				videoElement.srcObject = stream
+				videoElement.play()
+				videoElement.width = VIDEO_SIZE
+				videoElement.height = VIDEO_SIZE
+				
+				canvasElement.width = VIDEO_SIZE
+				canvasElement.height = VIDEO_SIZE
+
+				return new Promise((resolve) => {
+					videoElement.onloadedmetadata = () => {
+						resolve(videoElement)
+						initBlinkRateCalculator()
+						blinkStateSpan.textContent = 'Detectando...'
+					}
+				})
+			}
+
+			function stopPrediction() {
+				rendering = false
+				clearInterval(rateInterval)
+				previousBlinkState = false
+				blinkCount = 0
+				tempBlinkRate = 0
+				blinkRate = 0
+				if (videoElement.srcObject) {
+					videoElement.srcObject.getTracks().forEach(track => track.stop())
+				}
+				blinkStateSpan.textContent = 'Inactivo'
+				blinkRateSpan.textContent = '0'
+			}
+
+			function updateBlinkRate() {
+				tempBlinkRate++
+			}
+
+			function getEucledianDistance(x1, y1, x2, y2) {
+				return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+			}
+
+			function getEAR(upper, lower) {
+				return (
+					(getEucledianDistance(upper[5][0], upper[5][1], lower[4][0], lower[4][1]) +
+						getEucledianDistance(upper[3][0], upper[3][1], lower[2][0], lower[2][1])) /
+					(2 * getEucledianDistance(upper[0][0], upper[0][1], upper[8][0], upper[8][1]))
+				)
+			}
+
+			function isVoluntaryBlink(blinkDetected) {
+				if (blinkDetected) {
+					blinkCount++
+					if (blinkCount > 4) {
+						blinkCount = 0
+						return true
+					}
+				} else {
+					blinkCount = 0
+				}
+				return false
+			}
+
+			async function getBlinkPrediction() {
+				if (!rendering) return null
+				
+				try {
+					// Draw video frame to canvas
+					canvasCtx.save()
+					canvasCtx.clearRect(0, 0, VIDEO_SIZE, VIDEO_SIZE)
+					canvasCtx.drawImage(videoElement, 0, 0, VIDEO_SIZE, VIDEO_SIZE)
+
+					const predictions = await model.estimateFaces({
+						input: videoElement,
+						returnTensors: false,
+						flipHorizontal: false,
+						predictIrises: true
+					})
+					
+					// Draw detection status
+					canvasCtx.fillStyle = predictions.length > 0 ? '#4caf50' : '#f44336'
+					canvasCtx.font = 'bold 16px Arial'
+					canvasCtx.strokeStyle = '#000000'
+					canvasCtx.lineWidth = 3
+					canvasCtx.strokeText(`Caras detectadas: ${predictions.length}`, 10, 30)
+					canvasCtx.fillText(`Caras detectadas: ${predictions.length}`, 10, 30)
+
+					if (predictions.length > 0) {
+						const prediction = predictions[0]
+						
+						// Use annotations like blink.js
+						const lowerRight = prediction.annotations.rightEyeUpper0
+						const upperRight = prediction.annotations.rightEyeLower0
+						const rightEAR = getEAR(upperRight, lowerRight)
+						
+						const lowerLeft = prediction.annotations.leftEyeUpper0
+						const upperLeft = prediction.annotations.leftEyeLower0
+						const leftEAR = getEAR(upperLeft, lowerLeft)
+						
+						// Draw eye landmarks for visualization
+						canvasCtx.fillStyle = '#ff0000'
+						upperRight.forEach(point => {
+							canvasCtx.beginPath()
+							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
+							canvasCtx.fill()
+						})
+						lowerRight.forEach(point => {
+							canvasCtx.beginPath()
+							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
+							canvasCtx.fill()
+						})
+						
+						canvasCtx.fillStyle = '#0000ff'
+						upperLeft.forEach(point => {
+							canvasCtx.beginPath()
+							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
+							canvasCtx.fill()
+						})
+						lowerLeft.forEach(point => {
+							canvasCtx.beginPath()
+							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
+							canvasCtx.fill()
+						})
+
+						const blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD
+						
+						// Count blinks on state change (from open to closed)
+						if (blinked && !previousBlinkState) {
+							updateBlinkRate()
+							console.log(`🔴 ¡PARPADEO DETECTADO! (Left EAR: ${leftEAR.toFixed(3)}, Right EAR: ${rightEAR.toFixed(3)})`)
+						}
+						previousBlinkState = blinked
+
+						const event = {
+							left: leftEAR <= EAR_THRESHOLD,
+							right: rightEAR <= EAR_THRESHOLD,
+							wink: leftEAR <= EAR_THRESHOLD || rightEAR <= EAR_THRESHOLD,
+							blink: blinked,
+							longBlink: isVoluntaryBlink(blinked),
+							rate: blinkRate || 0,
+							leftEAR: leftEAR.toFixed(3),
+							rightEAR: rightEAR.toFixed(3)
+						}
+						
+						// Draw EAR values on canvas
+						canvasCtx.fillStyle = '#ffffff'
+						canvasCtx.font = 'bold 14px Arial'
+						canvasCtx.strokeText(`Left EAR: ${event.leftEAR}`, 10, 60)
+						canvasCtx.fillText(`Left EAR: ${event.leftEAR}`, 10, 60)
+						canvasCtx.strokeText(`Right EAR: ${event.rightEAR}`, 10, 80)
+						canvasCtx.fillText(`Right EAR: ${event.rightEAR}`, 10, 80)
+						canvasCtx.strokeText(`Threshold: ${EAR_THRESHOLD}`, 10, 100)
+						canvasCtx.fillText(`Threshold: ${EAR_THRESHOLD}`, 10, 100)
+						canvasCtx.strokeText(`Rate: ${event.rate}/min`, 10, 120)
+						canvasCtx.fillText(`Rate: ${event.rate}/min`, 10, 120)
+						
+						canvasCtx.fillStyle = event.blink ? '#00ff00' : '#ffffff'
+						canvasCtx.strokeText(`Blink: ${event.blink ? 'YES' : 'NO'}`, 10, 140)
+						canvasCtx.fillText(`Blink: ${event.blink ? 'YES' : 'NO'}`, 10, 140)
+
+						// Update UI indicators
+						leftEyeIndicator.classList.toggle('active', event.left)
+						rightEyeIndicator.classList.toggle('active', event.right)
+						blinkIndicator.classList.toggle('active', event.blink)
+						longBlinkIndicator.classList.toggle('active', event.longBlink)
+
+						// Send event to WebSocket if needed
+						if (ws.readyState === WebSocket.OPEN) {
+							ws.send(JSON.stringify({ type: 'blink', event }))
+						}
+
+						canvasCtx.restore()
+						return event
+					} else {
+						canvasCtx.fillStyle = '#ffffff'
+						canvasCtx.font = 'bold 20px Arial'
+						canvasCtx.strokeText('No se detecta ninguna cara', 50, VIDEO_SIZE / 2)
+						canvasCtx.fillText('No se detecta ninguna cara', 50, VIDEO_SIZE / 2)
+						canvasCtx.restore()
+					}
+				} catch (error) {
+					console.error('Error en predicción:', error)
+					canvasCtx.fillStyle = '#ff0000'
+					canvasCtx.font = 'bold 16px Arial'
+					canvasCtx.fillText('Error: ' + error.message, 10, 30)
+					canvasCtx.restore()
+				}
+				return null
+			}
+
+			async function startBlinkDetection() {
+				try {
+					if (!rendering) {
+						rendering = true
+						blinkBtn.textContent = '⏸️ Detener Detección'
+						blinkBtn.classList.add('active')
+						
+						if (!model) {
+							await loadModel()
+						}
+						
+						if (!model) {
+							throw new Error('No se pudo cargar el modelo')
+						}
+						
+						await setUpCamera()
+						
+						console.log('Iniciando detección...')
+						
+						// Start prediction loop
+						const predict = async () => {
+							if (rendering) {
+								await getBlinkPrediction()
+								requestAnimationFrame(predict)
+							}
+						}
+						predict()
+					} else {
+						rendering = false
+						stopPrediction()
+						blinkBtn.textContent = '👁️ Iniciar Detección'
+						blinkBtn.classList.remove('active')
+					}
+				} catch (error) {
+					console.error('Error al iniciar detección:', error)
+					blinkStateSpan.textContent = 'Error: ' + error.message
+					rendering = false
+					blinkBtn.classList.remove('active')
+				}
+			}
+
+			blinkBtn.onclick = startBlinkDetection
 
 			// Update server status
 			function updateStatus(connected) {
