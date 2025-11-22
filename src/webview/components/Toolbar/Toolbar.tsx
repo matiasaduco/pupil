@@ -4,7 +4,7 @@ import './Toolbar.css'
 import Snippets from '../Snippets/Snippets.js'
 import TerminalsDialog from '../TerminalsDialog/TerminalsDialog.js'
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { RefObject } from 'react'
+import { RefObject, useState } from 'react'
 import useToolbar from './hooks/useToolbar.js'
 import useToolbarButtonRegistry from './hooks/useToolbarButtonRegistry.js'
 import useHighlightSequence from './hooks/useHighlightSequence.js'
@@ -119,6 +119,78 @@ const Toolbar = ({
 
 	const sectionGuideStopActive = isSectionGuideActive || isHighlighting || keyboardHighlighting
 
+	const [orderedGeneralShortcuts, setOrderedGeneralShortcuts] = useState(() => generalShortcuts)
+	const [orderedEditorShortcuts, setOrderedEditorShortcuts] = useState(() => editorShortcuts)
+	const [orderedTerminalShortcuts, setOrderedTerminalShortcuts] = useState(() => terminalShortcuts)
+	const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+	const [draggedCategory, setDraggedCategory] = useState<'general' | 'editor' | 'terminal' | null>(
+		null
+	)
+
+	const handleDragStart = (
+		e: React.DragEvent,
+		index: number,
+		category: 'general' | 'editor' | 'terminal'
+	) => {
+		console.log('Drag start:', index, category)
+		setDraggedIndex(index)
+		setDraggedCategory(category)
+		e.dataTransfer.effectAllowed = 'move'
+	}
+
+	const handleDragOver = (e: React.DragEvent, category: 'general' | 'editor' | 'terminal') => {
+		e.preventDefault()
+		if (draggedCategory === category) {
+			e.dataTransfer.dropEffect = 'move'
+		}
+	}
+
+	const handleDrop = (
+		e: React.DragEvent,
+		dropIndex: number,
+		category: 'general' | 'editor' | 'terminal'
+	) => {
+		e.preventDefault()
+		console.log(
+			'Drop:',
+			dropIndex,
+			category,
+			'draggedIndex:',
+			draggedIndex,
+			'draggedCategory:',
+			draggedCategory
+		)
+
+		if (draggedIndex === null || draggedCategory !== category || draggedIndex === dropIndex) {
+			console.log('Drop cancelled')
+			return
+		}
+
+		console.log('Reordering...')
+		const reorder = <T,>(list: T[]): T[] => {
+			const result = Array.from(list)
+			const [removed] = result.splice(draggedIndex, 1)
+			result.splice(dropIndex, 0, removed)
+			return result
+		}
+
+		if (category === 'general') {
+			setOrderedGeneralShortcuts(reorder(orderedGeneralShortcuts))
+		} else if (category === 'editor') {
+			setOrderedEditorShortcuts(reorder(orderedEditorShortcuts))
+		} else if (category === 'terminal') {
+			setOrderedTerminalShortcuts(reorder(orderedTerminalShortcuts))
+		}
+
+		setDraggedIndex(null)
+		setDraggedCategory(null)
+	}
+
+	const handleDragEnd = () => {
+		setDraggedIndex(null)
+		setDraggedCategory(null)
+	}
+
 	return (
 		<>
 			<nav
@@ -172,7 +244,7 @@ const Toolbar = ({
 				/>
 
 				{/* GENERAL SHORTCUTS */}
-				{generalShortcuts.map((shortcut) => {
+				{generalShortcuts.map((shortcut, index) => {
 					const id = nextButtonId(shortcut.label)
 					return (
 						<ToolbarButton
@@ -183,6 +255,10 @@ const Toolbar = ({
 							onButtonClick={shortcut.onClick || (() => {})}
 							id={id}
 							active={highlightedButtonId === id}
+							onDragStart={(e) => handleDragStart(e, index, 'general')}
+							onDragOver={(e) => handleDragOver(e, 'general')}
+							onDrop={(e) => handleDrop(e, index, 'general')}
+							onDragEnd={handleDragEnd}
 						/>
 					)
 				})}
@@ -202,7 +278,7 @@ const Toolbar = ({
 							highlightedButtonId={highlightedButtonId}
 							editorRef={editorRef}
 						/>
-						{editorShortcuts.map((shortcut) =>
+						{orderedEditorShortcuts.map((shortcut, index) =>
 							shortcut.divider ? (
 								<Divider
 									key="divider"
@@ -223,6 +299,10 @@ const Toolbar = ({
 											onButtonClick={() => handleButtonClick(shortcut.value!)}
 											id={id}
 											active={highlightedButtonId === id}
+											onDragStart={(e) => handleDragStart(e, index, 'editor')}
+											onDragOver={(e) => handleDragOver(e, 'editor')}
+											onDrop={(e) => handleDrop(e, index, 'editor')}
+											onDragEnd={handleDragEnd}
 										/>
 									)
 								})()
@@ -233,7 +313,7 @@ const Toolbar = ({
 
 				{/* TERMINAL SHORTCUTS */}
 				{focus === 'terminal' &&
-					terminalShortcuts.map((shortcut) =>
+					orderedTerminalShortcuts.map((shortcut, index) =>
 						shortcut.divider ? (
 							<Divider
 								key="divider"
@@ -254,6 +334,10 @@ const Toolbar = ({
 										onButtonClick={() => handleButtonClick(shortcut.value!)}
 										id={id}
 										active={highlightedButtonId === id}
+										onDragStart={(e) => handleDragStart(e, index, 'terminal')}
+										onDragOver={(e) => handleDragOver(e, 'terminal')}
+										onDrop={(e) => handleDrop(e, index, 'terminal')}
+										onDragEnd={handleDragEnd}
 									/>
 								)
 							})()

@@ -6,10 +6,14 @@ type ToolbarButtonProps = {
 	tooltipTitle: string
 	icon?: OverridableComponent<SvgIconTypeMap> | ReactElement
 	label?: string
-	onButtonClick?: () => void
 	onClick?: () => void
 	id?: string
 	active?: boolean
+	onButtonClick: () => void
+	onDragStart?: (e: React.DragEvent) => void
+	onDragOver?: (e: React.DragEvent) => void
+	onDrop?: (e: React.DragEvent) => void
+	onDragEnd?: () => void
 }
 
 const ToolbarButton = ({
@@ -19,7 +23,11 @@ const ToolbarButton = ({
 	onButtonClick,
 	onClick,
 	id,
-	active
+	active,
+	onDragStart,
+	onDragOver,
+	onDrop,
+	onDragEnd
 }: ToolbarButtonProps) => {
 	const theme = useTheme()
 	const highlightColor = theme.palette.primary?.main ?? '#1976d2'
@@ -43,37 +51,50 @@ const ToolbarButton = ({
 	const ariaLabel = isIconOnly ? (tooltipTitle ?? label) : undefined
 
 	return (
-		<Tooltip title={tooltipTitle}>
-			<IconButton
-				id={id}
-				aria-label={ariaLabel}
-				onClick={handleClick}
-				sx={{
-					width: 35,
-					height: 35,
-					fontSize: 14,
-					color: theme.palette.text.primary,
-					borderWidth: active ? 2 : 2,
-					borderStyle: 'solid',
-					borderColor: active ? highlightColor : 'transparent',
-					transition: 'border-color 200ms ease'
-				}}
-			>
-				{icon ? (
-					renderIcon()
-				) : (
-					<Typography
-						variant="body2"
-						sx={{
-							fontSize: '0.75rem',
-							color: theme.palette.text.primary
-						}}
-					>
-						{label}
-					</Typography>
-				)}
-			</IconButton>
-		</Tooltip>
+		<div
+			draggable={!!onDragStart}
+			onDragStart={onDragStart}
+			onDragOver={onDragOver}
+			onDrop={onDrop}
+			onDragEnd={onDragEnd}
+			style={{ display: 'inline-flex' }}
+		>
+			<Tooltip title={tooltipTitle}>
+				<IconButton
+					id={id}
+					aria-label={ariaLabel}
+					onClick={handleClick}
+					sx={{
+						width: 35,
+						height: 35,
+						fontSize: 14,
+						color: theme.palette.text.primary,
+						borderWidth: active ? 2 : 2,
+						borderStyle: 'solid',
+						borderColor: active ? highlightColor : 'transparent',
+						transition: 'border-color 200ms ease',
+						cursor: onDragStart ? 'grab' : 'pointer',
+						'&:active': {
+							cursor: onDragStart ? 'grabbing' : 'pointer'
+						}
+					}}
+				>
+					{icon ? (
+						renderIcon()
+					) : (
+						<Typography
+							variant="body2"
+							sx={{
+								fontSize: '0.75rem',
+								color: theme.palette.text.primary
+							}}
+						>
+							{label}
+						</Typography>
+					)}
+				</IconButton>
+			</Tooltip>
+		</div>
 	)
 }
 
