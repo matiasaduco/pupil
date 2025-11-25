@@ -31,7 +31,7 @@ const PupilKeyboard = ({
 	'data-testid': testId
 }: PupilKeyboardProps) => {
 	const { layout, handleKeyPress, clickedKey } = usePupilKeyboard(onInput)
-	const [orderedLayout, setOrderedLayout] = useState(() => {
+	const [orderedLayout, setOrderedLayout] = useState<typeof layout>(() => {
 		const saved = localStorage.getItem('pupil-keyboard-layout')
 		if (saved) {
 			try {
@@ -42,7 +42,7 @@ const PupilKeyboard = ({
 						if (original) {
 							return { ...original, col: saved.col }
 						}
-						return saved
+						return saved as (typeof layout)[number]
 					})
 					return ordered
 				}

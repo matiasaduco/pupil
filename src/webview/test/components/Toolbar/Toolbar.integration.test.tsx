@@ -368,6 +368,7 @@ describe('Toolbar Integration', () => {
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={mockOpenSettingsDialog}
 						openBlinkDialog={vi.fn()}
+						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -401,6 +402,7 @@ describe('Toolbar Integration', () => {
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
 						openBlinkDialog={vi.fn()}
+						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -433,6 +435,11 @@ describe('Toolbar Integration', () => {
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
 						openBlinkDialog={vi.fn()}
+						highlightConfirmKey={{
+							key: '',
+							code: '',
+							label: ''
+						}}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
@@ -458,6 +465,7 @@ describe('Toolbar Integration', () => {
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
 						openBlinkDialog={vi.fn()}
+						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
 			</VsCodeApiProvider>
