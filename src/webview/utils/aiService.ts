@@ -25,13 +25,19 @@ export class VSCodeLMService implements AIService {
 
 		window.addEventListener('message', (event) => {
 			const message = event.data
-			if (message.type === 'language-model-available') {
-				this.available = true
+			// Listen for unified status message; extension will send this even if not available
+			if (message.type === 'language-model-status') {
+				this.available = !!message.available
 				this.checkPending = false
-				console.log('✓ VS Code Language Model detected:', message.modelName)
+				if (this.available) {
+					console.log('✓ VS Code Language Model detected:', message.modelName)
+				} else {
+					console.log('ℹ VS Code Language Model not available yet')
+				}
 			}
 		})
 
+		// Ask extension for current status; extension will reply immediately and again later if status changes
 		this.vscodeApi.postMessage({ type: 'request-language-model-status' })
 	}
 
@@ -395,6 +401,20 @@ export class AIServiceManager {
 		if (openAIKey) {
 			this.services.push(new OpenAIService(openAIKey))
 		}
+
+		// Listen for late notifications from the extension: if the extension
+		// reports that the VS Code language model is available after the webview
+		// initialized, pick it as the active service.
+		window.addEventListener('message', (event) => {
+			const message = (event as MessageEvent).data
+			if (message?.type === 'language-model-status' && message.available) {
+				const vm = this.services.find((s) => s.getName() === 'VS Code Copilot')
+				if (vm && this.currentService === null) {
+					this.currentService = vm
+					console.log(`✓ AI completions enabled: ${vm.getName()} (late)`)
+				}
+			}
+		})
 	}
 
 	async initialize(): Promise<void> {

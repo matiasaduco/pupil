@@ -17,6 +17,7 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	private stopSpeechServer: () => void
 	private connectionStatus: ConnectionStatusType = ConnectionStatus.DISCONNECTED
 	private languageModelService: VSCodeLanguageModelService
+	private languageModelInitPromise: Promise<void> | null = null
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
@@ -27,7 +28,9 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		this.stopSpeechServer = stopSpeechServer
 		this.languageModelService = new VSCodeLanguageModelService()
 		this.initializeLogsDirectory()
-		this.initializeLanguageModel()
+		// Start language model initialization and keep the promise so we can
+		// respond to early requests from the webview reliably.
+		this.languageModelInitPromise = this.initializeLanguageModel()
 	}
 
 	public sendMessageToWebview(message: unknown) {
@@ -238,13 +241,14 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 						this.handleAICompletionRequest(message, webviewPanel)
 					}
 					if (message.type === 'request-language-model-status') {
-						// Send current language model status
-						if (this.languageModelService.isAvailable()) {
-							webviewPanel.webview.postMessage({
-								type: 'language-model-available',
-								modelName: this.languageModelService.getModelName()
-							})
-						}
+						// Reply immediately with current status (may be false) so the webview
+						// doesn't time out; the extension will also send a follow-up when
+						// initialization completes (see initializeLanguageModel).
+						webviewPanel.webview.postMessage({
+							type: 'language-model-status',
+							available: this.languageModelService.isAvailable(),
+							modelName: this.languageModelService.getModelName()
+						})
 					}
 				} catch (error) {
 					console.error('Error en onDidReceiveMessage:', error)
@@ -473,20 +477,45 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 	}
 
 	private async handleAICompletionRequest(
-		message: { requestId: string; service: string; payload: any },
+		message: { requestId: string; service: string; payload: unknown },
 		webviewPanel: vscode.WebviewPanel
 	) {
 		try {
-			let response: any = null
+			let response: unknown = null
 
 			if (message.service === 'vscode-lm') {
-				response = await this.fetchVSCodeLanguageModel(message.payload)
+				response = await this.fetchVSCodeLanguageModel(
+					message.payload as {
+						prompt: string
+						context: string
+						language: string
+					}
+				)
 			} else if (message.service === 'huggingface') {
-				response = await this.fetchHuggingFace(message.payload)
+				response = await this.fetchHuggingFace(
+					message.payload as {
+						inputs: string
+						parameters: Record<string, unknown>
+					}
+				)
 			} else if (message.service === 'ollama') {
-				response = await this.fetchOllama(message.payload)
+				response = await this.fetchOllama(
+					message.payload as {
+						model: string
+						prompt: string
+						stream: boolean
+						options?: Record<string, unknown>
+					}
+				)
 			} else if (message.service === 'openai') {
-				response = await this.fetchOpenAI(message.payload)
+				response = await this.fetchOpenAI(
+					message.payload as {
+						model: string
+						messages: unknown[]
+						temperature: number
+						max_tokens: number
+					}
+				)
 			}
 
 			webviewPanel.webview.postMessage({
@@ -506,13 +535,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 
 	private async fetchHuggingFace(payload: {
 		inputs: string
-		parameters: any
-	}): Promise<any> {
-		const response = await fetch('https://api-inference.huggingface.co/models/Salesforce/codegen-350M-mono', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload)
-		})
+		parameters: Record<string, unknown>
+	}): Promise<unknown> {
+		const response = await fetch(
+			'https://api-inference.huggingface.co/models/Salesforce/codegen-350M-mono',
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			}
+		)
 
 		if (!response.ok) {
 			throw new Error(`HuggingFace API error: ${response.status}`)
@@ -521,7 +553,12 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		return await response.json()
 	}
 
-	private async fetchOllama(payload: { model: string; prompt: string; stream: boolean; options: any }): Promise<any> {
+	private async fetchOllama(payload: {
+		model: string
+		prompt: string
+		stream: boolean
+		options?: Record<string, unknown>
+	}): Promise<unknown> {
 		const response = await fetch('http://localhost:11434/api/generate', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -535,7 +572,12 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		return await response.json()
 	}
 
-	private async fetchOpenAI(payload: { model: string; messages: any[]; temperature: number; max_tokens: number }): Promise<any> {
+	private async fetchOpenAI(payload: {
+		model: string
+		messages: unknown[]
+		temperature: number
+		max_tokens: number
+	}): Promise<unknown> {
 		const apiKey = vscode.workspace.getConfiguration('pupil').get<string>('openaiApiKey')
 		if (!apiKey) {
 			throw new Error('OpenAI API key not configured')
@@ -564,12 +606,20 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			// Notify webview that Copilot is available
 			if (this.webviewPanel) {
 				this.webviewPanel.webview.postMessage({
-					type: 'language-model-available',
+					type: 'language-model-status',
+					available: true,
 					modelName: this.languageModelService.getModelName()
 				})
 			}
 		} else {
 			console.log('ℹ No language models available (Copilot not enabled)')
+			// Notify webview of negative status so it can stop waiting
+			if (this.webviewPanel) {
+				this.webviewPanel.webview.postMessage({
+					type: 'language-model-status',
+					available: false
+				})
+			}
 		}
 	}
 
