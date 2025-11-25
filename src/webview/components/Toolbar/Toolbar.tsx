@@ -111,28 +111,110 @@ const Toolbar = ({
 			isMountedRef
 		})
 
+	const sectionGuideStopActive = isSectionGuideActive || isHighlighting || keyboardHighlighting
+
+	const [orderedGeneralShortcuts, setOrderedGeneralShortcuts] = useState(() => {
+		const saved = localStorage.getItem('pupil-toolbar-general')
+		if (saved) {
+			try {
+				const savedOrder: string[] = JSON.parse(saved)
+				if (Array.isArray(savedOrder) && savedOrder.length === generalShortcuts.length) {
+					const ordered = savedOrder
+						.map((label) => generalShortcuts.find((s) => s.label === label))
+						.filter((s): s is (typeof generalShortcuts)[number] => s !== undefined)
+					if (ordered.length === generalShortcuts.length) {
+						return ordered
+					}
+				}
+			} catch (e) {
+				console.error('Failed to parse saved general shortcuts:', e)
+			}
+		}
+		return generalShortcuts
+	})
+	const [orderedEditorShortcuts, setOrderedEditorShortcuts] = useState(() => {
+		const saved = localStorage.getItem('pupil-toolbar-editor')
+		if (saved) {
+			try {
+				const savedOrder: string[] = JSON.parse(saved)
+				if (Array.isArray(savedOrder) && savedOrder.length === editorShortcuts.length) {
+					const ordered = savedOrder
+						.map((val) => {
+							if (val === '__DIVIDER__') {
+								return editorShortcuts.find((s) => s.divider)
+							}
+							return editorShortcuts.find((s) => s.value === val || s.label === val)
+						})
+						.filter((s): s is (typeof editorShortcuts)[number] => s !== undefined)
+					if (ordered.length === editorShortcuts.length) {
+						return ordered
+					}
+				}
+			} catch (e) {
+				console.error('Failed to parse saved editor shortcuts:', e)
+			}
+		}
+		return editorShortcuts
+	})
+	const [orderedTerminalShortcuts, setOrderedTerminalShortcuts] = useState(() => {
+		const saved = localStorage.getItem('pupil-toolbar-terminal')
+		if (saved) {
+			try {
+				const savedOrder: string[] = JSON.parse(saved)
+				if (Array.isArray(savedOrder) && savedOrder.length === terminalShortcuts.length) {
+					const ordered = savedOrder
+						.map((val) => {
+							if (val === '__DIVIDER__') {
+								return terminalShortcuts.find((s) => s.divider)
+							}
+							return terminalShortcuts.find((s) => s.value === val || s.label === val)
+						})
+						.filter((s): s is (typeof terminalShortcuts)[number] => s !== undefined)
+					if (ordered.length === terminalShortcuts.length) {
+						return ordered
+					}
+				}
+			} catch (e) {
+				console.error('Failed to parse saved terminal shortcuts:', e)
+			}
+		}
+		return terminalShortcuts
+	})
+	const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+	const [draggedCategory, setDraggedCategory] = useState<'general' | 'editor' | 'terminal' | null>(
+		null
+	)
+
 	useEffect(() => {
 		return () => {
 			isMountedRef.current = false
 		}
 	}, [])
 
-	const sectionGuideStopActive = isSectionGuideActive || isHighlighting || keyboardHighlighting
+	useEffect(() => {
+		const order = orderedGeneralShortcuts.map((s) => s.label)
+		localStorage.setItem('pupil-toolbar-general', JSON.stringify(order))
+	}, [orderedGeneralShortcuts])
 
-	const [orderedGeneralShortcuts, setOrderedGeneralShortcuts] = useState(() => generalShortcuts)
-	const [orderedEditorShortcuts, setOrderedEditorShortcuts] = useState(() => editorShortcuts)
-	const [orderedTerminalShortcuts, setOrderedTerminalShortcuts] = useState(() => terminalShortcuts)
-	const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
-	const [draggedCategory, setDraggedCategory] = useState<'general' | 'editor' | 'terminal' | null>(
-		null
-	)
+	useEffect(() => {
+		const order = orderedEditorShortcuts.map((s) =>
+			s.divider ? '__DIVIDER__' : s.value || s.label
+		)
+		localStorage.setItem('pupil-toolbar-editor', JSON.stringify(order))
+	}, [orderedEditorShortcuts])
+
+	useEffect(() => {
+		const order = orderedTerminalShortcuts.map((s) =>
+			s.divider ? '__DIVIDER__' : s.value || s.label
+		)
+		localStorage.setItem('pupil-toolbar-terminal', JSON.stringify(order))
+	}, [orderedTerminalShortcuts])
 
 	const handleDragStart = (
 		e: React.DragEvent,
 		index: number,
 		category: 'general' | 'editor' | 'terminal'
 	) => {
-		console.log('Drag start:', index, category)
 		setDraggedIndex(index)
 		setDraggedCategory(category)
 		e.dataTransfer.effectAllowed = 'move'
@@ -151,18 +233,8 @@ const Toolbar = ({
 		category: 'general' | 'editor' | 'terminal'
 	) => {
 		e.preventDefault()
-		console.log(
-			'Drop:',
-			dropIndex,
-			category,
-			'draggedIndex:',
-			draggedIndex,
-			'draggedCategory:',
-			draggedCategory
-		)
 
 		if (draggedIndex === null || draggedCategory !== category || draggedIndex === dropIndex) {
-			console.log('Drop cancelled')
 			return
 		}
 
@@ -244,7 +316,7 @@ const Toolbar = ({
 				/>
 
 				{/* GENERAL SHORTCUTS */}
-				{generalShortcuts.map((shortcut, index) => {
+				{orderedGeneralShortcuts.map((shortcut, index) => {
 					const id = nextButtonId(shortcut.label)
 					return (
 						<ToolbarButton
