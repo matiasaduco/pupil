@@ -13,7 +13,11 @@ type ActionsProps = {
 	dialog: Record<string, () => void>
 }
 
-const usePupilContainer = () => {
+const usePupilContainer = (
+	setOpenSimpleBrowserDialog?: (open: boolean) => void,
+	setOpenFileFolderDialog?: (open: boolean) => void,
+	setOpenSettingsDialog?: (open: boolean) => void
+) => {
 	const vscode = useVsCodeApi()
 	const editorRef = useRef<PupilEditorHandle>(null)
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
@@ -44,11 +48,28 @@ const usePupilContainer = () => {
 			if (event.data.type === 'connection-status') {
 				setConnectionStatus(event.data.status)
 			}
+			// Handle voice commands
+			if (event.data.type === 'voice-open-simple-browser') {
+				setOpenSimpleBrowserDialog?.(true)
+			}
+			if (event.data.type === 'voice-open-create-dialog') {
+				setOpenFileFolderDialog?.(true)
+			}
+			if (event.data.type === 'voice-open-terminal') {
+				vscode.postMessage({ type: 'terminal-open' })
+				setFocus('terminal')
+			}
+			if (event.data.type === 'voice-save-document') {
+				vscode.postMessage({ type: 'save-file' })
+			}
+			if (event.data.type === 'voice-open-settings') {
+				setOpenSettingsDialog?.(true)
+			}
 		}
 
 		window.addEventListener('message', handleMessage)
 		return () => window.removeEventListener('message', handleMessage)
-	}, [])
+	}, [setOpenSimpleBrowserDialog, setOpenFileFolderDialog, setOpenSettingsDialog])
 
 	const actions: ActionsProps = {
 		editor: {

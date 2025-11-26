@@ -85,6 +85,35 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 		this.sendMessageToWebview({ type: 'connection-status', status })
 	}
 
+	public handleVoiceCommand(command: string) {
+		if (!this.webviewPanel) {
+			return
+		}
+
+		console.log('Handling voice command:', command)
+
+		// Map voice commands to webview messages
+		switch (command) {
+			case 'open-simple-browser':
+				this.webviewPanel.webview.postMessage({ type: 'voice-open-simple-browser' })
+				break
+			case 'open-create-dialog':
+				this.webviewPanel.webview.postMessage({ type: 'voice-open-create-dialog' })
+				break
+			case 'open-terminal':
+				this.webviewPanel.webview.postMessage({ type: 'voice-open-terminal' })
+				break
+			case 'save-document':
+				this.webviewPanel.webview.postMessage({ type: 'voice-save-document' })
+				break
+			case 'open-settings':
+				this.webviewPanel.webview.postMessage({ type: 'voice-open-settings' })
+				break
+			default:
+				console.warn('Unknown voice command:', command)
+		}
+	}
+
 	public disposable(): vscode.Disposable {
 		return vscode.window.registerCustomEditorProvider(PupilEditorProvider.viewType, this, {
 			webviewOptions: { retainContextWhenHidden: true },
@@ -235,6 +264,13 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'transcript') {
 						webviewPanel.webview.postMessage(message)
+					}
+					if (message.type === 'update-voice-commands-settings') {
+						// Forward settings update to speech-web client
+						this.sendToSpeechWebClient({
+							type: 'update-voice-commands-settings',
+							settings: message.settings
+						})
 					}
 					if (message.type === 'ai-completion-request') {
 						// Proxy AI completion requests to avoid CORS in webview

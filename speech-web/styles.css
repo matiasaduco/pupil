@@ -322,6 +322,147 @@ body {
 	box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 }
 
+/* Voice Commands Styles */
+.voice-commands-section {
+	background: var(--container-bg);
+	padding: 1.5em;
+	border-radius: 15px;
+	border: 1px solid var(--border-color);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.commands-header {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.commands-status {
+	font-weight: 500;
+	font-size: 0.95em;
+}
+
+.commands-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.command-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1em;
+	background: rgba(0, 0, 0, 0.02);
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+	transition: all 0.3s ease;
+}
+
+.dark .command-item {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.command-item:hover {
+	background: rgba(0, 0, 0, 0.05);
+	transform: translateX(5px);
+}
+
+.dark .command-item:hover {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.command-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.command-label {
+	font-weight: 600;
+	font-size: 0.95em;
+	color: var(--text-color);
+}
+
+.command-description {
+	font-size: 0.85em;
+	color: #666;
+	font-style: italic;
+}
+
+.dark .command-description {
+	color: #999;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+	position: relative;
+	display: inline-block;
+	width: 50px;
+	height: 26px;
+	flex-shrink: 0;
+}
+
+.toggle-switch.small {
+	width: 40px;
+	height: 22px;
+}
+
+.toggle-switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.toggle-slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	transition: 0.3s;
+	border-radius: 26px;
+}
+
+.toggle-slider:before {
+	position: absolute;
+	content: "";
+	height: 20px;
+	width: 20px;
+	left: 3px;
+	bottom: 3px;
+	background-color: white;
+	transition: 0.3s;
+	border-radius: 50%;
+}
+
+.toggle-switch.small .toggle-slider:before {
+	height: 16px;
+	width: 16px;
+}
+
+input:checked + .toggle-slider {
+	background-color: var(--button-bg);
+}
+
+input:checked + .toggle-slider:before {
+	transform: translateX(24px);
+}
+
+.toggle-switch.small input:checked + .toggle-slider:before {
+	transform: translateX(18px);
+}
+
+input:focus + .toggle-slider {
+	box-shadow: 0 0 1px var(--button-bg);
+}
+
 @media (max-width: 768px) {
 	.main-content {
 		grid-template-columns: 1fr;

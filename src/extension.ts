@@ -49,8 +49,20 @@ export function activate(context: vscode.ExtensionContext) {
 			pupilEditorProvider.updateConnectionStatus(ConnectionStatus.CONNECTED)
 
 			ws.on('message', (message: Buffer) => {
-				const transcript = JSON.parse(message.toString())
-				pupilEditorProvider.sendMessageToWebview(transcript)
+				const data = JSON.parse(message.toString())
+				
+				// Handle voice commands
+				if (data.type === 'voice-command') {
+					console.log('Voice command received:', data.command)
+					pupilEditorProvider.handleVoiceCommand(data.command)
+				} else if (data.type === 'voice-commands-settings') {
+					// Handle voice commands settings from speech-web
+					console.log('Voice commands settings received:', data.settings)
+					pupilEditorProvider.sendMessageToWebview(data)
+				} else {
+					// Handle regular transcripts and other messages
+					pupilEditorProvider.sendMessageToWebview(data)
+				}
 			})
 
 			ws.on('close', () => {
