@@ -168,9 +168,11 @@ const useForwardRef = (ref?: Ref<PupilEditorHandle>) => {
 
 			editor.focus()
 
+			// Trigger inline completions after programmatic text insertion
+			// Now that we removed the triggerKind check, this will work
 			setTimeout(() => {
-				editor.trigger('keyboard', 'editor.action.triggerSuggest', {})
-			}, 0)
+				editor.trigger('pupilKeyboard', 'editor.action.inlineSuggest.trigger', {})
+			}, 50)
 		}
 	}
 

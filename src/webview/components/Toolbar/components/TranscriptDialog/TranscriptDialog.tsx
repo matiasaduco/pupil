@@ -29,9 +29,11 @@ const TranscriptDialog = ({
 		commentTranscription,
 		setCommmentTranscription,
 		editableTranscript,
-		setEditableTranscript,
-		textareaRef
-	} = useTranscriptDialog({ editorRef, onClose })
+		textareaRef,
+		handleInputFocus,
+		handleInputChange,
+		handleInput
+	} = useTranscriptDialog({ editorRef, onClose, isOpen })
 
 	const ActionButton = () => (
 		<>
@@ -66,9 +68,13 @@ const TranscriptDialog = ({
 					multiline
 					fullWidth
 					value={editableTranscript}
-					onChange={(e) => setEditableTranscript(e.target.value)}
+					onChange={handleInputChange}
 					placeholder="No transcript available."
 					variant="outlined"
+					inputProps={{
+						onFocus: handleInputFocus,
+						onInput: handleInput
+					}}
 					sx={{
 						'& .MuiOutlinedInput-root': {
 							backgroundColor: 'transparent',

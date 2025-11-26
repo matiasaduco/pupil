@@ -1,5 +1,5 @@
 .transcript-box {
-	min-width: 400px;
+	width: 400px;
 	max-height: 200px;
 	overflow-y: auto;
 	border-radius: 12px;
@@ -12,6 +12,9 @@
 	transition:
 		background 0.2s,
 		color 0.2s;
+	resize: horizontal;
+	min-width: 200px;
+	max-width: 800px;
 }
 
 .dark .transcript-box {

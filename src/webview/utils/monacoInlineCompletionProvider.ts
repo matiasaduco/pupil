@@ -25,12 +25,6 @@ export class MonacoInlineCompletionProvider implements monaco.languages.InlineCo
 		context: monaco.languages.InlineCompletionContext
 	): monaco.languages.ProviderResult<monaco.languages.InlineCompletions> {
 		try {
-			// Don't provide suggestions if explicitly triggered or if there's already a suggestion
-			if (context.triggerKind === 1) {
-				// 1 = Explicit trigger
-				return { items: [] }
-			}
-
 			const lineContent = model.getLineContent(position.lineNumber)
 			const textBeforeCursor = lineContent.substring(0, position.column - 1).trim()
 

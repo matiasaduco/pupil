@@ -31,13 +31,42 @@ const PupilKeyboard = ({
 	'data-testid': testId
 }: PupilKeyboardProps) => {
 	const { layout, handleKeyPress, clickedKey } = usePupilKeyboard(onInput)
-	const [orderedLayout, setOrderedLayout] = useState(() => layout)
+	const [orderedLayout, setOrderedLayout] = useState<typeof layout>(() => {
+		const saved = localStorage.getItem('pupil-keyboard-layout')
+		if (saved) {
+			try {
+				const savedOrder: Array<{ value: string; label?: string; col?: number }> = JSON.parse(saved)
+				if (Array.isArray(savedOrder) && savedOrder.length === layout.length) {
+					const ordered = savedOrder.map((saved) => {
+						const original = layout.find((k) => k.value === saved.value)
+						if (original) {
+							return { ...original, col: saved.col }
+						}
+						return saved as (typeof layout)[number]
+					})
+					return ordered
+				}
+			} catch (e) {
+				console.error('Failed to parse saved keyboard layout:', e)
+			}
+		}
+		return layout
+	})
 	const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 	const [editMode, setEditMode] = useState(false)
 
 	if (layout.length !== orderedLayout.length || layout[0]?.value !== orderedLayout[0]?.value) {
 		setOrderedLayout(layout)
 	}
+
+	useEffect(() => {
+		const serializableLayout = orderedLayout.map((key) => ({
+			value: key.value,
+			label: key.label,
+			col: key.col
+		}))
+		localStorage.setItem('pupil-keyboard-layout', JSON.stringify(serializableLayout))
+	}, [orderedLayout])
 
 	const handleDragStart = (e: React.DragEvent, index: number) => {
 		setDraggedIndex(index)
@@ -59,7 +88,6 @@ const PupilKeyboard = ({
 		const draggedKey = orderedLayout[draggedIndex]
 		const dropKey = orderedLayout[dropIndex]
 
-		// Swap the two keys but keep their original column spans
 		const result = Array.from(orderedLayout)
 		const draggedCol = draggedKey.col
 		const dropCol = dropKey.col
