@@ -18,7 +18,7 @@ const usePupilContainer = () => {
 	const editorRef = useRef<PupilEditorHandle>(null)
 	const [keyboardVisible, setKeyboardVisible] = useState<boolean>(true)
 	const [focus, setFocus] = useState<FocusTarget>('editor')
-	const { insertIntoActiveInput, deleteFromActiveInput } = useKeyboardFocus()
+	const { insertIntoActiveInput, deleteFromActiveInput, activeInput } = useKeyboardFocus()
 	const [colorScheme, setColorScheme] = useState<string>('vs-dark')
 	const [connectionStatus, setConnectionStatus] = useState<ConnectionStatusType>(
 		ConnectionStatus.DISCONNECTED
@@ -104,6 +104,18 @@ const usePupilContainer = () => {
 	}
 
 	const handleKeyboardInput = (input: string) => {
+		// Check if there's an active input (dialog is open with a text field)
+		if (activeInput.current) {
+			const actionsDialog = actions['dialog']
+			if (input in actionsDialog) {
+				actionsDialog[input]()
+			} else {
+				insertIntoActiveInput(input)
+			}
+			return
+		}
+
+		// Otherwise, use the focus-based actions
 		const actionsF = actions[focus]
 		if (input in actionsF) {
 			actionsF[input]()

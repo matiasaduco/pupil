@@ -1,18 +1,41 @@
 import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
-import { RefObject, useState, useEffect, useRef } from 'react'
+import { RefObject, useState, useEffect, useRef, useLayoutEffect } from 'react'
 import useSpeechRecognition from './useSpeechRecognition.js'
+import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 
 type TranscriptDialogProps = {
 	editorRef: RefObject<PupilEditorHandle | null>
 	onClose: () => void
+	isOpen: boolean
 }
 
-const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
+const useTranscriptDialog = ({ editorRef, onClose, isOpen }: TranscriptDialogProps) => {
 	const { transcript, listening, resetTranscript, startListening, stopListening } =
 		useSpeechRecognition()
 	const [commentTranscription, setCommmentTranscription] = useState<boolean>(true)
 	const [editableTranscript, setEditableTranscript] = useState<string>('')
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+	const { setActiveInput } = useKeyboardFocus()
+	const shouldMaintainFocusRef = useRef(false)
+	const cursorPositionRef = useRef<number | null>(null)
+
+	useLayoutEffect(() => {
+		if (shouldMaintainFocusRef.current && textareaRef.current) {
+			const cursorPos = cursorPositionRef.current
+			textareaRef.current.focus()
+			if (cursorPos !== null) {
+				textareaRef.current.setSelectionRange(cursorPos, cursorPos)
+			}
+			shouldMaintainFocusRef.current = false
+			cursorPositionRef.current = null
+		}
+	}, [editableTranscript])
+
+	useEffect(() => {
+		if (!isOpen) {
+			setActiveInput(null)
+		}
+	}, [isOpen, setActiveInput])
 
 	// Previously we inserted artificial line breaks to fit a TextField width.
 	// Instead, keep the raw transcript and let the editor handle wrapping when
@@ -29,6 +52,31 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		}
 	}
 
+	const handleInputFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+		const nativeInput = e.target as HTMLTextAreaElement
+		textareaRef.current = nativeInput
+		setActiveInput(nativeInput)
+	}
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		const input = e.target as HTMLTextAreaElement
+		const cursorPos = input.selectionStart
+		textareaRef.current = input
+		setActiveInput(input)
+		setEditableTranscript(e.target.value)
+		cursorPositionRef.current = cursorPos
+		shouldMaintainFocusRef.current = true
+	}
+
+	const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+		const input = e.target as HTMLTextAreaElement
+		const cursorPos = input.selectionStart
+		textareaRef.current = input
+		setEditableTranscript(input.value)
+		cursorPositionRef.current = cursorPos
+		shouldMaintainFocusRef.current = true
+	}
+
 	const handleOnSubmit = () => {
 		if (listening) {
 			stopListening()
@@ -36,6 +84,7 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		onSubmit(editableTranscript)
 		resetTranscript()
 		setEditableTranscript('')
+		setActiveInput(null)
 		onClose()
 	}
 
@@ -115,6 +164,7 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		}
 		resetTranscript()
 		setEditableTranscript('')
+		setActiveInput(null)
 		onClose()
 	}
 
@@ -128,7 +178,10 @@ const useTranscriptDialog = ({ editorRef, onClose }: TranscriptDialogProps) => {
 		setCommmentTranscription,
 		editableTranscript,
 		setEditableTranscript,
-		textareaRef
+		textareaRef,
+		handleInputFocus,
+		handleInputChange,
+		handleInput
 	}
 }
 
