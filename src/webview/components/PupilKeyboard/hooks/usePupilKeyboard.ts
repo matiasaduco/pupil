@@ -3,6 +3,8 @@ import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn'
 import KeyboardCapslockIcon from '@mui/icons-material/KeyboardCapslock'
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab'
 import SpaceBarIcon from '@mui/icons-material/SpaceBar'
+import EditIcon from '@mui/icons-material/Edit'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import { Layout } from '../types/layout.js'
 import { useCallback, useState } from 'react'
 import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
@@ -22,7 +24,9 @@ const KEYBOARD_LAYOUT: Layout = {
 		{ value: '0', label: '0' },
 		{ value: '-', label: '-' },
 		{ value: '=', label: '=' },
-		{ value: '{bksp}', icon: BackspaceIcon, col: 4 },
+		{ value: '{edit}', icon: EditIcon, col: 1 },
+		{ value: '{reset}', icon: RestartAltIcon, col: 1 },
+		{ value: '{bksp}', icon: BackspaceIcon, col: 2 },
 
 		{ value: '{tab}', label: 'Tab', icon: KeyboardTabIcon, col: 3 },
 		{ value: 'q', label: 'q' },
@@ -80,7 +84,9 @@ const KEYBOARD_LAYOUT: Layout = {
 		{ value: ')', label: ')' },
 		{ value: '_', label: '_' },
 		{ value: '+', label: '+' },
-		{ value: '{bksp}', icon: BackspaceIcon, col: 4 },
+		{ value: '{edit}', icon: EditIcon, col: 1 },
+		{ value: '{reset}', icon: RestartAltIcon, col: 1 },
+		{ value: '{bksp}', icon: BackspaceIcon, col: 2 },
 
 		{ value: '{tab}', label: 'Tab', icon: KeyboardTabIcon, col: 3 },
 		{ value: 'Q', label: 'Q' },
