@@ -178,84 +178,89 @@ const PupilKeyboard = ({
 	return (
 		<div style={{ position: 'relative' }}>
 			<div
-				style={{
-					position: 'absolute',
-					top: 12,
-					right: 20,
-					zIndex: 100,
-					display: 'flex',
-					gap: '4px'
-				}}
-			>
-				<Tooltip title={editMode ? 'Disable Edit Mode' : 'Enable Edit Mode'}>
-					<Button
-						onClick={() => setEditMode(!editMode)}
-						className={clsx('pupil-keyboard-btn border-2', {
-							'border-amber-500!': editMode,
-							'border-transparent': !editMode
-						})}
-						sx={{
-							minWidth: 'auto',
-							padding: '6px',
-							width: '32px',
-							height: '32px'
-						}}
-					>
-						{editMode ? <EditOffIcon sx={{ fontSize: 16 }} /> : <EditIcon sx={{ fontSize: 16 }} />}
-					</Button>
-				</Tooltip>
-				<Tooltip title="Reset to Default Layout">
-					<Button
-						onClick={handleResetLayout}
-						className="pupil-keyboard-btn border-2 border-transparent"
-						sx={{
-							minWidth: 'auto',
-							padding: '6px',
-							width: '32px',
-							height: '32px'
-						}}
-					>
-						<RestartAltIcon sx={{ fontSize: 16 }} />
-					</Button>
-				</Tooltip>
-			</div>
-			<div
 				className={clsx('grid grid-cols-30 gap-1 bg-gray-400 rounded p-2', {
 					'pupil-keyboard--section-highlighted': sectionHighlighting
 				})}
 				style={{ height: 'min(30vh, 220px)' }}
 				data-testid={testId}
 			>
-				{orderedLayout.map((key, index) => (
-					<div
-						key={`${key.value}-${index}`}
-						draggable={editMode}
-						onDragStart={editMode ? (e) => handleDragStart(e, index) : undefined}
-						onDragOver={editMode ? handleDragOver : undefined}
-						onDrop={editMode ? (e) => handleDrop(e, index) : undefined}
-						onDragEnd={editMode ? handleDragEnd : undefined}
-						style={{
-							gridColumn: `span ${key.col || 2} / span ${key.col || 2}`,
-							display: 'flex',
-							cursor: editMode ? 'grab' : 'default'
-						}}
-					>
-						<Button
-							onClick={() => handleKeyPress(key)}
-							disabled={editMode}
-							className={clsx('pupil-keyboard-btn border-2 border-transparent', {
-								'border-amber-500!': key.value === clickedKey,
-								'pupil-keyboard-btn--highlighted': highlightedKeyIndex === index
-							})}
-							sx={{
-								width: '100%',
-								textTransform: 'unset'
+				{orderedLayout.map((key, index) => {
+					const isEditButton = key.value === '{edit}'
+					const isResetButton = key.value === '{reset}'
+					const isSpecialButton = isEditButton || isResetButton
+
+					return (
+						<div
+							key={`${key.value}-${index}`}
+							draggable={editMode && !isSpecialButton}
+							onDragStart={
+								editMode && !isSpecialButton ? (e) => handleDragStart(e, index) : undefined
+							}
+							onDragOver={editMode && !isSpecialButton ? handleDragOver : undefined}
+							onDrop={editMode && !isSpecialButton ? (e) => handleDrop(e, index) : undefined}
+							onDragEnd={editMode && !isSpecialButton ? handleDragEnd : undefined}
+							style={{
+								gridColumn: `span ${key.col || 2} / span ${key.col || 2}`,
+								display: 'flex',
+								cursor: editMode && !isSpecialButton ? 'grab' : 'default'
 							}}
 						>
-							{key.icon ? <key.icon /> : key.label || key.value}
-						</Button>
-					</div>
-				))}
+							{isEditButton ? (
+								<Tooltip title={editMode ? 'Disable Edit Mode' : 'Enable Edit Mode'}>
+									<Button
+										onClick={() => setEditMode(!editMode)}
+										className={clsx('pupil-keyboard-btn border-2', {
+											'border-amber-500!': editMode,
+											'border-transparent': !editMode
+										})}
+										sx={{
+											width: '100%',
+											textTransform: 'unset',
+											minWidth: 'auto',
+											padding: '6px'
+										}}
+									>
+										{editMode ? (
+											<EditOffIcon sx={{ fontSize: 16 }} />
+										) : (
+											<EditIcon sx={{ fontSize: 16 }} />
+										)}
+									</Button>
+								</Tooltip>
+							) : isResetButton ? (
+								<Tooltip title="Reset to Default Layout">
+									<Button
+										onClick={handleResetLayout}
+										className="pupil-keyboard-btn border-2 border-transparent"
+										sx={{
+											width: '100%',
+											textTransform: 'unset',
+											minWidth: 'auto',
+											padding: '6px'
+										}}
+									>
+										<RestartAltIcon sx={{ fontSize: 16 }} />
+									</Button>
+								</Tooltip>
+							) : (
+								<Button
+									onClick={() => handleKeyPress(key)}
+									disabled={editMode}
+									className={clsx('pupil-keyboard-btn border-2 border-transparent', {
+										'border-amber-500!': key.value === clickedKey,
+										'pupil-keyboard-btn--highlighted': highlightedKeyIndex === index
+									})}
+									sx={{
+										width: '100%',
+										textTransform: 'unset'
+									}}
+								>
+									{key.icon ? <key.icon /> : key.label || key.value}
+								</Button>
+							)}
+						</div>
+					)
+				})}
 			</div>
 		</div>
 	)
