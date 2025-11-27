@@ -1,0 +1,31 @@
+
+.radial-menu-wrapper svg foreignObject div.__rrm-content {
+	color: #ffffff !important;
+}
+
+.radial-menu-wrapper svg path,
+.radial-menu-wrapper svg circle,
+.radial-menu-wrapper svg rect,
+.radial-menu-wrapper svg polygon {
+	fill: #2a2a2a !important;
+	stroke: #3a3f4b !important;
+}
+
+/* Light theme */
+.radial-menu-wrapper.light-theme svg foreignObject div.__rrm-content {
+	color: #000000 !important;
+}
+
+.radial-menu-wrapper.light-theme svg path,
+.radial-menu-wrapper.light-theme svg circle,
+.radial-menu-wrapper.light-theme svg rect,
+.radial-menu-wrapper.light-theme svg polygon {
+	fill: #ffffff !important;
+	stroke: #cccccc !important;
+}
+
+.radial-menu-wrapper svg text,
+.radial-menu-wrapper svg tspan {
+	stroke: none !important;
+	font-weight: 500 !important;
+}
