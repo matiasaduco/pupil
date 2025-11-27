@@ -36,10 +36,8 @@ const RadialKeyboard = ({
 	const theme = useTheme()
 	const isDark = theme.palette.mode === 'dark'
 
-	// Apply theme-based styling to radial menu SVG elements after render
 	useEffect(() => {
 		if (show) {
-			// Add theme class to wrapper
 			const wrapperEl = document.querySelector('.radial-menu-wrapper')
 			if (wrapperEl) {
 				if (isDark) {
@@ -62,18 +60,15 @@ const RadialKeyboard = ({
 					return
 				}
 
-				// Theme-based colors
 				const textColor = isDark ? '#ffffff' : '#000000'
 				const bgColor = isDark ? '#2a2a2a' : '#ffffff'
 				const strokeColor = isDark ? '#3a3f4b' : '#cccccc'
 
-				// The library uses foreignObject with div elements for text, not SVG text elements
 				const contentDivs = svg.querySelectorAll('foreignObject div.__rrm-content')
 				contentDivs.forEach((div) => {
 					;(div as HTMLElement).style.setProperty('color', textColor, 'important')
 				})
 
-				// Apply to all shape elements
 				const shapes = svg.querySelectorAll('path, circle, rect, polygon')
 				shapes.forEach((shape) => {
 					;(shape as SVGElement).style.setProperty('fill', bgColor, 'important')
@@ -81,12 +76,10 @@ const RadialKeyboard = ({
 				})
 			}
 
-			// Set up mutation observer to watch for new elements only (not attribute changes)
 			const wrapper = document.querySelector('.radial-menu-wrapper')
 			if (wrapper) {
 				let debounceTimer: NodeJS.Timeout | null = null
 				observer = new MutationObserver((mutations) => {
-					// Check if new elements were added
 					let hasNewElements = false
 					mutations.forEach((mutation) => {
 						if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
@@ -95,7 +88,6 @@ const RadialKeyboard = ({
 					})
 
 					if (hasNewElements) {
-						// Debounce to prevent infinite loops
 						if (debounceTimer) {
 							clearTimeout(debounceTimer)
 						}
@@ -111,7 +103,6 @@ const RadialKeyboard = ({
 				})
 			}
 
-			// Apply with immediate and progressive timing to catch various render stages
 			const timer0 = setTimeout(applyTheme, 0)
 			const timer1 = setTimeout(applyTheme, 10)
 			const timer2 = setTimeout(applyTheme, 50)
