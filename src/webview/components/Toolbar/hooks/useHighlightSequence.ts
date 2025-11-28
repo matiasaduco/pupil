@@ -149,6 +149,37 @@ const useHighlightSequence = ({
 		return () => document.removeEventListener('keydown', onKeyDown)
 	}, [activeInput, highlightedButtonId, matchesHighlightKey])
 
+	useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			if (event.data.type === 'blink-detected') {
+				// Simular presión de la tecla configurada (barra espaciadora por defecto)
+				const keyEvent = new KeyboardEvent('keydown', {
+					key: highlightConfirmKey?.key || ' ',
+					code: highlightConfirmKey?.code || 'Space',
+					bubbles: true,
+					cancelable: true
+				})
+
+				document.dispatchEvent(keyEvent)
+			}
+
+			if (event.data.type === 'left-eye-closed') {
+				console.log('left-eye-closed', event.data)
+			}
+
+			if (event.data.type === 'right-eye-closed') {
+				console.log('right-eye-closed', event.data)
+			}
+
+			if (event.data.type === 'long-blink-detected') {
+				console.log('long-blink-detected', event.data)
+			}
+		}
+
+		window.addEventListener('message', handleMessage)
+		return () => window.removeEventListener('message', handleMessage)
+	}, [highlightConfirmKey])
+
 	return {
 		highlightedButtonId,
 		isHighlighting,
