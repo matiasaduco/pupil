@@ -15,6 +15,7 @@ import BlinkDialog from '../Toolbar/components/BlinkDialog.js'
 import useDialog from './hooks/useDialog.js'
 import useRadialPreference from './hooks/useRadialPreference.js'
 import useKeyMappings from './hooks/useKeyMappings.js'
+import useVoiceCommandsSettings from './hooks/useVoiceCommandsSettings.js'
 
 const useColorSchemeSync = (colorScheme: string) => {
 	useEffect(() => {
@@ -28,6 +29,19 @@ const useColorSchemeSync = (colorScheme: string) => {
 
 const PupilContainer = () => {
 	const isDev = window.location.hostname === 'localhost'
+
+	const {
+		openSimpleBrowserDialog,
+		openFileFolderDialog,
+		openTranscriptDialog,
+		openSettingsDialog,
+		openBlinkDialog,
+		setOpenSimpleBrowserDialog,
+		setOpenFileFolderDialog,
+		setOpenTranscriptDialog,
+		setOpenSettingsDialog,
+		setOpenBlinkDialog
+	} = useDialog()
 
 	const {
 		editorRef,
@@ -51,23 +65,15 @@ const PupilContainer = () => {
 		setHighlightDelayMs,
 		sectionGuideMode,
 		setSectionGuideMode
-	} = usePupilEditorContainer()
+	} = usePupilEditorContainer(
+		setOpenSimpleBrowserDialog,
+		setOpenFileFolderDialog,
+		setOpenSettingsDialog
+	)
 
 	const { radialEnabled, toggleRadial } = useRadialPreference()
 	const { keyMappings, handleKeyMappingChange } = useKeyMappings()
-
-	const {
-		openSimpleBrowserDialog,
-		openFileFolderDialog,
-		openTranscriptDialog,
-		openSettingsDialog,
-		openBlinkDialog,
-		setOpenSimpleBrowserDialog,
-		setOpenFileFolderDialog,
-		setOpenTranscriptDialog,
-		setOpenSettingsDialog,
-		setOpenBlinkDialog
-	} = useDialog()
+	const { voiceCommandsSettings, updateVoiceCommandsSettings } = useVoiceCommandsSettings()
 
 	const theme = useMemo(
 		() =>
@@ -166,6 +172,8 @@ const PupilContainer = () => {
 					onSectionGuideModeChange={setSectionGuideMode}
 					keyMappings={keyMappings}
 					onKeyMappingChange={handleKeyMappingChange}
+					voiceCommandsSettings={voiceCommandsSettings}
+					onVoiceCommandsSettingsChange={updateVoiceCommandsSettings}
 				/>
 				<BlinkDialog open={openBlinkDialog} onClose={() => setOpenBlinkDialog(false)} />
 			</div>

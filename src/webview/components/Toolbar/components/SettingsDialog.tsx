@@ -26,7 +26,7 @@ import {
 	RadialMouseBinding
 } from '@webview/types/KeyMapping.js'
 
-type TabValue = 'general' | 'shortcuts' | 'server'
+type TabValue = 'general' | 'shortcuts' | 'server' | 'voice-commands'
 
 type TabPanelProps = {
 	value: TabValue
@@ -74,6 +74,18 @@ const KEY_MAPPING_META: Array<{
 	}
 ]
 
+type VoiceCommand = {
+	id: string
+	label: string
+	description: string
+	patterns: string[]
+}
+
+type VoiceCommandsSettings = {
+	enabled: boolean
+	commands: Record<string, boolean>
+}
+
 type SettingsDialogProps = {
 	open: boolean
 	onClose: () => void
@@ -88,7 +100,42 @@ type SettingsDialogProps = {
 	onSectionGuideModeChange: (mode: HighlightMode) => void
 	keyMappings: KeyMappings
 	onKeyMappingChange: (id: KeyMappingId, value: KeyMappingValue) => void
+	voiceCommandsSettings?: VoiceCommandsSettings
+	onVoiceCommandsSettingsChange?: (settings: VoiceCommandsSettings) => void
 }
+
+const VOICE_COMMANDS: VoiceCommand[] = [
+	{
+		id: 'open-simple-browser',
+		label: 'Abrir Simple Browser',
+		description: 'Abre el diálogo de Simple Browser',
+		patterns: ['abrir simple browser', 'abrir navegador', 'abrir browser']
+	},
+	{
+		id: 'open-create-dialog',
+		label: 'Crear Archivo/Carpeta',
+		description: 'Abre el diálogo de creación',
+		patterns: ['crear archivo', 'nuevo archivo', 'crear carpeta', 'nueva carpeta']
+	},
+	{
+		id: 'open-terminal',
+		label: 'Abrir Terminal',
+		description: 'Abre la terminal integrada',
+		patterns: ['abrir terminal', 'mostrar terminal']
+	},
+	{
+		id: 'save-document',
+		label: 'Guardar Documento',
+		description: 'Guarda el documento actual',
+		patterns: ['guardar archivo', 'guardar documento', 'guardar']
+	},
+	{
+		id: 'open-settings',
+		label: 'Abrir Configuración',
+		description: 'Abre el diálogo de configuración',
+		patterns: ['abrir configuración', 'abrir ajustes', 'configuración']
+	}
+]
 
 const SettingsDialog = ({
 	open,
@@ -103,7 +150,9 @@ const SettingsDialog = ({
 	sectionGuideMode,
 	onSectionGuideModeChange,
 	keyMappings,
-	onKeyMappingChange
+	onKeyMappingChange,
+	voiceCommandsSettings,
+	onVoiceCommandsSettingsChange
 }: SettingsDialogProps) => {
 	const isConnected = connectionStatus.value === 'connected'
 	const isConnecting = connectionStatus.value === 'connecting'
@@ -216,6 +265,12 @@ const SettingsDialog = ({
 						value="shortcuts"
 						id="settings-tab-shortcuts"
 						aria-controls="settings-tabpanel-shortcuts"
+					/>
+					<Tab
+						label="Comandos"
+						value="voice-commands"
+						id="settings-tab-voice-commands"
+						aria-controls="settings-tabpanel-voice-commands"
 					/>
 					<Tab
 						label="Servidor"
@@ -337,6 +392,75 @@ const SettingsDialog = ({
 								)
 							})}
 						</Box>
+					</Box>
+				</TabPanel>
+				<TabPanel value="voice-commands" activeTab={activeTab} labelledBy="settings-tab-voice-commands">
+					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+						Configura los comandos de voz que quieres usar. Los comandos habilitados se ejecutarán automáticamente cuando se detecten en el reconocimiento de voz.
+					</Typography>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={voiceCommandsSettings?.enabled ?? true}
+								onChange={(e) => {
+									if (onVoiceCommandsSettingsChange && voiceCommandsSettings) {
+										onVoiceCommandsSettingsChange({
+											...voiceCommandsSettings,
+											enabled: e.target.checked
+										})
+									}
+								}}
+								color="primary"
+							/>
+						}
+						label="Habilitar detección de comandos de voz"
+					/>
+					<Divider sx={{ my: 2 }} />
+					<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+						Comandos Disponibles
+					</Typography>
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+						{VOICE_COMMANDS.map((cmd) => (
+							<Box
+								key={cmd.id}
+								sx={{
+									p: 1.5,
+									border: '1px solid',
+									borderColor: 'divider',
+									borderRadius: 1,
+									'&:hover': {
+										bgcolor: 'action.hover'
+									}
+								}}
+							>
+								<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+									<Box sx={{ flex: 1 }}>
+										<Typography variant="body2" sx={{ fontWeight: 500 }}>
+											{cmd.label}
+										</Typography>
+										<Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+											Frases: {cmd.patterns.join(', ')}
+										</Typography>
+									</Box>
+									<Switch
+										checked={voiceCommandsSettings?.commands[cmd.id] ?? true}
+										onChange={(e) => {
+											if (onVoiceCommandsSettingsChange && voiceCommandsSettings) {
+												onVoiceCommandsSettingsChange({
+													...voiceCommandsSettings,
+													commands: {
+														...voiceCommandsSettings.commands,
+														[cmd.id]: e.target.checked
+													}
+												})
+											}
+										}}
+										disabled={!voiceCommandsSettings?.enabled}
+										size="small"
+									/>
+								</Box>
+							</Box>
+						))}
 					</Box>
 				</TabPanel>
 				<TabPanel value="server" activeTab={activeTab} labelledBy="settings-tab-server">
