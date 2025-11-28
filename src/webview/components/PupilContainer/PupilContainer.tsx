@@ -11,7 +11,6 @@ import SimpleBrowserDialog from '../Toolbar/components/SimpleBrowserDialog.js'
 import CreateFileFolderDialog from '../Toolbar/components/CreateFileFolderDialog.js'
 import TranscriptDialog from '../Toolbar/components/TranscriptDialog/TranscriptDialog.js'
 import SettingsDialog from '../Toolbar/components/SettingsDialog.js'
-import BlinkDialog from '../Toolbar/components/BlinkDialog.js'
 import useDialog from './hooks/useDialog.js'
 import useRadialPreference from './hooks/useRadialPreference.js'
 import useKeyMappings from './hooks/useKeyMappings.js'
@@ -35,12 +34,10 @@ const PupilContainer = () => {
 		openFileFolderDialog,
 		openTranscriptDialog,
 		openSettingsDialog,
-		openBlinkDialog,
 		setOpenSimpleBrowserDialog,
 		setOpenFileFolderDialog,
 		setOpenTranscriptDialog,
-		setOpenSettingsDialog,
-		setOpenBlinkDialog
+		setOpenSettingsDialog
 	} = useDialog()
 
 	const {
@@ -64,7 +61,9 @@ const PupilContainer = () => {
 		highlightGapMs,
 		setHighlightDelayMs,
 		sectionGuideMode,
-		setSectionGuideMode
+		setSectionGuideMode,
+		hideEditorOnFocusChange,
+		setHideEditorOnFocusChange
 	} = usePupilEditorContainer(
 		setOpenSimpleBrowserDialog,
 		setOpenFileFolderDialog,
@@ -123,7 +122,6 @@ const PupilContainer = () => {
 					openFileFolderDialog={() => setOpenFileFolderDialog(true)}
 					openTranscriptDialog={() => setOpenTranscriptDialog(true)}
 					openSettingsDialog={() => setOpenSettingsDialog(true)}
-					openBlinkDialog={() => setOpenBlinkDialog(true)}
 				/>
 				<PupilKeyboard
 					onInput={handleKeyboardInput}
@@ -174,8 +172,11 @@ const PupilContainer = () => {
 					onKeyMappingChange={handleKeyMappingChange}
 					voiceCommandsSettings={voiceCommandsSettings}
 					onVoiceCommandsSettingsChange={updateVoiceCommandsSettings}
+					hideEditorOnFocusChange={hideEditorOnFocusChange}
+					onHideEditorOnFocusChangeToggle={() =>
+						setHideEditorOnFocusChange(!hideEditorOnFocusChange)
+					}
 				/>
-				<BlinkDialog open={openBlinkDialog} onClose={() => setOpenBlinkDialog(false)} />
 			</div>
 		</ThemeProvider>
 	)

@@ -90,8 +90,6 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 			return
 		}
 
-		console.log('Handling voice command:', command)
-
 		// Map voice commands to webview messages
 		switch (command) {
 			case 'open-simple-browser':
@@ -225,6 +223,16 @@ export class PupilEditorProvider implements vscode.CustomTextEditorProvider {
 					}
 					if (message.type === 'terminal-hide') {
 						vscode.window.activeTerminal?.hide()
+					}
+					if (message.type === 'terminal-show') {
+						if (vscode.window.activeTerminal) {
+							vscode.window.activeTerminal.show(false)
+						}
+					}
+					if (message.type === 'terminal-minimize') {
+						if (vscode.window.activeTerminal) {
+							vscode.window.activeTerminal.show(false)
+						}
 					}
 					if (message.type === 'terminal-list') {
 						this.getTerminals(webviewPanel)

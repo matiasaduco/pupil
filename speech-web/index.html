@@ -34,7 +34,7 @@
 					<a
 						href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API#browser_compatibility"
 						target="_blank"
-						>MDN Web Docs</a
+						>MDN Web Docs </a
 					>.
 				</p>
 			</div>
@@ -422,10 +422,6 @@
 						// Count blinks on state change (from open to closed)
 						if (blinked && !previousBlinkState) {
 							updateBlinkRate()
-							console.log(
-								`🔴 ¡PARPADEO DETECTADO! (Left EAR: ${leftEAR.toFixed(3)}, Right EAR: ${rightEAR.toFixed(3)})`
-							)
-
 							// Send blink event immediately
 							if (ws.readyState === WebSocket.OPEN) {
 								const blinkMessage = {
@@ -439,7 +435,6 @@
 										timestamp: Date.now()
 									}
 								}
-								console.log('📤 Enviando mensaje de parpadeo por WebSocket:', blinkMessage)
 								ws.send(JSON.stringify(blinkMessage))
 							} else {
 								console.warn('⚠️ WebSocket no está conectado. Estado:', ws.readyState)
@@ -503,7 +498,6 @@
 										timestamp: Date.now()
 									}
 								}
-								console.log('📤 Enviando ojo derecho cerrado:', message)
 								ws.send(JSON.stringify(message))
 							}
 
@@ -518,7 +512,6 @@
 										timestamp: Date.now()
 									}
 								}
-								console.log('📤 Enviando parpadeo largo:', message)
 								ws.send(JSON.stringify(message))
 							}
 						}
@@ -605,7 +598,8 @@
 				recognition.lang = 'es-ES'
 
 				recognition.onresult = (event) => {
-					const transcript = event.results[0][0].transcript
+					const lastResultIndex = event.results.length - 1
+					const transcript = event.results[lastResultIndex][0].transcript
 					resultDiv.textContent = transcript
 
 					// Check for voice commands only if enabled
@@ -671,6 +665,13 @@
 				recognition.onend = () => {
 					micBtn.classList.remove('listening')
 					document.querySelector('.transcript-section').classList.remove('listening')
+					// Reset the transcript display when recognition ends
+					setTimeout(() => {
+						if (!micBtn.classList.contains('listening')) {
+							resultDiv.textContent = 'Presiona el micrófono para comenzar.'
+							resultDiv.style.color = ''
+						}
+					}, 2000)
 				}
 
 				recognition.onerror = (event) => {
@@ -679,7 +680,11 @@
 				}
 
 				micBtn.onclick = () => {
-					recognition.start()
+					if (micBtn.classList.contains('listening')) {
+						recognition.stop()
+					} else {
+						recognition.start()
+					}
 				}
 			}
 

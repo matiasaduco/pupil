@@ -53,11 +53,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 				// Handle voice commands
 				if (data.type === 'voice-command') {
-					console.log('Voice command received:', data.command)
 					pupilEditorProvider.handleVoiceCommand(data.command)
 				} else if (data.type === 'voice-commands-settings') {
 					// Handle voice commands settings from speech-web
-					console.log('Voice commands settings received:', data.settings)
 					pupilEditorProvider.sendMessageToWebview(data)
 				} else {
 					// Handle regular transcripts and other messages

@@ -22,6 +22,7 @@ type UseSectionGuideResult = {
 	isToolbarSectionHighlighted: boolean
 	isSectionGuideActive: boolean
 	handleSectionGuideButtonClick: () => void
+	sectionGuideStopActive: boolean
 }
 
 // Small helper that pauses execution between section transitions
@@ -50,6 +51,7 @@ const useSectionGuide = ({
 	const [sectionGuideTarget, setSectionGuideTarget] = useState<SectionTarget | null>(null)
 	const [isToolbarSectionHighlighted, setIsToolbarSectionHighlighted] = useState(false)
 	const sectionGuideRef = useRef(false)
+	const sectionGuideStopActive = isSectionGuideActive || isHighlighting || keyboardHighlighting
 
 	// Wraps boolean state setters to avoid updates after unmount
 	const safeUpdateBoolean = useCallback(
@@ -211,7 +213,8 @@ const useSectionGuide = ({
 	return {
 		isToolbarSectionHighlighted,
 		isSectionGuideActive,
-		handleSectionGuideButtonClick
+		handleSectionGuideButtonClick,
+		sectionGuideStopActive
 	}
 }
 
