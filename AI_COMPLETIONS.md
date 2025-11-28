@@ -10,14 +10,12 @@ The extension automatically detects and uses the best available completion servi
    - ✅ Uses your existing Copilot subscription
    - ✅ Best quality completions
    - ✅ No additional setup needed
-   
 2. **Pattern-Based (Built-in)** - Works immediately
    - ✅ No setup required
    - ✅ Fast and reliable
    - ✅ Context-aware suggestions
    - ✅ Recognizes 15+ function patterns
    - ✅ Works offline
-   
 3. **Ollama (Optional)** - For local AI without Copilot
    - ✅ Local AI, runs on your machine
    - ✅ Fast, private, no internet required
@@ -36,6 +34,7 @@ Nothing to do! The extension automatically detects and uses Copilot if you have 
 For the best experience, install Ollama locally:
 
 #### Windows
+
 1. Download from https://ollama.ai/download
 2. Run the installer
 3. Open PowerShell and run:
@@ -45,6 +44,7 @@ For the best experience, install Ollama locally:
    ```
 
 #### Mac
+
 ```bash
 brew install ollama
 ollama pull codellama:7b
@@ -52,6 +52,7 @@ ollama serve
 ```
 
 #### Linux
+
 ```bash
 curl -fsSL https://ollama.ai/install.sh | sh
 ollama pull codellama:7b
@@ -73,6 +74,7 @@ If you have an OpenAI API key, you can configure it:
 ## Checking What's Running
 
 Open the browser console in the webview to see the completion mode:
+
 - `✓ AI completions enabled: VS Code Copilot` - Using your Copilot subscription
 - `✓ AI completions enabled: Ollama (CodeLlama)` - Using local AI
 - `⚠ No AI services available` - Using pattern-based (still works great!)

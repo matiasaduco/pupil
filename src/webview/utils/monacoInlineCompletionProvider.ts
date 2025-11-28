@@ -21,8 +21,7 @@ export class MonacoInlineCompletionProvider implements monaco.languages.InlineCo
 	}
 	provideInlineCompletions(
 		model: monaco.editor.ITextModel,
-		position: monaco.Position,
-		context: monaco.languages.InlineCompletionContext
+		position: monaco.Position
 	): monaco.languages.ProviderResult<monaco.languages.InlineCompletions> {
 		try {
 			const lineContent = model.getLineContent(position.lineNumber)

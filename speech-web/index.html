@@ -48,7 +48,7 @@
 					<h3>Comandos de Voz</h3>
 					<div class="commands-header">
 						<label class="toggle-switch">
-							<input type="checkbox" id="commands-enabled" checked>
+							<input type="checkbox" id="commands-enabled" checked />
 							<span class="toggle-slider"></span>
 						</label>
 						<span class="commands-status">Comandos habilitados</span>
@@ -117,37 +117,37 @@
 
 			// Voice commands configuration
 			const VOICE_COMMANDS = [
-				{ 
+				{
 					id: 'open-simple-browser',
-					patterns: ['abrir simple browser', 'abrir navegador', 'abrir browser'], 
+					patterns: ['abrir simple browser', 'abrir navegador', 'abrir browser'],
 					type: 'open-simple-browser',
 					label: 'Abrir Simple Browser',
 					description: 'Abre el diálogo de Simple Browser'
 				},
-				{ 
+				{
 					id: 'open-create-dialog',
-					patterns: ['crear archivo', 'nuevo archivo', 'crear carpeta', 'nueva carpeta'], 
+					patterns: ['crear archivo', 'nuevo archivo', 'crear carpeta', 'nueva carpeta'],
 					type: 'open-create-dialog',
 					label: 'Crear Archivo/Carpeta',
 					description: 'Abre el diálogo de creación'
 				},
-				{ 
+				{
 					id: 'open-terminal',
-					patterns: ['abrir terminal', 'mostrar terminal'], 
+					patterns: ['abrir terminal', 'mostrar terminal'],
 					type: 'open-terminal',
 					label: 'Abrir Terminal',
 					description: 'Abre la terminal integrada'
 				},
-				{ 
+				{
 					id: 'save-document',
-					patterns: ['guardar archivo', 'guardar documento', 'guardar'], 
+					patterns: ['guardar archivo', 'guardar documento', 'guardar'],
 					type: 'save-document',
 					label: 'Guardar Documento',
 					description: 'Guarda el documento actual'
 				},
-				{ 
+				{
 					id: 'open-settings',
-					patterns: ['abrir configuración', 'abrir ajustes', 'configuración'], 
+					patterns: ['abrir configuración', 'abrir ajustes', 'configuración'],
 					type: 'open-settings',
 					label: 'Abrir Configuración',
 					description: 'Abre el diálogo de configuración'
@@ -165,7 +165,7 @@
 					enabled: true,
 					commands: {}
 				}
-				VOICE_COMMANDS.forEach(cmd => {
+				VOICE_COMMANDS.forEach((cmd) => {
 					defaultSettings.commands[cmd.id] = true
 				})
 				return defaultSettings
@@ -176,10 +176,12 @@
 				localStorage.setItem('voiceCommandsSettings', JSON.stringify(settings))
 				// Notify extension about the change
 				if (ws.readyState === WebSocket.OPEN) {
-					ws.send(JSON.stringify({ 
-						type: 'voice-commands-settings', 
-						settings: settings 
-					}))
+					ws.send(
+						JSON.stringify({
+							type: 'voice-commands-settings',
+							settings: settings
+						})
+					)
 				}
 			}
 
@@ -188,27 +190,27 @@
 			// Populate commands list
 			function populateCommandsList() {
 				commandsList.innerHTML = ''
-				VOICE_COMMANDS.forEach(cmd => {
+				VOICE_COMMANDS.forEach((cmd) => {
 					const commandItem = document.createElement('div')
 					commandItem.className = 'command-item'
-					
+
 					const commandInfo = document.createElement('div')
 					commandInfo.className = 'command-info'
-					
+
 					const commandLabel = document.createElement('div')
 					commandLabel.className = 'command-label'
 					commandLabel.textContent = cmd.label
-					
+
 					const commandDesc = document.createElement('div')
 					commandDesc.className = 'command-description'
 					commandDesc.textContent = `Frases: ${cmd.patterns.join(', ')}`
-					
+
 					commandInfo.appendChild(commandLabel)
 					commandInfo.appendChild(commandDesc)
-					
+
 					const toggleLabel = document.createElement('label')
 					toggleLabel.className = 'toggle-switch small'
-					
+
 					const toggleInput = document.createElement('input')
 					toggleInput.type = 'checkbox'
 					toggleInput.checked = commandsSettings.commands[cmd.id] !== false
@@ -216,27 +218,31 @@
 						commandsSettings.commands[cmd.id] = toggleInput.checked
 						saveCommandsSettings(commandsSettings)
 					}
-					
+
 					const toggleSlider = document.createElement('span')
 					toggleSlider.className = 'toggle-slider'
-					
+
 					toggleLabel.appendChild(toggleInput)
 					toggleLabel.appendChild(toggleSlider)
-					
+
 					commandItem.appendChild(commandInfo)
 					commandItem.appendChild(toggleLabel)
-					
+
 					commandsList.appendChild(commandItem)
 				})
 			}
 
 			// Initialize commands toggle
 			commandsEnabledToggle.checked = commandsSettings.enabled
-			commandsStatusSpan.textContent = commandsSettings.enabled ? 'Comandos habilitados' : 'Comandos deshabilitados'
+			commandsStatusSpan.textContent = commandsSettings.enabled
+				? 'Comandos habilitados'
+				: 'Comandos deshabilitados'
 
 			commandsEnabledToggle.onchange = () => {
 				commandsSettings.enabled = commandsEnabledToggle.checked
-				commandsStatusSpan.textContent = commandsSettings.enabled ? 'Comandos habilitados' : 'Comandos deshabilitados'
+				commandsStatusSpan.textContent = commandsSettings.enabled
+					? 'Comandos habilitados'
+					: 'Comandos deshabilitados'
 				saveCommandsSettings(commandsSettings)
 			}
 
@@ -294,7 +300,7 @@
 				videoElement.play()
 				videoElement.width = VIDEO_SIZE
 				videoElement.height = VIDEO_SIZE
-				
+
 				canvasElement.width = VIDEO_SIZE
 				canvasElement.height = VIDEO_SIZE
 
@@ -315,7 +321,7 @@
 				tempBlinkRate = 0
 				blinkRate = 0
 				if (videoElement.srcObject) {
-					videoElement.srcObject.getTracks().forEach(track => track.stop())
+					videoElement.srcObject.getTracks().forEach((track) => track.stop())
 				}
 				blinkStateSpan.textContent = 'Inactivo'
 				blinkRateSpan.textContent = '0'
@@ -352,7 +358,7 @@
 
 			async function getBlinkPrediction() {
 				if (!rendering) return null
-				
+
 				try {
 					// Draw video frame to canvas
 					canvasCtx.save()
@@ -365,7 +371,7 @@
 						flipHorizontal: false,
 						predictIrises: true
 					})
-					
+
 					// Draw detection status
 					canvasCtx.fillStyle = predictions.length > 0 ? '#4caf50' : '#f44336'
 					canvasCtx.font = 'bold 16px Arial'
@@ -376,51 +382,53 @@
 
 					if (predictions.length > 0) {
 						const prediction = predictions[0]
-						
+
 						// Use annotations like blink.js
 						const lowerRight = prediction.annotations.rightEyeUpper0
 						const upperRight = prediction.annotations.rightEyeLower0
 						const rightEAR = getEAR(upperRight, lowerRight)
-						
+
 						const lowerLeft = prediction.annotations.leftEyeUpper0
 						const upperLeft = prediction.annotations.leftEyeLower0
 						const leftEAR = getEAR(upperLeft, lowerLeft)
-						
+
 						// Draw eye landmarks for visualization
 						canvasCtx.fillStyle = '#ff0000'
-						upperRight.forEach(point => {
+						upperRight.forEach((point) => {
 							canvasCtx.beginPath()
 							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
 							canvasCtx.fill()
 						})
-						lowerRight.forEach(point => {
+						lowerRight.forEach((point) => {
 							canvasCtx.beginPath()
 							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
 							canvasCtx.fill()
 						})
-						
+
 						canvasCtx.fillStyle = '#0000ff'
-						upperLeft.forEach(point => {
+						upperLeft.forEach((point) => {
 							canvasCtx.beginPath()
 							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
 							canvasCtx.fill()
 						})
-						lowerLeft.forEach(point => {
+						lowerLeft.forEach((point) => {
 							canvasCtx.beginPath()
 							canvasCtx.arc(point[0], point[1], 2, 0, 2 * Math.PI)
 							canvasCtx.fill()
 						})
 
 						const blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD
-						
+
 						// Count blinks on state change (from open to closed)
 						if (blinked && !previousBlinkState) {
 							updateBlinkRate()
-							console.log(`🔴 ¡PARPADEO DETECTADO! (Left EAR: ${leftEAR.toFixed(3)}, Right EAR: ${rightEAR.toFixed(3)})`)
-							
+							console.log(
+								`🔴 ¡PARPADEO DETECTADO! (Left EAR: ${leftEAR.toFixed(3)}, Right EAR: ${rightEAR.toFixed(3)})`
+							)
+
 							// Send blink event immediately
 							if (ws.readyState === WebSocket.OPEN) {
-								const blinkMessage = { 
+								const blinkMessage = {
 									type: 'blink-detected',
 									data: {
 										blink: true,
@@ -449,7 +457,7 @@
 							leftEAR: leftEAR.toFixed(3),
 							rightEAR: rightEAR.toFixed(3)
 						}
-						
+
 						// Draw EAR values on canvas
 						canvasCtx.fillStyle = '#ffffff'
 						canvasCtx.font = 'bold 14px Arial'
@@ -461,7 +469,7 @@
 						canvasCtx.fillText(`Threshold: ${EAR_THRESHOLD}`, 10, 100)
 						canvasCtx.strokeText(`Rate: ${event.rate}/min`, 10, 120)
 						canvasCtx.fillText(`Rate: ${event.rate}/min`, 10, 120)
-						
+
 						canvasCtx.fillStyle = event.blink ? '#00ff00' : '#ffffff'
 						canvasCtx.strokeText(`Blink: ${event.blink ? 'YES' : 'NO'}`, 10, 140)
 						canvasCtx.fillText(`Blink: ${event.blink ? 'YES' : 'NO'}`, 10, 140)
@@ -476,7 +484,7 @@
 						if (ws.readyState === WebSocket.OPEN) {
 							// Send on left eye close (wink left)
 							if (event.left && !event.right) {
-								const message = { 
+								const message = {
 									type: 'left-eye-closed',
 									data: {
 										leftEAR: event.leftEAR,
@@ -485,10 +493,10 @@
 								}
 								ws.send(JSON.stringify(message))
 							}
-							
+
 							// Send on right eye close (wink right)
 							if (event.right && !event.left) {
-								const message = { 
+								const message = {
 									type: 'right-eye-closed',
 									data: {
 										rightEAR: event.rightEAR,
@@ -498,10 +506,10 @@
 								console.log('📤 Enviando ojo derecho cerrado:', message)
 								ws.send(JSON.stringify(message))
 							}
-							
+
 							// Send on long blink detection
 							if (event.longBlink) {
-								const message = { 
+								const message = {
 									type: 'long-blink-detected',
 									data: {
 										longBlink: true,
@@ -540,19 +548,19 @@
 						rendering = true
 						blinkBtn.textContent = '⏸️ Detener Detección'
 						blinkBtn.classList.add('active')
-						
+
 						if (!model) {
 							await loadModel()
 						}
-						
+
 						if (!model) {
 							throw new Error('No se pudo cargar el modelo')
 						}
-						
+
 						await setUpCamera()
-						
+
 						console.log('Iniciando detección...')
-						
+
 						// Start prediction loop
 						const predict = async () => {
 							if (rendering) {
@@ -596,91 +604,95 @@
 				recognition.continuous = true
 				recognition.lang = 'es-ES'
 
-			recognition.onresult = (event) => {
-				const transcript = event.results[0][0].transcript
-				resultDiv.textContent = transcript
+				recognition.onresult = (event) => {
+					const transcript = event.results[0][0].transcript
+					resultDiv.textContent = transcript
 
-				// Check for voice commands only if enabled
-				if (!commandsSettings.enabled) {
-					// Send as regular transcript
+					// Check for voice commands only if enabled
+					if (!commandsSettings.enabled) {
+						// Send as regular transcript
+						if (ws.readyState === WebSocket.OPEN) {
+							ws.send(JSON.stringify({ type: 'transcript', content: transcript }))
+						}
+						return
+					}
+
+					const lowerTranscript = transcript.toLowerCase()
+					let commandDetected = false
+					let commandType = null
+					let matchedCommand = null
+
+					// Check if any command pattern matches and if that command is enabled
+					for (const command of VOICE_COMMANDS) {
+						// Skip if command is disabled
+						if (commandsSettings.commands[command.id] === false) {
+							continue
+						}
+
+						if (command.patterns.some((pattern) => lowerTranscript.includes(pattern))) {
+							commandDetected = true
+							commandType = command.type
+							matchedCommand = command
+							break
+						}
+					}
+
 					if (ws.readyState === WebSocket.OPEN) {
-						ws.send(JSON.stringify({ type: 'transcript', content: transcript }))
-					}
-					return
-				}
+						if (commandDetected) {
+							// Send command message
+							ws.send(
+								JSON.stringify({
+									type: 'voice-command',
+									command: commandType,
+									transcript: transcript,
+									commandLabel: matchedCommand.label
+								})
+							)
+							resultDiv.textContent = `✓ Comando detectado: ${matchedCommand.label}`
+							resultDiv.style.color = '#4caf50'
 
-				const lowerTranscript = transcript.toLowerCase()
-				let commandDetected = false
-				let commandType = null
-				let matchedCommand = null
-
-				// Check if any command pattern matches and if that command is enabled
-				for (const command of VOICE_COMMANDS) {
-					// Skip if command is disabled
-					if (commandsSettings.commands[command.id] === false) {
-						continue
-					}
-					
-					if (command.patterns.some(pattern => lowerTranscript.includes(pattern))) {
-						commandDetected = true
-						commandType = command.type
-						matchedCommand = command
-						break
-					}
-				}
-
-				if (ws.readyState === WebSocket.OPEN) {
-					if (commandDetected) {
-						// Send command message
-						ws.send(JSON.stringify({ 
-							type: 'voice-command', 
-							command: commandType, 
-							transcript: transcript,
-							commandLabel: matchedCommand.label
-						}))
-						resultDiv.textContent = `✓ Comando detectado: ${matchedCommand.label}`
-						resultDiv.style.color = '#4caf50'
-						
-						// Reset color after 2 seconds
-						setTimeout(() => {
-							resultDiv.style.color = ''
-						}, 2000)
-					} else {
-						// Send regular transcript
-						ws.send(JSON.stringify({ type: 'transcript', content: transcript }))
+							// Reset color after 2 seconds
+							setTimeout(() => {
+								resultDiv.style.color = ''
+							}, 2000)
+						} else {
+							// Send regular transcript
+							ws.send(JSON.stringify({ type: 'transcript', content: transcript }))
+						}
 					}
 				}
-			}
 
-			recognition.onstart = () => {
-				micBtn.classList.add('listening')
-				document.querySelector('.transcript-section').classList.add('listening')
-				resultDiv.textContent = 'Escuchando...'
-			}
+				recognition.onstart = () => {
+					micBtn.classList.add('listening')
+					document.querySelector('.transcript-section').classList.add('listening')
+					resultDiv.textContent = 'Escuchando...'
+				}
 
-			recognition.onend = () => {
-				micBtn.classList.remove('listening')
-				document.querySelector('.transcript-section').classList.remove('listening')
-			}
+				recognition.onend = () => {
+					micBtn.classList.remove('listening')
+					document.querySelector('.transcript-section').classList.remove('listening')
+				}
 
-			recognition.onerror = (event) => {
-				resultDiv.textContent = 'Error: ' + event.error
-				resultDiv.classList.add('error')
-			}
+				recognition.onerror = (event) => {
+					resultDiv.textContent = 'Error: ' + event.error
+					resultDiv.classList.add('error')
+				}
 
-			micBtn.onclick = () => {
-				recognition.start()
-			}
+				micBtn.onclick = () => {
+					recognition.start()
+				}
 			}
 
 			ws.onopen = () => {
 				console.log('Connected to WebSocket')
 				updateStatus(true)
 				// Send current settings to extension
-				ws.send(JSON.stringify({ 
-					type: 'voice-commands-settings', 
-					settings: commandsSettings 
-				}))
+				ws.send(
+					JSON.stringify({
+						type: 'voice-commands-settings',
+						settings: commandsSettings
+					})
+				)
 			}
 
 			ws.onclose = () => {
@@ -709,10 +721,12 @@
 				if (message.type === 'update-voice-commands-settings') {
 					commandsSettings = message.settings
 					saveCommandsSettings(commandsSettings)
-					
+
 					// Update UI
 					commandsEnabledToggle.checked = commandsSettings.enabled
-					commandsStatusSpan.textContent = commandsSettings.enabled ? 'Comandos habilitados' : 'Comandos deshabilitados'
+					commandsStatusSpan.textContent = commandsSettings.enabled
+						? 'Comandos habilitados'
+						: 'Comandos deshabilitados'
 					populateCommandsList()
 				}
 			}

@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			ws.on('message', (message: Buffer) => {
 				const data = JSON.parse(message.toString())
-				
+
 				// Handle voice commands
 				if (data.type === 'voice-command') {
 					console.log('Voice command received:', data.command)

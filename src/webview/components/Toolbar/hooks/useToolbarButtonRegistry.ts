@@ -29,15 +29,12 @@ const useToolbarButtonRegistry = (): ToolbarButtonRegistry => {
 		buttonIdsRef.current = []
 	}, [])
 
-	const nextButtonId = useCallback(
-		(base?: string) => {
-			const semantic = sanitizeId(base)
-			const id = semantic ? `toolbar-button-${semantic}` : `toolbar-button-${++counterRef.current}`
-			buttonIdsRef.current.push(id)
-			return id
-		},
-		[]
-	)
+	const nextButtonId = useCallback((base?: string) => {
+		const semantic = sanitizeId(base)
+		const id = semantic ? `toolbar-button-${semantic}` : `toolbar-button-${++counterRef.current}`
+		buttonIdsRef.current.push(id)
+		return id
+	}, [])
 
 	return {
 		nextButtonId,
