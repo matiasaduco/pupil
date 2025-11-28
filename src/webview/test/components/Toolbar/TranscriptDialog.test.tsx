@@ -46,12 +46,9 @@ vi.mock('@mui/material', () => ({
 	),
 	TextField: ({
 		inputRef,
-		multiline,
 		rows,
 		value,
 		placeholder,
-		variant,
-		fullWidth,
 		InputProps
 	}: {
 		inputRef?: React.Ref<HTMLTextAreaElement>

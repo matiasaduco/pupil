@@ -283,8 +283,8 @@ const SettingsDialog = ({
 				<TabPanel value="general" activeTab={activeTab} labelledBy="settings-tab-general">
 					<p>Aquí puedes configurar las opciones de Pupil.</p>
 					<p>
-						Por ahora está disponible la opción de iniciar y detener el servidor de reconocimiento de
-						voz.
+						Por ahora está disponible la opción de iniciar y detener el servidor de reconocimiento
+						de voz.
 					</p>
 					<FormControlLabel
 						control={<Switch checked={radialEnabled} onChange={onToggleRadial} color="primary" />}
@@ -304,7 +304,8 @@ const SettingsDialog = ({
 							}
 						/>
 						<Typography variant="caption" color="text.secondary">
-							Intervalo actual: {highlightDelayMs} ms (pausa {Math.round(highlightDelayMs * 0.25)} ms)
+							Intervalo actual: {highlightDelayMs} ms (pausa {Math.round(highlightDelayMs * 0.25)}{' '}
+							ms)
 						</Typography>
 					</FormControl>
 					<FormControl component="fieldset">
@@ -336,7 +337,8 @@ const SettingsDialog = ({
 					>
 						<Typography variant="subtitle1">Mapeo de teclas</Typography>
 						<Typography variant="body2" color="text.secondary">
-							Personaliza los atajos principales para usar Pupil de la forma que te resulte más cómoda.
+							Personaliza los atajos principales para usar Pupil de la forma que te resulte más
+							cómoda.
 						</Typography>
 						{listeningLabel && (
 							<Typography variant="caption" color="primary" role="status">
@@ -394,9 +396,14 @@ const SettingsDialog = ({
 						</Box>
 					</Box>
 				</TabPanel>
-				<TabPanel value="voice-commands" activeTab={activeTab} labelledBy="settings-tab-voice-commands">
+				<TabPanel
+					value="voice-commands"
+					activeTab={activeTab}
+					labelledBy="settings-tab-voice-commands"
+				>
 					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-						Configura los comandos de voz que quieres usar. Los comandos habilitados se ejecutarán automáticamente cuando se detecten en el reconocimiento de voz.
+						Configura los comandos de voz que quieres usar. Los comandos habilitados se ejecutarán
+						automáticamente cuando se detecten en el reconocimiento de voz.
 					</Typography>
 					<FormControlLabel
 						control={
@@ -433,12 +440,18 @@ const SettingsDialog = ({
 									}
 								}}
 							>
-								<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+								<Box
+									sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+								>
 									<Box sx={{ flex: 1 }}>
 										<Typography variant="body2" sx={{ fontWeight: 500 }}>
 											{cmd.label}
 										</Typography>
-										<Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+										<Typography
+											variant="caption"
+											color="text.secondary"
+											sx={{ fontStyle: 'italic' }}
+										>
 											Frases: {cmd.patterns.join(', ')}
 										</Typography>
 									</Box>
