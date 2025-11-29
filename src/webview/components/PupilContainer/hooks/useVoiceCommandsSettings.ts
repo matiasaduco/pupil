@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useVsCodeApi } from '@webview/contexts/VsCodeApiContext.js'
+import { safeLocalStorage } from '@webview/utils/safeLocalStorage.js'
 
 type VoiceCommandsSettings = {
 	enabled: boolean
@@ -19,7 +20,7 @@ const useVoiceCommandsSettings = () => {
 
 	const [voiceCommandsSettings, setVoiceCommandsSettings] = useState<VoiceCommandsSettings>(() => {
 		// Try to load from localStorage (synced from speech-web)
-		const saved = localStorage.getItem('voiceCommandsSettings')
+		const saved = safeLocalStorage.getItem('voiceCommandsSettings')
 		if (saved) {
 			try {
 				return JSON.parse(saved)
@@ -44,7 +45,7 @@ const useVoiceCommandsSettings = () => {
 		const handleMessage = (event: MessageEvent) => {
 			if (event.data.type === 'voice-commands-settings') {
 				setVoiceCommandsSettings(event.data.settings)
-				localStorage.setItem('voiceCommandsSettings', JSON.stringify(event.data.settings))
+				safeLocalStorage.setItem('voiceCommandsSettings', JSON.stringify(event.data.settings))
 			}
 		}
 
@@ -54,7 +55,7 @@ const useVoiceCommandsSettings = () => {
 
 	const updateVoiceCommandsSettings = (settings: VoiceCommandsSettings) => {
 		setVoiceCommandsSettings(settings)
-		localStorage.setItem('voiceCommandsSettings', JSON.stringify(settings))
+		safeLocalStorage.setItem('voiceCommandsSettings', JSON.stringify(settings))
 
 		// Send to extension to propagate to speech-web
 		vscode.postMessage({

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { SvgIconTypeMap } from '@mui/material'
 import { OverridableComponent } from '@mui/material/OverridableComponent'
 import { ReactElement } from 'react'
+import { safeLocalStorage } from '@webview/utils/safeLocalStorage.js'
 
 type GeneralShortcut = {
 	tooltipTitle: string
@@ -44,7 +45,7 @@ const useDragAndDrop = ({
 	terminalShortcuts
 }: UseDragAndDropProps): UseDragAndDropReturn => {
 	const [orderedGeneralShortcuts, setOrderedGeneralShortcuts] = useState<GeneralShortcut[]>(() => {
-		const saved = localStorage.getItem('pupil-toolbar-general')
+		const saved = safeLocalStorage.getItem('pupil-toolbar-general')
 		if (saved) {
 			try {
 				const savedOrder: string[] = JSON.parse(saved)
@@ -64,7 +65,7 @@ const useDragAndDrop = ({
 	})
 
 	const [orderedEditorShortcuts, setOrderedEditorShortcuts] = useState<ShortcutItem[]>(() => {
-		const saved = localStorage.getItem('pupil-toolbar-editor')
+		const saved = safeLocalStorage.getItem('pupil-toolbar-editor')
 		if (saved) {
 			try {
 				const savedOrder: string[] = JSON.parse(saved)
@@ -89,7 +90,7 @@ const useDragAndDrop = ({
 	})
 
 	const [orderedTerminalShortcuts, setOrderedTerminalShortcuts] = useState<ShortcutItem[]>(() => {
-		const saved = localStorage.getItem('pupil-toolbar-terminal')
+		const saved = safeLocalStorage.getItem('pupil-toolbar-terminal')
 		if (saved) {
 			try {
 				const savedOrder: string[] = JSON.parse(saved)
@@ -118,21 +119,21 @@ const useDragAndDrop = ({
 
 	useEffect(() => {
 		const order = orderedGeneralShortcuts.map((s) => s.label)
-		localStorage.setItem('pupil-toolbar-general', JSON.stringify(order))
+		safeLocalStorage.setItem('pupil-toolbar-general', JSON.stringify(order))
 	}, [orderedGeneralShortcuts])
 
 	useEffect(() => {
 		const order = orderedEditorShortcuts.map((s) =>
 			s.divider ? '__DIVIDER__' : s.value || s.label
 		)
-		localStorage.setItem('pupil-toolbar-editor', JSON.stringify(order))
+		safeLocalStorage.setItem('pupil-toolbar-editor', JSON.stringify(order))
 	}, [orderedEditorShortcuts])
 
 	useEffect(() => {
 		const order = orderedTerminalShortcuts.map((s) =>
 			s.divider ? '__DIVIDER__' : s.value || s.label
 		)
-		localStorage.setItem('pupil-toolbar-terminal', JSON.stringify(order))
+		safeLocalStorage.setItem('pupil-toolbar-terminal', JSON.stringify(order))
 	}, [orderedTerminalShortcuts])
 
 	const handleDragStart = (e: React.DragEvent, index: number, category: Category) => {

@@ -101,7 +101,7 @@ const PupilContainer = () => {
 				<PupilEditor
 					ref={editorRef}
 					keyboardVisible={keyboardVisible}
-					visible={focus === 'editor'}
+					visible={focus === 'editor' || (!hideEditorOnFocusChange && focus === 'terminal')}
 					theme={colorScheme}
 				/>
 				<Toolbar

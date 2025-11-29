@@ -7,6 +7,7 @@ import { useKeyboardFocus } from '@webview/contexts/KeyboardFocusContext.js'
 import EditIcon from '@mui/icons-material/Edit'
 import EditOffIcon from '@mui/icons-material/EditOff'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import { safeLocalStorage } from '@webview/utils/safeLocalStorage.js'
 
 type PupilKeyboardProps = {
 	onInput?: (input: string) => void
@@ -32,7 +33,7 @@ const PupilKeyboard = ({
 }: PupilKeyboardProps) => {
 	const { layout, handleKeyPress, clickedKey } = usePupilKeyboard(onInput)
 	const [orderedLayout, setOrderedLayout] = useState<typeof layout>(() => {
-		const saved = localStorage.getItem('pupil-keyboard-layout')
+		const saved = safeLocalStorage.getItem('pupil-keyboard-layout')
 		if (saved) {
 			try {
 				const savedOrder: Array<{ value: string; label?: string; col?: number }> = JSON.parse(saved)
@@ -65,7 +66,7 @@ const PupilKeyboard = ({
 			label: key.label,
 			col: key.col
 		}))
-		localStorage.setItem('pupil-keyboard-layout', JSON.stringify(serializableLayout))
+		safeLocalStorage.setItem('pupil-keyboard-layout', JSON.stringify(serializableLayout))
 	}, [orderedLayout])
 
 	const handleDragStart = (e: React.DragEvent, index: number) => {
