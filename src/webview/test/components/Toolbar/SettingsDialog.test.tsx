@@ -96,8 +96,8 @@ vi.mock('@mui/material', () => {
 		}) => {
 			const element = control as React.ReactElement<Record<string, unknown>>
 			const controlWithLabel = React.cloneElement(element, {
-				value,
-				checked,
+				value: value ?? element.props?.value,
+				checked: checked ?? element.props?.checked,
 				onChange: onChange ?? element.props?.onChange
 			})
 			return (
@@ -250,7 +250,6 @@ describe('SettingsDialog', () => {
 	const mockOnHighlightDelayChange = vi.fn()
 	const mockOnSectionGuideModeChange = vi.fn()
 	const mockOnKeyMappingChange = vi.fn()
-	const mockOnHideEditorOnFocusChangeToggle = vi.fn()
 	const mockOnHideEditorOnFocusChangeToggle = vi.fn()
 
 	type TestSettingsDialogProps = {
