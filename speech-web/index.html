@@ -114,6 +114,7 @@
 			let previousBlinkState = false
 			const VIDEO_SIZE = 500
 			const EAR_THRESHOLD = 0.27
+			let longBlinkHighlightTimeout = null
 
 			// Voice commands configuration
 			const VOICE_COMMANDS = [
@@ -320,11 +321,19 @@
 				blinkCount = 0
 				tempBlinkRate = 0
 				blinkRate = 0
+				if (longBlinkHighlightTimeout) {
+					clearTimeout(longBlinkHighlightTimeout)
+					longBlinkHighlightTimeout = null
+				}
 				if (videoElement.srcObject) {
 					videoElement.srcObject.getTracks().forEach((track) => track.stop())
 				}
 				blinkStateSpan.textContent = 'Inactivo'
 				blinkRateSpan.textContent = '0'
+				leftEyeIndicator.classList.remove('active')
+				rightEyeIndicator.classList.remove('active')
+				blinkIndicator.classList.remove('active')
+				longBlinkIndicator.classList.remove('active')
 			}
 
 			function updateBlinkRate() {
@@ -418,6 +427,7 @@
 						})
 
 						const blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD
+						const longBlinkDetected = isVoluntaryBlink(blinked)
 
 						// Count blinks on state change (from open to closed)
 						if (blinked && !previousBlinkState) {
@@ -428,7 +438,7 @@
 									type: 'blink-detected',
 									data: {
 										blink: true,
-										longBlink: isVoluntaryBlink(blinked),
+										longBlink: longBlinkDetected,
 										leftEAR: leftEAR.toFixed(3),
 										rightEAR: rightEAR.toFixed(3),
 										rate: blinkRate || 0,
@@ -447,7 +457,7 @@
 							right: rightEAR <= EAR_THRESHOLD,
 							wink: leftEAR <= EAR_THRESHOLD || rightEAR <= EAR_THRESHOLD,
 							blink: blinked,
-							longBlink: isVoluntaryBlink(blinked),
+							longBlink: longBlinkDetected,
 							rate: blinkRate || 0,
 							leftEAR: leftEAR.toFixed(3),
 							rightEAR: rightEAR.toFixed(3)
@@ -473,7 +483,16 @@
 						leftEyeIndicator.classList.toggle('active', event.left)
 						rightEyeIndicator.classList.toggle('active', event.right)
 						blinkIndicator.classList.toggle('active', event.blink)
-						longBlinkIndicator.classList.toggle('active', event.longBlink)
+							if (event.longBlink) {
+								longBlinkIndicator.classList.add('active')
+								if (longBlinkHighlightTimeout) {
+									clearTimeout(longBlinkHighlightTimeout)
+								}
+								longBlinkHighlightTimeout = setTimeout(() => {
+									longBlinkIndicator.classList.remove('active')
+									longBlinkHighlightTimeout = null
+								}, 700)
+							}
 
 						// Send other eye events to WebSocket
 						if (ws.readyState === WebSocket.OPEN) {
