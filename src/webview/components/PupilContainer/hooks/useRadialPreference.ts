@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
+import { safeLocalStorage } from '@webview/utils/safeLocalStorage.js'
 
 const STORAGE_KEY = 'pupil-radial-enabled'
 
 // Reads the persisted radial keyboard state, falling back to true
 const readRadialEnabled = () => {
 	try {
-		const stored = localStorage.getItem(STORAGE_KEY)
+		const stored = safeLocalStorage.getItem(STORAGE_KEY)
 		return stored !== null ? JSON.parse(stored) : true
 	} catch (error) {
 		console.warn('No se pudo leer el estado del teclado radial', error)
@@ -21,7 +22,7 @@ const useRadialPreference = () => {
 	const toggleRadial = useCallback(() => {
 		setRadialEnabled((prev) => {
 			const next = !prev
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+			safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(next))
 			return next
 		})
 	}, [])

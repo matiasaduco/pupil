@@ -4,6 +4,7 @@ import { PupilEditorHandle } from '@webview/types/PupilEditorHandle.js'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ConnectionStatus, ConnectionStatusType } from '../../../../constants.js'
 import { HighlightMode } from '@webview/types/HighlightSettings.js'
+import { safeLocalStorage } from '@webview/utils/safeLocalStorage.js'
 
 type FocusTarget = 'editor' | 'terminal' | 'dialog'
 
@@ -32,7 +33,7 @@ const usePupilContainer = (
 	const [sectionGuideMode, setSectionGuideMode] = useState<HighlightMode>('both')
 	const [highlightDelayMs, setHighlightDelay] = useState(700)
 	const [hideEditorOnFocusChange, setHideEditorOnFocusChange] = useState<boolean>(() => {
-		const saved = localStorage.getItem('pupil-hide-editor-on-focus-change')
+		const saved = safeLocalStorage.getItem('pupil-hide-editor-on-focus-change')
 		return saved ? JSON.parse(saved) : true
 	})
 
@@ -181,7 +182,7 @@ const usePupilContainer = (
 	}, [keyboardVisible])
 
 	useEffect(() => {
-		localStorage.setItem(
+		safeLocalStorage.setItem(
 			'pupil-hide-editor-on-focus-change',
 			JSON.stringify(hideEditorOnFocusChange)
 		)

@@ -5,6 +5,7 @@ import {
 	KeyMappings
 } from '@webview/types/KeyMapping.js'
 import { useCallback, useState } from 'react'
+import { safeLocalStorage } from '@webview/utils/safeLocalStorage.js'
 
 const STORAGE_KEY = 'pupil-key-mappings'
 
@@ -23,7 +24,7 @@ const mergeWithDefaults = (stored: Partial<KeyMappings> = {}): KeyMappings => ({
 // Reads persisted mappings from storage while handling malformed data
 const readKeyMappings = () => {
 	try {
-		const stored = localStorage.getItem(STORAGE_KEY)
+		const stored = safeLocalStorage.getItem(STORAGE_KEY)
 		if (!stored) {
 			return { ...DEFAULT_KEY_MAPPINGS }
 		}
@@ -42,7 +43,7 @@ const useKeyMappings = () => {
 	const handleKeyMappingChange = useCallback((id: KeyMappingId, value: KeyMappingValue) => {
 		setKeyMappings((prev) => {
 			const next = { ...prev, [id]: value }
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+			safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(next))
 			return next
 		})
 	}, [])
