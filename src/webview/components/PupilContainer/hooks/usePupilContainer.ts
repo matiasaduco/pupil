@@ -31,6 +31,10 @@ const usePupilContainer = (
 	const [isKeyboardSectionHighlighted, setKeyboardSectionHighlighted] = useState(false)
 	const [sectionGuideMode, setSectionGuideMode] = useState<HighlightMode>('both')
 	const [highlightDelayMs, setHighlightDelay] = useState(700)
+	const [hideEditorOnFocusChange, setHideEditorOnFocusChange] = useState<boolean>(() => {
+		const saved = localStorage.getItem('pupil-hide-editor-on-focus-change')
+		return saved ? JSON.parse(saved) : true
+	})
 
 	const highlightGapMs = useMemo(
 		() => Math.max(80, Math.round(highlightDelayMs * 0.25)),
@@ -149,10 +153,18 @@ const usePupilContainer = (
 
 	const switchFocus = (current: FocusTarget) => {
 		if (current === 'editor') {
-			vscode.postMessage({ type: 'terminal-open' })
+			if (hideEditorOnFocusChange) {
+				vscode.postMessage({ type: 'terminal-open' })
+			} else {
+				vscode.postMessage({ type: 'terminal-show' })
+			}
 			setFocus('terminal')
 		} else if (current === 'terminal') {
-			vscode.postMessage({ type: 'terminal-hide' })
+			if (hideEditorOnFocusChange) {
+				vscode.postMessage({ type: 'terminal-hide' })
+			} else {
+				vscode.postMessage({ type: 'terminal-minimize' })
+			}
 			setFocus('editor')
 		}
 	}
@@ -167,6 +179,13 @@ const usePupilContainer = (
 			setKeyboardSectionHighlighted(false)
 		}
 	}, [keyboardVisible])
+
+	useEffect(() => {
+		localStorage.setItem(
+			'pupil-hide-editor-on-focus-change',
+			JSON.stringify(hideEditorOnFocusChange)
+		)
+	}, [hideEditorOnFocusChange])
 
 	const handleStartServer = () => {
 		vscode.postMessage({ type: 'start-speech-server' })
@@ -206,7 +225,9 @@ const usePupilContainer = (
 		highlightGapMs,
 		setHighlightDelayMs,
 		sectionGuideMode,
-		setSectionGuideMode
+		setSectionGuideMode,
+		hideEditorOnFocusChange,
+		setHideEditorOnFocusChange
 	}
 }
 

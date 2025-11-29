@@ -250,6 +250,8 @@ describe('SettingsDialog', () => {
 	const mockOnHighlightDelayChange = vi.fn()
 	const mockOnSectionGuideModeChange = vi.fn()
 	const mockOnKeyMappingChange = vi.fn()
+	const mockOnHideEditorOnFocusChangeToggle = vi.fn()
+	const mockOnHideEditorOnFocusChangeToggle = vi.fn()
 
 	type TestSettingsDialogProps = {
 		open: boolean
@@ -268,6 +270,8 @@ describe('SettingsDialog', () => {
 		onSectionGuideModeChange: (mode: 'toolbar' | 'keyboard' | 'both') => void
 		keyMappings: KeyMappings
 		onKeyMappingChange: typeof mockOnKeyMappingChange
+		hideEditorOnFocusChange: boolean
+		onHideEditorOnFocusChangeToggle: () => void
 	}
 
 	const defaultKeyMappings: KeyMappings = {
@@ -295,7 +299,9 @@ describe('SettingsDialog', () => {
 		sectionGuideMode: 'both',
 		onSectionGuideModeChange: mockOnSectionGuideModeChange,
 		keyMappings: defaultKeyMappings,
-		onKeyMappingChange: mockOnKeyMappingChange
+		onKeyMappingChange: mockOnKeyMappingChange,
+		hideEditorOnFocusChange: true,
+		onHideEditorOnFocusChangeToggle: mockOnHideEditorOnFocusChangeToggle
 	}
 
 	const renderSettingsDialog = (props: Partial<TestSettingsDialogProps> = {}) => {
@@ -317,6 +323,7 @@ describe('SettingsDialog', () => {
 		mockOnHighlightDelayChange.mockClear()
 		mockOnSectionGuideModeChange.mockClear()
 		mockOnKeyMappingChange.mockClear()
+		mockOnHideEditorOnFocusChangeToggle.mockClear()
 	})
 
 	it('renders dialog when open is true', () => {
@@ -502,5 +509,22 @@ describe('SettingsDialog', () => {
 			button: 2,
 			label: 'Botón derecho del mouse'
 		})
+	})
+
+	it('renders hide editor on focus change switch', () => {
+		renderSettingsDialog()
+
+		const hideEditorSwitch = screen.getByLabelText('Ocultar Editor al cambiar foco a Terminal')
+		expect(hideEditorSwitch).toBeInTheDocument()
+		expect(hideEditorSwitch).toBeChecked()
+	})
+
+	it('calls onHideEditorOnFocusChangeToggle when switch is toggled', () => {
+		renderSettingsDialog()
+
+		const hideEditorSwitch = screen.getByLabelText('Ocultar Editor al cambiar foco a Terminal')
+		fireEvent.click(hideEditorSwitch)
+
+		expect(mockOnHideEditorOnFocusChangeToggle).toHaveBeenCalled()
 	})
 })

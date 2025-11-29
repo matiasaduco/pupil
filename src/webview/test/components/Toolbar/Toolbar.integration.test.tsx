@@ -261,7 +261,6 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
-						openBlinkDialog={vi.fn()}
 						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
@@ -367,7 +366,6 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={mockOpenSettingsDialog}
-						openBlinkDialog={vi.fn()}
 						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
@@ -401,7 +399,6 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
-						openBlinkDialog={vi.fn()}
 						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>
@@ -434,7 +431,6 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
-						openBlinkDialog={vi.fn()}
 						highlightConfirmKey={{
 							key: '',
 							code: '',
@@ -464,7 +460,6 @@ describe('Toolbar Integration', () => {
 						openFileFolderDialog={vi.fn()}
 						openTranscriptDialog={vi.fn()}
 						openSettingsDialog={vi.fn()}
-						openBlinkDialog={vi.fn()}
 						highlightConfirmKey={DEFAULT_KEY_MAPPINGS.highlightSequence}
 					/>
 				</KeyboardFocusProvider>

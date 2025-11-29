@@ -38,7 +38,13 @@ greet('World');
 					console.log('Mock: terminal OPEN')
 					break
 				case 'terminal-hide':
-					console.log('Mock: terminal OPEN')
+					console.log('Mock: terminal HIDE')
+					break
+				case 'terminal-show':
+					console.log('Mock: terminal SHOW')
+					break
+				case 'terminal-minimize':
+					console.log('Mock: terminal MINIMIZE')
 					break
 				case 'terminal-list':
 					window.postMessage({

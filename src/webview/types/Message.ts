@@ -15,6 +15,7 @@ type MessageType =
 	| 'terminal-enter'
 	| 'terminal-clear'
 	| 'terminal-hide'
+	| 'terminal-minimize'
 	| 'terminal-list'
 	| 'terminal-show'
 	| 'openSimpleBrowser'

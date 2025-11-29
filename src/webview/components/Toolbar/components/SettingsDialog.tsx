@@ -102,6 +102,8 @@ type SettingsDialogProps = {
 	onKeyMappingChange: (id: KeyMappingId, value: KeyMappingValue) => void
 	voiceCommandsSettings?: VoiceCommandsSettings
 	onVoiceCommandsSettingsChange?: (settings: VoiceCommandsSettings) => void
+	hideEditorOnFocusChange: boolean
+	onHideEditorOnFocusChangeToggle: () => void
 }
 
 const VOICE_COMMANDS: VoiceCommand[] = [
@@ -152,7 +154,9 @@ const SettingsDialog = ({
 	keyMappings,
 	onKeyMappingChange,
 	voiceCommandsSettings,
-	onVoiceCommandsSettingsChange
+	onVoiceCommandsSettingsChange,
+	hideEditorOnFocusChange,
+	onHideEditorOnFocusChangeToggle
 }: SettingsDialogProps) => {
 	const isConnected = connectionStatus.value === 'connected'
 	const isConnecting = connectionStatus.value === 'connecting'
@@ -289,6 +293,16 @@ const SettingsDialog = ({
 					<FormControlLabel
 						control={<Switch checked={radialEnabled} onChange={onToggleRadial} color="primary" />}
 						label="Activar Teclado Radial"
+					/>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={hideEditorOnFocusChange}
+								onChange={onHideEditorOnFocusChangeToggle}
+								color="primary"
+							/>
+						}
+						label="Ocultar Editor al cambiar foco a Terminal"
 					/>
 					<FormControl component="fieldset">
 						<FormLabel component="legend">Velocidad de iluminación</FormLabel>
